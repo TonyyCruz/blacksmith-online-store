@@ -120,6 +120,13 @@ public class BlacksmithControllerTest extends TestBase {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content.length()").value(1));
+      searchUrl = BLACKSMITH_BASE_URL + "/search?name=" + "e";
+      mockMvc.perform(get(searchUrl)
+              .contentType(MediaType.APPLICATION_JSON)
+              .header("Authorization", userToken))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content.length()").value(2));
     }
   }
 
@@ -156,6 +163,38 @@ public class BlacksmithControllerTest extends TestBase {
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
           .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Create blacksmith throws exception when name is invalid")
+    void createBlacksmith_throwsExceptionWhenNameIsInvalid() throws Exception {
+      String[] invalidNames = {"", "  ", "A", null};
+      for (String invalidName : invalidNames) {
+        String valueAsString = objectMapper.writeValueAsString(
+            MockBlacksmith.requestDto(invalidName, "Valid Description"));
+        String adminToken = performLogin(adminLogin);
+        mockMvc.perform(post(BLACKSMITH_BASE_URL)
+                .header("Authorization", adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(valueAsString))
+            .andExpect(status().isBadRequest());
+      }
+    }
+
+    @Test
+    @DisplayName("Create blacksmith throws exception when description is invalid")
+    void createBlacksmith_throwsExceptionWhenDescriptionIsInvalid() throws Exception {
+      String[] invalidDescriptions = {"", "  ", "Too short", null};
+      for (String invalidDescription : invalidDescriptions) {
+        String valueAsString = objectMapper.writeValueAsString(
+            MockBlacksmith.requestDto("Valid Name", invalidDescription));
+        String adminToken = performLogin(adminLogin);
+        mockMvc.perform(post(BLACKSMITH_BASE_URL)
+                .header("Authorization", adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(valueAsString))
+            .andExpect(status().isBadRequest());
+      }
     }
   }
 }

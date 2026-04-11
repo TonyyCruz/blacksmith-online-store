@@ -32,3 +32,22 @@ VALUES
         8,
         3.75
     );
+
+INSERT INTO ITEMS (material, base_damage, base_defense, name, base_price, final_price,
+                   has_discount, description, weight, stock, type, rarity, sold, total_ratings_sum,
+                   rating_count, rating_average,created_at, updated_at, blacksmith_id, active,
+                   blacksmith_name_snapshot, blacksmith_id_snapshot)
+VALUES
+    (
+     'Steel', 50, 20, 'Sword of Valor', 100.00,
+     90.00, true, 'A legendary sword forged by the finest blacksmiths.',
+     5.0, 10, 'SHORT_SWORD', 'Rare', 2, 10, 2, 5,
+     '2025-11-15', '2026-02-25', 1, true,
+     'Gimli o Marteleiro', 1
+    ), (
+     'Iron', 30, 10, 'Dagger of Night', 80.00,
+     80.00, false,
+     'A consistent weapon great fot night hunts.', 7.0,
+     15, 'DAGGER', 'Uncommon', 154, 549, 122, 4.5, '2025-11-15', '2026-02-25', 2, false,
+     'Tyrion o Perdido', 2
+);
