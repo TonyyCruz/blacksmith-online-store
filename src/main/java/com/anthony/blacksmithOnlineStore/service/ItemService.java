@@ -6,6 +6,7 @@ import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
@@ -24,6 +25,9 @@ public class ItemService {
 
   @Transactional
   public Item create(ItemRequestDto dto) {
+    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
+      throw new InvalidItemDataException("Final price cannot be greater than base price");
+    }
     Item item = ItemRequestDto.toEntity(dto);
     Blacksmith blacksmith = blacksmithService.findById(dto.blacksmithId());
     item.setCraftedBy(blacksmith);
@@ -34,13 +38,17 @@ public class ItemService {
 
   @Transactional
   public Item update(Long id, ItemRequestDto dto) {
+    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
+      throw new InvalidItemDataException("Final price cannot be greater than base price");
+    }
     Blacksmith blacksmith = blacksmithService.findById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());
     item.setMaterial(dto.material());
     item.setBaseDamage(dto.baseDamage());
     item.setBaseDefense(dto.baseDefense());
-    item.setBasePrice(dto.price());
+    item.setBasePrice(dto.basePrice());
+    item.setFinalPrice(dto.finalPrice());
     item.setDescription(dto.description());
     item.setWeight(dto.weight());
     item.setStock(dto.stock());

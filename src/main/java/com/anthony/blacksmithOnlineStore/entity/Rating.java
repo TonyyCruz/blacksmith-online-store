@@ -72,7 +72,7 @@ public class Rating {
         ", reviewerUserId=" + reviewerUserId +
         ", reviewerUsername=" + reviewerUsername +
         ", orderItem=" + (orderItem == null ? null : orderItem.getId()) +
-        ", rating=" + ratingValue +
+        ", ratingValue=" + ratingValue +
         ", comment='" + review + '\'' +
         ", createdAt=" + createdAt +
         ", updatedAt=" + updatedAt +

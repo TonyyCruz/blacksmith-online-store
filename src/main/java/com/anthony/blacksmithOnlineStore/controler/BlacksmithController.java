@@ -4,6 +4,7 @@ import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithRequ
 import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,24 +28,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class BlacksmithController {
   private final BlacksmithService blacksmithService;
 
-  @PostMapping("/blacksmith")
+  @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BlacksmithResponseDto> createBlacksmith(
-      @RequestBody BlacksmithRequestDto dto) {
+      @Valid @RequestBody BlacksmithRequestDto dto) {
     Blacksmith createdBlacksmith = blacksmithService.create(dto);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(BlacksmithResponseDto.fromEntity(createdBlacksmith));
   }
 
-  @PutMapping("/blacksmiths/{id}")
+  @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BlacksmithResponseDto> updateBlacksmith(
-      @RequestBody BlacksmithRequestDto dto, @PathVariable Long id) {
+      @Valid @RequestBody BlacksmithRequestDto dto, @PathVariable Long id) {
     Blacksmith createdBlacksmith = blacksmithService.update(id, dto);
     return ResponseEntity.ok(BlacksmithResponseDto.fromEntity(createdBlacksmith));
   }
 
-  @GetMapping("/blacksmiths")
+  @GetMapping
   public ResponseEntity<Page<BlacksmithResponseDto>> findAll(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
       Pageable pageable
@@ -59,7 +60,7 @@ public class BlacksmithController {
     return ResponseEntity.ok(BlacksmithResponseDto.fromEntity(blacksmith));
   }
 
-  @GetMapping
+  @GetMapping("/search")
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
       Pageable pageable,

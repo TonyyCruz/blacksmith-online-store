@@ -77,7 +77,7 @@ public class RestExceptionHandler {
     ExceptionDetails exceptionDetails = new ExceptionDetails();
     exceptionDetails.setTitle("Unauthorized");
     exceptionDetails.setTimestamp(Instant.now());
-    exceptionDetails.setStatus(HttpStatus.UNAUTHORIZED.value());
+    exceptionDetails.setStatus(HttpStatus.FORBIDDEN.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
     exceptionDetails.addError("error", e.getMessage());
@@ -100,16 +100,16 @@ public class RestExceptionHandler {
     return ResponseEntity.status(validationDetails.getStatus()).body(validationDetails);
   }
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ExceptionDetails> defaultException(Exception e,
-      HttpServletRequest request) {
-    ExceptionDetails exceptionDetails = new ExceptionDetails();
-    exceptionDetails.setTitle("Server Error");
-    exceptionDetails.setTimestamp(Instant.now());
-    exceptionDetails.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    exceptionDetails.setException(e.getClass().toString());
-    exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", "Ops, algo deu errado. 😵");
-    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
-  }
+//  @ExceptionHandler(Exception.class)
+//  public ResponseEntity<ExceptionDetails> defaultException(Exception e,
+//      HttpServletRequest request) {
+//    ExceptionDetails exceptionDetails = new ExceptionDetails();
+//    exceptionDetails.setTitle("Server Error");
+//    exceptionDetails.setTimestamp(Instant.now());
+//    exceptionDetails.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+//    exceptionDetails.setException(e.getClass().toString());
+//    exceptionDetails.setPath(request.getRequestURI());
+//    exceptionDetails.addError("error", "Ops, algo deu errado. 😵");
+//    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
+//  }
 }

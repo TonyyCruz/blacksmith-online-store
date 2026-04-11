@@ -5,13 +5,16 @@ import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
 import java.math.BigDecimal;
+import lombok.Builder;
 
+@Builder
 public record ItemRequestDto(
     String name,
     Material material,
     Integer baseDamage,
     Integer baseDefense,
-    BigDecimal price,
+    BigDecimal basePrice,
+    BigDecimal finalPrice,
     String description,
     Float weight,
     Integer stock,
@@ -22,18 +25,19 @@ public record ItemRequestDto(
 ) {
 
   public static Item toEntity(ItemRequestDto dto) {
-    return Item.builder()
-        .material(dto.material())
-        .baseDamage(dto.baseDamage())
-        .baseDefense(dto.baseDefense())
-        .name(dto.name())
-        .basePrice(dto.price())
-        .description(dto.description())
-        .weight(dto.weight())
-        .stock(dto.stock())
-        .type(dto.type())
-        .rarity(dto.rarity())
-        .active(dto.active())
-        .build();
+    Item item = new Item();
+    item.setMaterial(dto.material());
+    item.setBaseDamage(dto.baseDamage());
+    item.setBaseDefense(dto.baseDefense());
+    item.setName(dto.name());
+    item.setBasePrice(dto.basePrice());
+    item.setFinalPrice(dto.finalPrice());
+    item.setDescription(dto.description());
+    item.setWeight(dto.weight());
+    item.setStock(dto.stock());
+    item.setType(dto.type());
+    item.setRarity(dto.rarity());
+    item.setActive(dto.active());
+    return item;
   }
 }
