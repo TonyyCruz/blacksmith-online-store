@@ -58,7 +58,6 @@ public class Blacksmith {
 
   public void addCraftedItem(Item item) {
     craftedItems.add(item);
-    item.setCraftedBy(this);
   }
 
   @Override

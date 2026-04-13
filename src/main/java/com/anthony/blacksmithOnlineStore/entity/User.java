@@ -28,7 +28,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Setter
-@ToString(exclude = {"password", "orders", "reviews"})
+@ToString(exclude = {"password", "orders"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -48,19 +48,9 @@ public class User implements UserDetails {
   @Setter(AccessLevel.NONE)
   @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
   private final List<Order> orders = new ArrayList<>();
-  @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
-  private final List<Rating> reviews = new ArrayList<>();
 
   public void addOrder(Order order) {
-    if (!orders.contains(order)) {
-      orders.add(order);
-      order.setUser(this);
-    }
-  }
-
-  public void addReview(Rating review) {
-    reviews.add(review);
-    review.setUser(this);
+    orders.add(order);
   }
 
   @Override

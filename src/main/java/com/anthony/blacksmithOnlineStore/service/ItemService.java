@@ -6,12 +6,11 @@ import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,22 +25,30 @@ public class ItemService {
 
   @Transactional
   public Item create(ItemRequestDto dto) {
+    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
+      throw new InvalidItemDataException("Final price cannot be greater than base price");
+    }
     Item item = ItemRequestDto.toEntity(dto);
     Blacksmith blacksmith = blacksmithService.findById(dto.blacksmithId());
     item.setCraftedBy(blacksmith);
-    item.setBlacksmithName(blacksmith.getName());
+    item.setBlacksmithIdSnapshot(blacksmith.getId());
+    item.setBlacksmithNameSnapshot(blacksmith.getName());
     return itemRepository.save(item);
   }
 
   @Transactional
   public Item update(Long id, ItemRequestDto dto) {
+    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
+      throw new InvalidItemDataException("Final price cannot be greater than base price");
+    }
     Blacksmith blacksmith = blacksmithService.findById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());
     item.setMaterial(dto.material());
     item.setBaseDamage(dto.baseDamage());
     item.setBaseDefense(dto.baseDefense());
-    item.setBasePrice(dto.price());
+    item.setBasePrice(dto.basePrice());
+    item.setFinalPrice(dto.finalPrice());
     item.setDescription(dto.description());
     item.setWeight(dto.weight());
     item.setStock(dto.stock());
@@ -49,9 +56,8 @@ public class ItemService {
     item.setRarity(dto.rarity());
     item.setActive(dto.active());
     item.setCraftedBy(blacksmith);
-    item.setBlacksmithId(dto.blacksmithId());
-    item.setBlacksmithName(blacksmith.getName());
-
+    item.setBlacksmithIdSnapshot(dto.blacksmithId());
+    item.setBlacksmithNameSnapshot(blacksmith.getName());
     return itemRepository.save(item);
   }
 
@@ -116,13 +122,13 @@ public class ItemService {
   }
 
   @Transactional
-  public void makeSale(Long itemId, int qty) {
+  public void performSale(Long itemId, int qty) {
     Item item = findById(itemId);
     item.addSoldQuantity(qty);
     decrementStock(itemId, qty);
   }
 
-  private void itemExistesVerifier(Long id) {
+  public void itemExistesVerifier(Long id) {
     if (!itemRepository.existsById(id)) throw new ItemNotFoundException(id);
   }
 

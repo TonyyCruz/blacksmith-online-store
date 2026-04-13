@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.controler.dto.user;
 
-import com.anthony.blacksmithOnlineStore.validation.user.ValidAge;
+import com.anthony.blacksmithOnlineStore.validations.user.ValidAge;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 

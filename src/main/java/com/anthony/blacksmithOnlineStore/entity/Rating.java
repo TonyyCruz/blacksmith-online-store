@@ -7,17 +7,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,27 +30,28 @@ import org.hibernate.annotations.CreationTimestamp;
 public class Rating {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-  @ManyToOne
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
-  @Setter(AccessLevel.NONE)
+  private BigInteger id;
+  @Column(nullable = false)
+  private UUID reviewerUserId;
+  @Column(nullable = false)
+  private Long reviewedItemId;
+  @Column(nullable = false)
+  private Long reviewedBlacksmithId;
   @OneToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "order_item_id", unique = true)
   private OrderItem orderItem;
+  @Column(nullable = false)
+  private String reviewerUsername;
   @Column(nullable = false)
   private Integer ratingValue;
   @Column(columnDefinition = "TEXT")
   private String review;
   @CreationTimestamp
-  private LocalDate date;
-
-  public void setOrderItem(OrderItem orderItem) {
-    if (!this.orderItem.equals(orderItem)) {
-      this.orderItem = orderItem;
-      orderItem.setRating(this);
-    }
-  }
+  @Setter(AccessLevel.NONE)
+  private LocalDateTime createdAt;
+  @UpdateTimestamp
+  @Setter(AccessLevel.NONE)
+  private LocalDateTime updatedAt;
 
   @Override
   public boolean equals(Object o) {
@@ -66,11 +69,13 @@ public class Rating {
   public String toString() {
     return "Rating{" +
         "id=" + id +
-        ", user=" + (user == null ? null : user.getId()) +
-        ", item=" + orderItem +
-        ", rating=" + ratingValue +
+        ", reviewerUserId=" + reviewerUserId +
+        ", reviewerUsername=" + reviewerUsername +
+        ", orderItem=" + (orderItem == null ? null : orderItem.getId()) +
+        ", ratingValue=" + ratingValue +
         ", comment='" + review + '\'' +
-        ", date=" + date +
+        ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
         '}';
   }
 }

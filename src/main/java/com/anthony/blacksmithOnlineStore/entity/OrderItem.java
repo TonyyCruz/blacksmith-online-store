@@ -1,5 +1,6 @@
 package com.anthony.blacksmithOnlineStore.entity;
 
+import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,16 +12,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -43,18 +43,38 @@ public class OrderItem {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id", nullable = false)
   private Order order;
-  @Setter(AccessLevel.NONE)
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "rating_id", unique = true)
   private Rating rating;
-  @Setter(AccessLevel.NONE)
   private Integer ratingValue;
   @Column(nullable = false, updatable = false)
   private UUID userId;
   @Column(nullable = false, updatable = false)
   private Long blacksmithId;
+  @CreationTimestamp
+  private LocalDateTime createdAt;
   @Column(nullable = false)
   private boolean reviewed = false;
+
+  public void setId(Long id) {
+    checkIfFinalized();
+    this.id = id;
+  }
+
+  public void setItemId(Long itemId) {
+    checkIfFinalized();
+    this.itemId = itemId;
+  }
+
+  public void setItemName(String itemName) {
+    checkIfFinalized();
+    this.itemName = itemName;
+  }
+
+  public void setBasePriceAtPurchase(BigDecimal basePriceAtPurchase) {
+    checkIfFinalized();
+    this.basePriceAtPurchase = basePriceAtPurchase;
+  }
 
   public void setPriceApplied(BigDecimal priceApplied) {
     checkIfFinalized();
@@ -72,13 +92,26 @@ public class OrderItem {
     }
   }
 
-  public void setRating(Rating rating) {
-    if (!this.rating.equals(rating)) {
-      this.rating = rating;
-      this.ratingValue = rating.getRatingValue();
-      this.reviewed = true;
-      rating.setOrderItem(this);
-    }
+  public void setOrder(Order order) {
+    checkIfFinalized();
+    this.order = order;
+  }
+
+  public void setRating(Rating newRating) {
+    if (!(rating == null)) throw new ForbiddenOperationException("Rating cannot be changed.");
+    rating = newRating;
+    ratingValue = newRating.getRatingValue();
+    reviewed = true;
+  }
+
+  public void setUserId(UUID userId) {
+    checkIfFinalized();
+    this.userId = userId;
+  }
+
+  public void setBlacksmithId(Long blacksmithId) {
+    checkIfFinalized();
+    this.blacksmithId = blacksmithId;
   }
 
   private void checkIfFinalized() {
@@ -110,6 +143,7 @@ public class OrderItem {
         ", totalPrice=" + totalPrice +
         ", ratingValue=" + ratingValue +
         ", order=" + (order == null ? null : order.getId()) +
+        ", userId=" + userId +
         '}';
   }
 }

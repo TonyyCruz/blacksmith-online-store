@@ -24,9 +24,9 @@ public class OrderService {
   public Order create(OrderRequestDto dto, Authentication auth) {
     Order order = new Order();
     User user = userService.getUserReferenceFromAuth(auth);
-    user.addOrder(order);
+    order.setUser(user);
     for (OrderItemRequestDto orderItemDto : dto.items()) {
-      itemService.makeSale(orderItemDto.itemId(), orderItemDto.quantity());
+      itemService.performSale(orderItemDto.itemId(), orderItemDto.quantity());
       Item item = itemService.getReferenceById(orderItemDto.itemId());
       order.addOrderItem(orderItemFactory.create(orderItemDto, item));
     }

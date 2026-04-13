@@ -79,17 +79,19 @@ public class Item {
   private BigDecimal ratingAverage;
   @Column(nullable = false, updatable = false)
   @CreationTimestamp
+  @Setter(AccessLevel.NONE)
   private LocalDateTime createdAt;
   @UpdateTimestamp
+  @Setter(AccessLevel.NONE)
   private LocalDateTime updatedAt;
   @Column(nullable = false)
   private boolean active = true;
   @Version
   private Long version;
   @Column(nullable = false, updatable = false)
-  private String blacksmithName;
+  private String blacksmithNameSnapshot;
   @Column(nullable = false, updatable = false)
-  private Long blacksmithId;
+  private Long blacksmithIdSnapshot;
 
   public void addRating(Integer newRating) {
     ratingCount++;
@@ -101,6 +103,10 @@ public class Item {
 
   public void addSoldQuantity(int quantity) {
     this.sold += quantity;
+  }
+
+  public void removeSoldQuantity(int quantity) {
+    this.sold -= quantity;
   }
 
   @Override

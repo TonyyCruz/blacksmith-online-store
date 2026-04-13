@@ -40,8 +40,10 @@ public class Order {
   @JoinColumn(name = "user_id")
   private User user;
   @CreationTimestamp
+  @Setter(AccessLevel.NONE)
   private LocalDateTime createdAt;
   @UpdateTimestamp
+  @Setter(AccessLevel.NONE)
   private LocalDateTime updatedAt;
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
@@ -56,7 +58,6 @@ public class Order {
   public void addOrderItem(OrderItem item) {
     checkIfFinalized();
     orderItems.add(item);
-    item.setOrder(this);
   }
 
   public void removeOrderItem(OrderItem item) {

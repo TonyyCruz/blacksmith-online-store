@@ -15,7 +15,8 @@ public record ItemResponseDto(
     Integer baseDamage,
     Integer baseDefense,
     String name,
-    BigDecimal price,
+    BigDecimal basePrice,
+    BigDecimal finalPrice,
     String description,
     Float weight,
     Integer stock,
@@ -34,7 +35,8 @@ public record ItemResponseDto(
         .baseDamage(item.getBaseDamage())
         .baseDefense(item.getBaseDefense())
         .name(item.getName())
-        .price(item.getBasePrice())
+        .basePrice(item.getBasePrice())
+        .finalPrice(item.getFinalPrice())
         .description(item.getDescription())
         .weight(item.getWeight())
         .stock(item.getStock())

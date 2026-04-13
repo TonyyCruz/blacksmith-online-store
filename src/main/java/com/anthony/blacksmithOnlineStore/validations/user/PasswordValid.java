@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.validation.user;
+package com.anthony.blacksmithOnlineStore.validations.user;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
