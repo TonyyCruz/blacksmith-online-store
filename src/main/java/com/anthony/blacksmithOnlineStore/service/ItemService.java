@@ -1,13 +1,16 @@
 package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemFilterDto;
+import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
 import jakarta.transaction.Transactional;
@@ -22,9 +25,10 @@ import org.springframework.stereotype.Service;
 public class ItemService {
   private final ItemRepository itemRepository;
   private final BlacksmithService blacksmithService;
+  private final ItemUpdate itemUpdate;
 
   @Transactional
-  public Item create(ItemRequestDto dto) {
+  public ItemResponseDto create(ItemRequestDto dto) {
     if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
       throw new InvalidItemDataException("Final price cannot be greater than base price");
     }
@@ -33,11 +37,11 @@ public class ItemService {
     item.setCraftedBy(blacksmith);
     item.setBlacksmithIdSnapshot(blacksmith.getId());
     item.setBlacksmithNameSnapshot(blacksmith.getName());
-    return itemRepository.save(item);
+    return ItemResponseDto.fromEntity(itemRepository.save(item));
   }
 
   @Transactional
-  public Item update(Long id, ItemRequestDto dto) {
+  public ItemResponseDto update(Long id, ItemRequestDto dto) {
     if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
       throw new InvalidItemDataException("Final price cannot be greater than base price");
     }
@@ -58,31 +62,31 @@ public class ItemService {
     item.setCraftedBy(blacksmith);
     item.setBlacksmithIdSnapshot(dto.blacksmithId());
     item.setBlacksmithNameSnapshot(blacksmith.getName());
-    return itemRepository.save(item);
+    return ItemResponseDto.fromEntity(itemRepository.save(item));
   }
 
-  public Item findById(Long id) {
+  public ItemResponseDto update(Long id, ItemPatchUpdateDto dto) {
+    Item item = getReferenceById(id);
+    itemUpdate.updateItemFromDto(dto, item);
+    return ItemResponseDto.fromEntity(itemRepository.save(item));
+  }
+
+  public ItemResponseDto findById(Long id) {
+    return ItemResponseDto.fromEntity(findEntityById(id));
+  }
+
+  public Item findEntityById(Long id) {
     return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
   }
 
-  public Page<Item> findAll(Pageable pageable) {
-    return itemRepository.findAll(pageable);
-  }
-
-  public void deactivateItem(Long id) {
-    Item item = getReferenceById(id);
-    item.setActive(false);
-    itemRepository.save(item);
-  }
-
-  public void activateItem(Long id) {
-    Item item = getReferenceById(id);
-    item.setActive(true);
-    itemRepository.save(item);
+  public Page<ItemResponseDto> findAll(ItemFilterDto filter, Pageable pageable) {
+    Specification<Item> specs = ItemSpecifications.withFilters(filter.toUserFilter());
+    Page<Item> items = itemRepository.findAll(specs, pageable);
+    return items.map(ItemResponseDto::fromEntity);
   }
 
   public void deleteItem(Long id) {
-    Item item = findById(id);
+    Item item = findEntityById(id);
     if (item.getSold() > 0) {
       throw new ForbiddenOperationException("Cannot delete an item that has been sold.");
     }
@@ -94,13 +98,15 @@ public class ItemService {
     return itemRepository.getReferenceById(id);
   }
 
-  public Page<Item> findByBlacksmithId(Long blacksmithId, Pageable pageable) {
-    return itemRepository.findByCraftedById(blacksmithId, pageable);
+  public Page<ItemResponseDto> findByBlacksmithId(Long blacksmithId, Pageable pageable) {
+    Page<Item> items = itemRepository.findByCraftedById(blacksmithId, pageable);
+    return items.map(ItemResponseDto::fromEntity);
   }
 
-  public Page<Item> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
-    Specification<Item> specs = ItemSpecifications.withFilters(filter);
-    return itemRepository.findAll(specs, pageable);
+  public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
+    Specification<Item> specs = ItemSpecifications.withFilters(filter.toUserFilter());
+    Page<Item> items = itemRepository.findAll(specs, pageable);
+    return items.map(ItemResponseDto::fromEntity);
   }
 
   @Transactional
@@ -123,7 +129,7 @@ public class ItemService {
 
   @Transactional
   public void performSale(Long itemId, int qty) {
-    Item item = findById(itemId);
+    Item item = findEntityById(itemId);
     item.addSoldQuantity(qty);
     decrementStock(itemId, qty);
   }
@@ -133,7 +139,7 @@ public class ItemService {
   }
 
   public void addRating(Long itemId, int rating) {
-    Item item = findById(itemId);
+    Item item = findEntityById(itemId);
     item.addRating(rating);
     itemRepository.save(item);
   }
