@@ -25,6 +25,7 @@ public record ItemResponseDto(
     BlacksmithResponseDto craftedBy,
     BigDecimal ratingAverage,
     Integer ratingCount,
+    Long sold,
     boolean active
 ) {
 
@@ -46,6 +47,7 @@ public record ItemResponseDto(
         .ratingAverage(item.getRatingAverage())
         .ratingCount(item.getRatingCount())
         .active(item.isActive())
+        .sold(item.getSold())
         .build();
   }
 }
