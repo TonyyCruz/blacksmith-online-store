@@ -1,5 +1,6 @@
 package com.anthony.blacksmithOnlineStore.helper.mocks;
 
+import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.enums.Material;
@@ -9,9 +10,9 @@ import java.math.BigDecimal;
 
 public class MockItem {
 
-  public static Item item() {
+  public static Item item(Long id) {
     return Item.builder()
-        .id(1L)
+        .id(id)
         .material(Material.ADAMANTIUM)
         .baseDamage(1000)
         .baseDefense(500)
@@ -25,7 +26,13 @@ public class MockItem {
         .type(Type.LONG_SWORD)
         .rarity(Rarity.LEGENDARY)
         .craftedBy(MockBlacksmith.blacksmith())
+        .blacksmithIdSnapshot(MockBlacksmith.blacksmith().getId())
+        .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
         .build();
+  }
+
+  public static Item item() {
+    return item(999L);
   }
 
   // ========== DTOs ==========
@@ -45,6 +52,24 @@ public class MockItem {
         .rarity(Rarity.COMMON)
         .blacksmithId(1L)
         .active(true)
+        .build();
+  }
+
+  public static ItemPatchUpdateDto itemPatchUpdateDto() {
+    return ItemPatchUpdateDto.builder()
+        .material(Material.STEEL)
+        .baseDamage(22)
+        .baseDefense(10)
+        .name("Patch")
+        .basePrice(BigDecimal.valueOf(100.00))
+        .finalPrice(BigDecimal.valueOf(99.99))
+        .description("Patch Dagger")
+        .weight(12.0f)
+        .stock(5)
+        .type(Type.DAGGER)
+        .rarity(Rarity.RARE)
+        .blacksmithId(1L)
+        .active(false)
         .build();
   }
 

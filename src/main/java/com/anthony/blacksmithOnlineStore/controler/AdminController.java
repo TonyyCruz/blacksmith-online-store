@@ -35,6 +35,6 @@ public class AdminController {
 
   @GetMapping("/users")
   public ResponseEntity<UserDto> findByUsername(@RequestParam String username) {
-    return ResponseEntity.ok(UserDto.fromEntity(adminService.findByUsername(username)));
+    return ResponseEntity.ok(adminService.findByUsername(username));
   }
 }

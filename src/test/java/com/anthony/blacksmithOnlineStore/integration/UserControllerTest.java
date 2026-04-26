@@ -97,12 +97,7 @@ public class UserControllerTest extends TestBase {
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(user.getId().toString()))
-          .andExpect(jsonPath("$.username").value(user.getUsername()))
-          .andExpect(jsonPath("$.birthDate").value(user.getBirthDate().toString()))
-          .andExpect(jsonPath("$.password").doesNotExist())
-          .andDo(print());
+          .andExpect(status().isNoContent());
       LoginRequest loginRequest = new LoginRequest(userLogin.username(), newPassword);
       String loginAsString = objectMapper.writeValueAsString(loginRequest);
       mockMvc.perform(post(AUTH_LOGIN_URL)

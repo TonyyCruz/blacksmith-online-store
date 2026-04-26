@@ -33,7 +33,7 @@ public class ItemService {
       throw new InvalidItemDataException("Final price cannot be greater than base price");
     }
     Item item = ItemRequestDto.toEntity(dto);
-    Blacksmith blacksmith = blacksmithService.findById(dto.blacksmithId());
+    Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     item.setCraftedBy(blacksmith);
     item.setBlacksmithIdSnapshot(blacksmith.getId());
     item.setBlacksmithNameSnapshot(blacksmith.getName());
@@ -45,7 +45,7 @@ public class ItemService {
     if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
       throw new InvalidItemDataException("Final price cannot be greater than base price");
     }
-    Blacksmith blacksmith = blacksmithService.findById(dto.blacksmithId());
+    Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());
     item.setMaterial(dto.material());

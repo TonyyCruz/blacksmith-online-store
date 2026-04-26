@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.controler.dto.rating.RatingRequestDto;
+import com.anthony.blacksmithOnlineStore.controler.dto.rating.RatingResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
 import com.anthony.blacksmithOnlineStore.entity.User;
@@ -25,8 +26,8 @@ public class RatingService {
 
   @Transactional
   public void ratePurchase(RatingRequestDto dto, Authentication auth) {
-    OrderItem orderItem = orderItemService.findById(dto.orderItemId());
-    User user = userService.getUserFromAuth(auth);
+    OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
+    User user = userService.getUserEntityFromAuth(auth);
     verifyUserCanRatePurchase(user.getId(), orderItem);
     blacksmithService.addRating(orderItem.getBlacksmithId(), dto.rating());
     itemService.addRating(orderItem.getItemId(), dto.rating());
@@ -39,9 +40,10 @@ public class RatingService {
     ratingRepository.save(rating);
   }
 
-  public Page<Rating> getRatingsForItemId(Long itemId, Pageable pageable) {
+  public Page<RatingResponseDto> getRatingsForItemId(Long itemId, Pageable pageable) {
     itemService.itemExistesVerifier(itemId);
-    return ratingRepository.findAllByReviewedItemId(itemId, pageable);
+    Page<Rating> ratings = ratingRepository.findAllByReviewedItemId(itemId, pageable);
+    return ratings.map(RatingResponseDto::fromEntity);
   }
 
   private void verifyUserCanRatePurchase(UUID userId, OrderItem orderItem) {

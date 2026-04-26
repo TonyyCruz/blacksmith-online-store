@@ -32,17 +32,14 @@ public class BlacksmithController {
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BlacksmithResponseDto> createBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto) {
-    Blacksmith createdBlacksmith = blacksmithService.create(dto);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(BlacksmithResponseDto.fromEntity(createdBlacksmith));
+    return ResponseEntity.status(HttpStatus.CREATED).body(blacksmithService.create(dto));
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BlacksmithResponseDto> updateBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto, @PathVariable Long id) {
-    Blacksmith createdBlacksmith = blacksmithService.update(id, dto);
-    return ResponseEntity.ok(BlacksmithResponseDto.fromEntity(createdBlacksmith));
+    return ResponseEntity.ok(blacksmithService.update(id, dto));
   }
 
   @GetMapping
@@ -50,14 +47,12 @@ public class BlacksmithController {
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
       Pageable pageable
   ) {
-    Page<Blacksmith> blacksmiths = blacksmithService.findAll(pageable);
-    return ResponseEntity.ok(blacksmiths.map(BlacksmithResponseDto::fromEntity));
+    return ResponseEntity.ok(blacksmithService.findAll(pageable));
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<BlacksmithResponseDto> findById(@PathVariable Long id) {
-    Blacksmith blacksmith = blacksmithService.findById(id);
-    return ResponseEntity.ok(BlacksmithResponseDto.fromEntity(blacksmith));
+    return ResponseEntity.ok(blacksmithService.findById(id));
   }
 
   @GetMapping("/search")
@@ -65,7 +60,6 @@ public class BlacksmithController {
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
       Pageable pageable,
       @RequestParam(value = "name") String name) {
-    Page<Blacksmith> blacksmiths = blacksmithService.findByName(name, pageable);
-    return ResponseEntity.ok(blacksmiths.map(BlacksmithResponseDto::fromEntity));
+    return ResponseEntity.ok(blacksmithService.findByName(name, pageable));
   }
 }

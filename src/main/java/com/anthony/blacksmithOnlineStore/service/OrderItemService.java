@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class OrderItemService {
   private final OrderItemRepository orderItemRepository;
 
-  public OrderItem findById(Long id) {
+  public OrderItem findEntityById(Long id) {
     return orderItemRepository.findById(id).orElseThrow(() -> new OrderItemNotFoundException(id));
   }
 

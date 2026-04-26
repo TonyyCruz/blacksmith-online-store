@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithRequestDto;
+import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
@@ -15,29 +16,37 @@ import org.springframework.stereotype.Service;
 public class BlacksmithService {
   private final BlacksmithRepository blacksmithRepository;
 
-  public Blacksmith findById(Long id) {
+  public BlacksmithResponseDto findById(Long id) {
+    return BlacksmithResponseDto.fromEntity(findEntityById(id));
+  }
+
+  public Blacksmith findEntityById(Long id) {
     return blacksmithRepository.findById(id)
         .orElseThrow(() -> new BlacksmithNotFoundException(id));
   }
 
-  public Page<Blacksmith> findByName(String name, Pageable pageable) {
-    return blacksmithRepository.findByNameContaining(name, pageable);
+  public Page<BlacksmithResponseDto> findByName(String name, Pageable pageable) {
+    Page<Blacksmith> blacksmiths = blacksmithRepository.findByNameContaining(name, pageable);
+    return blacksmiths.map(BlacksmithResponseDto::fromEntity);
   }
 
   @Transactional
-  public Blacksmith create(BlacksmithRequestDto dto) {
-    return blacksmithRepository.save(BlacksmithRequestDto.toEntity(dto));
+  public BlacksmithResponseDto create(BlacksmithRequestDto dto) {
+    Blacksmith blacksmith = blacksmithRepository.save(BlacksmithRequestDto.toEntity(dto));
+    return BlacksmithResponseDto.fromEntity(blacksmith);
   }
 
-  public Blacksmith update(Long id, BlacksmithRequestDto dto) {
+  public BlacksmithResponseDto update(Long id, BlacksmithRequestDto dto) {
     Blacksmith blacksmith = getReferenceById(id);
     blacksmith.setName(dto.name());
     blacksmith.setDescription(dto.description());
-    return blacksmithRepository.save(blacksmith);
+    Blacksmith updatedBlacksmith = blacksmithRepository.save(blacksmith);
+    return BlacksmithResponseDto.fromEntity(updatedBlacksmith);
   }
 
-  public Page<Blacksmith> findAll(Pageable pageable) {
-    return blacksmithRepository.findAll(pageable);
+  public Page<BlacksmithResponseDto> findAll(Pageable pageable) {
+    Page<Blacksmith> blacksmiths = blacksmithRepository.findAll(pageable);
+    return blacksmiths.map(BlacksmithResponseDto::fromEntity);
   }
 
   public Blacksmith getReferenceById(Long id) {
@@ -46,7 +55,7 @@ public class BlacksmithService {
   }
 
   public void addRating(Long blacksmithId, int rating) {
-    Blacksmith blacksmith = findById(blacksmithId);
+    Blacksmith blacksmith = findEntityById(blacksmithId);
     blacksmith.addRating(rating);
     blacksmithRepository.save(blacksmith);
   }
