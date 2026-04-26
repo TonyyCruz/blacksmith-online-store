@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.anthony.blacksmithOnlineStore.controler.dto.user.PasswordUpdateDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.user.UserCreateDto;
+import com.anthony.blacksmithOnlineStore.controler.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidCredentialsException;
@@ -57,13 +58,12 @@ class UserServiceTest {
       when(userRepository.save(any(User.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
-      User created = userService.create(dto);
+      UserDto created = userService.create(dto);
 
-      assertEquals(Role.CUSTOMER, created.getRole(), "The default role must be CUSTOMER");
+      assertEquals(Role.CUSTOMER.name(), created.role(), "The default role must be CUSTOMER");
       verify(passwordEncoder).encode(dto.password());
-      assertEquals("encoded", created.getPassword(), "The password must be encoded");
-      assertEquals(dto.username(), created.getUsername(), "The username must be maintained");
-      assertEquals(dto.birthDate(), created.getBirthDate(), "The birth date must be maintained");
+      assertEquals(dto.username(), created.username(), "The username must be maintained");
+      assertEquals(dto.birthDate().toString(), created.birthDate(), "The birth date must be maintained");
       verify(userRepository, times(1)).save(any(User.class));
       verify(userRepository, times(1)).existsByUsername(dto.username());
     }
@@ -80,13 +80,11 @@ class UserServiceTest {
       when(userRepository.save(any(User.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
-      User updated = userService.updateUser(dto, auth);
+      UserDto updated = userService.updateUser(dto, auth);
 
-      assertEquals(Role.CUSTOMER, updated.getRole(), "The Role should not be changed");
-      assertEquals(targetUser.getPassword(), updated.getPassword(), "The password should not be changed");
-      assertEquals(dto.username(), updated.getUsername(), "The username must be updated");
-      assertEquals(dto.birthDate(), updated.getBirthDate(), "The birth date must be updated");
-      assertSame(targetUser, updated, "Update should modify the same user instance");
+      assertEquals(Role.CUSTOMER.name(), updated.role(), "The Role should not be changed");
+      assertEquals(dto.username(), updated.username(), "The username must be updated");
+      assertEquals(dto.birthDate().toString(), updated.birthDate(), "The birth date must be updated");
       verify(userRepository, times(1)).save(any(User.class));
       verify(userRepository, times(1)).existsByUsername(dto.username());
     }
@@ -102,13 +100,11 @@ class UserServiceTest {
       when(userRepository.save(any(User.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
-      User updated = userService.updateUser(dto, auth);
+      UserDto updated = userService.updateUser(dto, auth);
 
-      assertEquals(Role.CUSTOMER, updated.getRole(), "The Role should not be changed");
-      assertEquals(targetUser.getPassword(), updated.getPassword(), "The password should not be changed");
-      assertEquals(dto.username(), updated.getUsername(), "The username must be updated");
-      assertEquals(dto.birthDate(), updated.getBirthDate(), "The birth date must be updated");
-      assertSame(targetUser, updated, "Update should modify the same user instance");
+      assertEquals(Role.CUSTOMER.name(), updated.role(), "The Role should not be changed");
+      assertEquals(dto.username(), updated.username(), "The username must be updated");
+      assertEquals(dto.birthDate().toString(), updated.birthDate(), "The birth date must be updated");
       verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -125,13 +121,8 @@ class UserServiceTest {
       when(userRepository.save(any(User.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
-      User updated = userService.updatePassword(dto, auth);
-
-      assertEquals("newEncoded", updated.getPassword(), "The password must be updated and encoded");
-      assertEquals(Role.CUSTOMER, updated.getRole(), "The Role should not be changed");
-      assertEquals(targetUser.getUsername(), updated.getUsername(), "The username should not be changed");
-      assertEquals(targetUser.getBirthDate(), updated.getBirthDate(), "The birth date should not be changed");
-      assertSame(targetUser, updated, "Update should modify the same user instance");
+      userService.updatePassword(dto, auth);
+      assertEquals("newEncoded", targetUser.getPassword());
       verify(passwordEncoder).matches(dto.currentPassword(), "encoded");
       verify(passwordEncoder).encode(dto.newPassword());
       verify(userRepository, times(1)).findById(targetUser.getId());

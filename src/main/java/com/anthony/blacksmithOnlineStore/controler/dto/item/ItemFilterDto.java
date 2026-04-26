@@ -15,7 +15,11 @@ public record ItemFilterDto(
     Float maxWeight,
     Type type,
     Rarity rarity,
-    Long blacksmithId
+    Long blacksmithId,
+    Boolean active
 ) {
-
+    public ItemFilterDto toUserFilter() {
+      return new ItemFilterDto(name, material, baseDamage, baseDefense, highestPrice, lowestPrice,
+          maxWeight, type, rarity, blacksmithId, true);
+    }
 }

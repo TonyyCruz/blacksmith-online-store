@@ -24,7 +24,7 @@ public class UserController {
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> getCurrentUser(Authentication auth) {
-    User user = userService.getUserFromAuth(auth);
+    User user = userService.getUserEntityFromAuth(auth);
     return ResponseEntity.ok(UserDto.fromEntity(user));
   }
 
@@ -32,16 +32,15 @@ public class UserController {
   public ResponseEntity<UserDto> updateCurrentUser(
       @RequestBody @Valid UserUpdateDto updateDto,
       Authentication auth) {
-    User updatedUser = userService.updateUser(updateDto, auth);
-    return ResponseEntity.ok(UserDto.fromEntity(updatedUser));
+    return ResponseEntity.ok(userService.updateUser(updateDto, auth));
   }
 
   @PutMapping("/me/password")
-  public ResponseEntity<UserDto> updateCurrentUserPassword(
+  public ResponseEntity<Void> updateCurrentUserPassword(
       @RequestBody @Valid PasswordUpdateDto passwordUpdateDto,
       Authentication auth) {
-    User updatedUser = userService.updatePassword(passwordUpdateDto, auth);
-    return ResponseEntity.ok(UserDto.fromEntity(updatedUser));
+    userService.updatePassword(passwordUpdateDto, auth);
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/me")

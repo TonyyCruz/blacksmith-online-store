@@ -37,7 +37,6 @@ public class RatingController {
       @PathVariable Long id,
       @PageableDefault(page = 0, size = 5, sort = "id", direction = Direction.DESC)
       Pageable pageable) {
-    Page<Rating> ratings = ratingService.getRatingsForItemId(id, pageable);
-    return ResponseEntity.ok(ratings.map(RatingResponseDto::fromEntity));
+    return ResponseEntity.ok(ratingService.getRatingsForItemId(id, pageable));
   }
 }

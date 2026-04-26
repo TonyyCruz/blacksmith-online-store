@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.controler.dto.Order.OrderRequestDto;
+import com.anthony.blacksmithOnlineStore.controler.dto.Order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.OrderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
@@ -21,7 +22,7 @@ public class OrderService {
   private final ItemService itemService;
 
   @Transactional
-  public Order create(OrderRequestDto dto, Authentication auth) {
+  public OrderResponseDto create(OrderRequestDto dto, Authentication auth) {
     Order order = new Order();
     User user = userService.getUserReferenceFromAuth(auth);
     order.setUser(user);
@@ -31,6 +32,6 @@ public class OrderService {
       order.addOrderItem(orderItemFactory.create(orderItemDto, item));
     }
     order.recalculateTotal();
-    return orderRepository.save(order);
+    return OrderResponseDto.fromEntity(orderRepository.save(order));
   }
 }

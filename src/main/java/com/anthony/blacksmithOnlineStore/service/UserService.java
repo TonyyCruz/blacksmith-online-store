@@ -2,6 +2,7 @@ package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.controler.dto.user.PasswordUpdateDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.user.UserCreateDto;
+import com.anthony.blacksmithOnlineStore.controler.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidCredentialsException;
@@ -21,15 +22,15 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  public User create(UserCreateDto createDto) {
+  public UserDto create(UserCreateDto createDto) {
     if (usernameExists(createDto.username())) throw new UsernameAlreadyExistsException();
     User user = UserCreateDto.toEntity(createDto);
     user.setRole(Role.CUSTOMER);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
-    return userRepository.save(user);
+    return UserDto.fromEntity(userRepository.save(user));
   }
 
-  public User updateUser(UserUpdateDto updateDto, Authentication auth) {
+  public UserDto updateUser(UserUpdateDto updateDto, Authentication auth) {
     boolean isUsernameChanged = !auth.getName().equals(updateDto.username());
     if (isUsernameChanged && usernameExists(updateDto.username())) {
       throw new UsernameAlreadyExistsException();
@@ -37,19 +38,19 @@ public class UserService {
     User user = getUserReferenceFromAuth(auth);
     user.setUsername(updateDto.username());
     user.setBirthDate(updateDto.birthDate());
-    return userRepository.save(user); // Opcional com o @Transactional, mas melhora a testabilidade
+    return UserDto.fromEntity(userRepository.save(user));
   }
 
-  public User updatePassword(PasswordUpdateDto passwordUpdateDto, Authentication auth) {
-    User user = getUserFromAuth(auth);
+  public void updatePassword(PasswordUpdateDto passwordUpdateDto, Authentication auth) {
+    User user = getUserEntityFromAuth(auth);
     if (!passwordEncoder.matches(passwordUpdateDto.currentPassword(), user.getPassword())) {
       throw new InvalidCredentialsException();
     }
     user.setPassword(passwordEncoder.encode(passwordUpdateDto.newPassword()));
-    return userRepository.save(user);
+    userRepository.save(user);
   }
 
-  public User getUserFromAuth(Authentication auth) {
+  public User getUserEntityFromAuth(Authentication auth) {
     UUID id = (UUID) auth.getDetails();
     return userRepository.findById(id)
         .orElseThrow(() -> new UserNotFoundException(id));
