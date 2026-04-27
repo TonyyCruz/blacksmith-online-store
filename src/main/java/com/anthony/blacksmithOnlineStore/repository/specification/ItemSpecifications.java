@@ -51,6 +51,11 @@ public class ItemSpecifications {
             criteriaBuilder.lessThanOrEqualTo(root.get("maxWeight"), filters.material()));
       }
 
+      if (filters.active() != null) {
+        predicates = criteriaBuilder.and(predicates,
+            criteriaBuilder.equal(root.get("active"), filters.material()));
+      }
+
       return predicates;
     };
   }
