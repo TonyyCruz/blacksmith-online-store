@@ -70,7 +70,8 @@ com.anthony.blacksmithOnlineStore <br>
 ├── security → Configuração de segurança e JWT<br>
 ├── entity → Mapeamento JPA das entidades<br>
 ├── enums → Enumerações (ex: Role)<br>
-└── exception → Exceções personalizadas e handlers globais<br>
+├── exception → Exceções personalizadas e handlers globais<br>
+└── mapstruct → Mapeadores para atualização parcial de entidades
 
 
 Essa estrutura garante:
@@ -87,7 +88,7 @@ Após o login bem-sucedido, o usuario recebe um token que deve ser enviado no ca
 `Authorization: Bearer <seu_token_aqui>`
 
 
-A autorização é controlada através de anotações como:
+A autorização é controlada por anotações como:
 
 ```java
 @PreAuthorize("hasRole('ADMIN')")
@@ -104,7 +105,7 @@ Pré-requisitos
 
 ### 1️⃣ Clone o repositório
 git clone git@github.com:TonyyCruz/blacksmith-online-store.git
-cd order-management-api
+cd blacksmith-online-store
 
 ### 2️⃣ Configure o banco de dados (Opcional)
 #### Edite o arquivo src/main/resources/application.properties:
@@ -115,7 +116,7 @@ spring.jpa.hibernate.ddl-auto=update
 
 ### 3️⃣ Compile e execute
 ```mvn spring-boot:run``` <br>
-Ou diretamente em sua IDE favorita.
+Ou diretamente na sua IDE favorita.
 
 ---
 
