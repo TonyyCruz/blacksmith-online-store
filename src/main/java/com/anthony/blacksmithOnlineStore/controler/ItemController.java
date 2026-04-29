@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ItemController {
   private final ItemService itemService;
 
-  @PostMapping("/create")
+  @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ItemResponseDto> createItem(@RequestBody @Valid ItemRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(dto));
@@ -57,7 +57,7 @@ public class ItemController {
     return ResponseEntity.ok(itemService.findById(id));
   }
 
-  @PostMapping("/filter")
+  @GetMapping("/all")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Page<ItemResponseDto>> getAllItems(
       @RequestBody ItemFilterDto filter,
@@ -66,9 +66,9 @@ public class ItemController {
     return ResponseEntity.ok(itemService.findAll(filter, pageable));
   }
 
-  @PostMapping
+  @GetMapping
   public ResponseEntity<Page<ItemResponseDto>> getAllActiveItems(
-      @RequestBody ItemFilterDto filter,
+      ItemFilterDto filter,
       @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
       Pageable pageable) {
     return ResponseEntity.ok(itemService.findFilteredItems(filter, pageable));
