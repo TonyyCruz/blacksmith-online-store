@@ -32,28 +32,28 @@ public class ItemSpecifications {
       }
       if (filters.baseDamage() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.greaterThanOrEqualTo(root.get("baseDamage"), filters.material()));
+            criteriaBuilder.greaterThanOrEqualTo(root.get("baseDamage"), filters.baseDamage()));
       }
       if (filters.baseDefense() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.greaterThanOrEqualTo(root.get("baseDefense"), filters.material()));
+            criteriaBuilder.greaterThanOrEqualTo(root.get("baseDefense"), filters.baseDefense()));
       }
       if (filters.highestPrice() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.lessThanOrEqualTo(root.get("highestPrice"), filters.material()));
+            criteriaBuilder.lessThanOrEqualTo(root.get("highestPrice"), filters.highestPrice()));
       }
       if (filters.lowestPrice() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.greaterThanOrEqualTo(root.get("lowestPrice"), filters.material()));
+            criteriaBuilder.greaterThanOrEqualTo(root.get("lowestPrice"), filters.lowestPrice()));
       }
       if (filters.maxWeight() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.lessThanOrEqualTo(root.get("maxWeight"), filters.material()));
+            criteriaBuilder.lessThanOrEqualTo(root.get("maxWeight"), filters.maxWeight()));
       }
 
       if (filters.active() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.equal(root.get("active"), filters.material()));
+            criteriaBuilder.equal(root.get("active"), filters.active()));
       }
 
       return predicates;
