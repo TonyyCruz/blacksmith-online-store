@@ -19,6 +19,7 @@ public enum Type {
   HALBERD("Halberd"),
   PIKE("Pike"),
   GLAIVE("Glaive"),
+  BOW("Bow"),
   SHORT_BOW("Short Bow"),
   LONG_BOW("Long Bow"),
   CROSSBOW("Crossbow"),

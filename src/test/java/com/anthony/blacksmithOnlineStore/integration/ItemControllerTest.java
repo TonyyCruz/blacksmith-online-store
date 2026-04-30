@@ -110,7 +110,19 @@ public class ItemControllerTest extends TestBase {
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isOk());
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.name").value(itemUpdate.name()))
+          .andExpect(jsonPath("$.material").value(itemUpdate.material().toString()))
+          .andExpect(jsonPath("$.baseDamage").value(itemUpdate.baseDamage()))
+          .andExpect(jsonPath("$.baseDefense").value(itemUpdate.baseDefense()))
+          .andExpect(jsonPath("$.basePrice").value(itemUpdate.basePrice().doubleValue()))
+          .andExpect(jsonPath("$.finalPrice").value(itemUpdate.finalPrice().doubleValue()))
+          .andExpect(jsonPath("$.description").value(itemUpdate.description()))
+          .andExpect(jsonPath("$.weight").value(itemUpdate.weight().doubleValue()))
+          .andExpect(jsonPath("$.stock").value(itemUpdate.stock()))
+          .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
+          .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
+          .andExpect(jsonPath("$.active").value(itemUpdate.active()));
 
     }
   }
