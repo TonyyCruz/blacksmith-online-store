@@ -40,15 +40,15 @@ public class ItemSpecifications {
       }
       if (filters.highestPrice() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.lessThanOrEqualTo(root.get("highestPrice"), filters.highestPrice()));
+            criteriaBuilder.lessThanOrEqualTo(root.get("finalPrice"), filters.highestPrice()));
       }
       if (filters.lowestPrice() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.greaterThanOrEqualTo(root.get("lowestPrice"), filters.lowestPrice()));
+            criteriaBuilder.greaterThanOrEqualTo(root.get("finalPrice"), filters.lowestPrice()));
       }
       if (filters.maxWeight() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.lessThanOrEqualTo(root.get("maxWeight"), filters.maxWeight()));
+            criteriaBuilder.lessThanOrEqualTo(root.get("weight"), filters.maxWeight()));
       }
 
       if (filters.active() != null) {
