@@ -8,18 +8,21 @@ import java.math.BigDecimal;
 public record ItemFilterDto(
     String name,
     Material material,
-    Integer baseDamage,
-    Integer baseDefense,
-    BigDecimal highestPrice,
-    BigDecimal lowestPrice,
+    Integer minDamage,
+    Integer maxDamage,
+    Integer minDefense,
+    Integer maxDefense,
+    BigDecimal minPrice,
+    BigDecimal maxPrice,
+    Float minWeight,
     Float maxWeight,
     Type type,
     Rarity rarity,
     Long blacksmithId,
     Boolean active
 ) {
-    public ItemFilterDto toUserFilter() {
-      return new ItemFilterDto(name, material, baseDamage, baseDefense, highestPrice, lowestPrice,
-          maxWeight, type, rarity, blacksmithId, true);
+    public ItemFilterDto withActiveTrue() {
+      return new ItemFilterDto(name, material, minDamage, maxDamage, minDefense, maxDefense, minPrice, maxPrice,
+          minWeight, maxWeight, type, rarity, blacksmithId, true);
     }
 }
