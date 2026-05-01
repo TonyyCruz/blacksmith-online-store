@@ -13,6 +13,7 @@ import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
+import com.anthony.blacksmithOnlineStore.security.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -79,9 +80,10 @@ public class ItemService {
     return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
   }
 
-  public Page<ItemResponseDto> findAll(ItemFilterDto filter, Pageable pageable) {
-    Specification<Item> specs = ItemSpecifications.withFilters(filter.toUserFilter());
-    Page<Item> items = itemRepository.findAll(specs, pageable);
+  public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
+    if (!SecurityUtils.isAdmin()) filter = filter.withActiveTrue();
+    Specification<Item> specification = ItemSpecifications.withFilters(filter);
+    Page<Item> items = itemRepository.findAll(specification, pageable);
     return items.map(ItemResponseDto::fromEntity);
   }
 
@@ -100,12 +102,6 @@ public class ItemService {
 
   public Page<ItemResponseDto> findByBlacksmithId(Long blacksmithId, Pageable pageable) {
     Page<Item> items = itemRepository.findByCraftedById(blacksmithId, pageable);
-    return items.map(ItemResponseDto::fromEntity);
-  }
-
-  public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
-    Specification<Item> specs = ItemSpecifications.withFilters(filter.toUserFilter());
-    Page<Item> items = itemRepository.findAll(specs, pageable);
     return items.map(ItemResponseDto::fromEntity);
   }
 
