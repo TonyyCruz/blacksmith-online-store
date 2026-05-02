@@ -4,23 +4,27 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import lombok.Builder;
 
 @Builder
 public record ItemRequestDto(
-    String name,
-    Material material,
-    Integer baseDamage,
-    Integer baseDefense,
-    BigDecimal basePrice,
-    BigDecimal finalPrice,
-    String description,
-    Float weight,
-    Integer stock,
-    Type type,
-    Rarity rarity,
-    Long blacksmithId,
+    @Size(min = 2, message = "Name must have at lest 2 characters") String name,
+    @NotNull(message = "Material must not be null") Material material,
+    @Min(value = 1, message = "Base damage must be at lest 1") Integer baseDamage,
+    @Min(value = 1, message = "Base defense must be at lest 1") Integer baseDefense,
+    @Positive(message = "Base price must not be a negative number") BigDecimal basePrice,
+    @Positive(message = "Final price must not be a negative number") BigDecimal finalPrice,
+    @Size(min = 10, message = "Description must have at lest 10 characters") String description,
+    @Positive(message = "Weight price must not be a negative number") Float weight,
+    @Positive(message = "Stock price must not be a negative number") Integer stock,
+    @NotNull(message = "Type must not be null") Type type,
+    @NotNull(message = "Rarity must not be null") Rarity rarity,
+    @NotNull(message = "Blacksmith must not be null") Long blacksmithId,
     boolean active
 ) {
 
