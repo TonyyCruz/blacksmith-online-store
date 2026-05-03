@@ -5,12 +5,16 @@ import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 
 public class MockBlacksmith {
 
-  public static Blacksmith blacksmith() {
+  public static Blacksmith blacksmith(Long id) {
     Blacksmith blacksmith = new Blacksmith();
-    blacksmith.setId(1L);
+    blacksmith.setId(id);
     blacksmith.setName("John the Smith");
     blacksmith.setDescription("Experienced blacksmith specializing in medieval weapons.");
     return blacksmith;
+  }
+
+  public static Blacksmith blacksmith() {
+    return blacksmith(1L);
   }
 
   public static Blacksmith clone(Blacksmith blacksmith) {

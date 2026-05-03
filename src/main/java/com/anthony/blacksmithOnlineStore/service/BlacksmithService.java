@@ -50,8 +50,14 @@ public class BlacksmithService {
   }
 
   public Blacksmith getReferenceById(Long id) {
-    if (!blacksmithRepository.existsById(id)) throw new BlacksmithNotFoundException(id);
+    existsVerify(id);
     return blacksmithRepository.getReferenceById(id);
+  }
+
+  public void existsVerify(Long id) {
+    if (!blacksmithRepository.existsById(id)) {
+      throw new BlacksmithNotFoundException(id);
+    }
   }
 
   public void addRating(Long blacksmithId, int rating) {

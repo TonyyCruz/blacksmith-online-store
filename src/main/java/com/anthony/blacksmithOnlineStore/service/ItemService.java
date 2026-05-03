@@ -66,7 +66,11 @@ public class ItemService {
     return ItemResponseDto.fromEntity(itemRepository.save(item));
   }
 
+  @Transactional
   public ItemResponseDto update(Long id, ItemPatchUpdateDto dto) {
+    if (dto.blacksmithId() != null) {
+      blacksmithService.existsVerify(dto.blacksmithId());
+    }
     Item item = getReferenceById(id);
     itemUpdate.updateItemFromDto(dto, item);
     return ItemResponseDto.fromEntity(itemRepository.save(item));
@@ -87,6 +91,7 @@ public class ItemService {
     return items.map(ItemResponseDto::fromEntity);
   }
 
+  @Transactional
   public void deleteItem(Long id) {
     Item item = findEntityById(id);
     if (item.getSold() > 0) {

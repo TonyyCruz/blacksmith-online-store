@@ -46,26 +46,21 @@ public class ItemControllerTest extends TestBase {
   private BlacksmithRepository blacksmithRepository;
   private final String item_BASE_URL = "/items";
   private Item item;
+  private String adminToken;
+  private String userToken;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws Exception {
     item = itemRepository.findById(1L)
         .orElseThrow(() -> new IllegalStateException("Item not found in test DB"));
+    adminToken = performLogin(adminLogin);
+    userToken = performLogin(userLogin);
   }
 
   @Nested
   @Transactional
   @DisplayName("Happy Path")
   class ItemControllerHappyPath {
-
-    private String adminToken;
-    private String userToken;
-
-    @BeforeEach
-    void setUp() throws Exception {
-      adminToken = performLogin(adminLogin);
-      userToken = performLogin(userLogin);
-    }
 
     @Test
     @Transactional
@@ -121,6 +116,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
+    @Transactional
     @DisplayName("Can update all fields witha PATH update successfully")
     void patchUpdate_canUpdateAllFieldsSuccessfully() throws Exception {
       ItemPatchUpdateDto itemUpdate = MockItem.itemPatchUpdateDto();
@@ -201,7 +197,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can get all active itens with user acount")
+    @DisplayName("Can get all active itens with user acount when filter is empty")
     void getAllActiveItems_canGetAllActiveItensSuccessfully_withUserAccount() throws Exception {
       mockMvc.perform(get(item_BASE_URL)
               .header("Authorization", userToken))
@@ -213,7 +209,29 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can get all itens with admin acount")
+    @DisplayName("User can get only active itens")
+    void getAllFilteredItems_canGetOnlyActiveItens_withUserAccount() throws Exception {
+      mockMvc.perform(get(item_BASE_URL)
+              .header("Authorization", userToken)
+              .param("active", "false"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content").isNotEmpty())
+          .andExpect(jsonPath("$.content[*].active").value(everyItem(is(true))));
+    }
+
+    @Test
+    @DisplayName("Can return empty list when filter have no match")
+    void filter_shouldReturnEmpty_whenNoMatch() throws Exception {
+      mockMvc.perform(get(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .param("name", "NONEXISTENT_ITEM_999999999"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Can get all itens with admin acount and empty search")
     void getAllActiveItems_canGetAllFilteredItemsSuccessfully_withAdminAccount() throws Exception {
       mockMvc.perform(get(item_BASE_URL)
               .header("Authorization", adminToken))
@@ -273,11 +291,11 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Can delete an itens with admin acount")
     void deleteItem_canDeleteAnItem_WithAdminAccount() throws Exception {
-      saveItem(MockItem.itemRequestDto());
-      mockMvc.perform(delete(item_BASE_URL + "/" + item.getId())
+      Item savedItem = saveItem(MockItem.itemRequestDto());
+      mockMvc.perform(delete(item_BASE_URL + "/" + savedItem.getId())
               .header("Authorization", adminToken))
           .andExpect(status().isNoContent());
-      assertFalse(itemRepository.existsById(item.getId()));
+      assertFalse(itemRepository.existsById(savedItem.getId()));
     }
   }
 
@@ -285,24 +303,236 @@ public class ItemControllerTest extends TestBase {
   @DisplayName("Exception Path")
   class ItemControllerExceptionPath {
 
-    private String userToken;
-
-    @BeforeEach
-    void setUp() throws Exception {
-      userToken = performLogin(userLogin);
+    @Test
+    @DisplayName("Should return 400 when finalPrice greater than basePrice")
+    void createItem_shouldReturn400_whenFinalPriceIsGreater() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
+          .basePrice(BigDecimal.valueOf(100))
+          .finalPrice(BigDecimal.valueOf(200))
+          .build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("User cannot get unactive itens")
-    void getAllFilteredItems_cannotGetUnactiveItens_withUserAccount() throws Exception {
-      mockMvc.perform(get(item_BASE_URL)
-              .header("Authorization", userToken)
-              .param("active", "false"))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content").isArray())
-          .andExpect(jsonPath("$.content").isNotEmpty())
-          .andExpect(jsonPath("$.content[*].active").value(everyItem(is(true))));
+    @DisplayName("Should return 400 when name is invalid")
+    void createItem_shouldReturn400_whenInvalidName() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().name("a").build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("Should return 400 when material is null")
+    void createItem_shouldReturn400_whenMaterialIsNull() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().material(null).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when base damage is negative")
+    void createItem_shouldReturn400_whenBaseDamageIsNegative() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().baseDamage(-1).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when base defense is negative")
+    void createItem_shouldReturn400_whenBaseDefenseIsNegative() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().baseDefense(-1).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when base price is negative")
+    void createItem_shouldReturn400_whenBasePriceIsNegative() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
+          .basePrice(BigDecimal.valueOf(-1)).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when final price is negative")
+    void createItem_shouldReturn400_whenFinalPriceIsNegative() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
+          .finalPrice(BigDecimal.valueOf(-1)).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when description is invalid")
+    void createItem_shouldReturn400_whenInvalidDescription() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().description("aaaaaaaaa").build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when weight is negative")
+    void createItem_shouldReturn400_whenWeightIsNegative() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
+          .weight(-1f).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when stock is negative")
+    void createItem_shouldReturn400_whenStockIsNegative() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
+          .stock(-1).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when type is null")
+    void createItem_shouldReturn400_whenTypeIsNull() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().type(null).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when rarity is null")
+    void createItem_shouldReturn400_whenRarityIsNull() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().rarity(null).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when blacksmith is null")
+    void createItem_shouldReturn400_whenBlacksmithIsNull() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().blacksmithId(null).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Create item should return 403 when user is not admin")
+    void createItem_shouldReturn403_whenUserIsNotAdmin() throws Exception {
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", userToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(MockItem.itemRequestDto())))
+          .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Should return 404 when item not found")
+    void getItem_shouldReturn404_whenNotFound() throws Exception {
+      mockMvc.perform(get(item_BASE_URL + "/999999")
+              .header("Authorization", userToken))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return 404 when updating non-existing item")
+    void update_shouldReturn404_whenItemNotFound() throws Exception {
+      mockMvc.perform(put(item_BASE_URL + "/999999")
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(MockItem.itemRequestDto())))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when updating with invalid price")
+    void update_shouldReturn400_whenInvalidPrice() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
+          .basePrice(BigDecimal.valueOf(100))
+          .finalPrice(BigDecimal.valueOf(200))
+          .build();
+      mockMvc.perform(put(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 404 when patching non-existing item")
+    void patch_shouldReturn404_whenItemNotFound() throws Exception {
+      mockMvc.perform(patch(item_BASE_URL + "/999999")
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(MockItem.itemPatchUpdateDto())))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return 404 when deleting non-existing item")
+    void delete_shouldReturn404_whenItemNotFound() throws Exception {
+      mockMvc.perform(delete(item_BASE_URL + "/999999")
+              .header("Authorization", adminToken))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Should return 403 when deleting sold item")
+    void delete_shouldReturn403_whenItemWasSold() throws Exception {
+      Item soldItem = saveItem(MockItem.itemRequestDto());
+      soldItem.addSoldQuantity(10);
+      itemRepository.save(soldItem);
+      mockMvc.perform(delete(item_BASE_URL + "/" + soldItem.getId())
+              .header("Authorization", adminToken))
+          .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Should return 403 when user tries to delete an item")
+    void delete_shouldReturn403_whenUserIsNotAdmin() throws Exception {
+      mockMvc.perform(delete(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", userToken))
+          .andExpect(status().isForbidden());
+    }
+
   }
 
   Item saveItem(ItemRequestDto dto) {
