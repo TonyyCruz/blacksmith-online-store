@@ -4,7 +4,6 @@ import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemFilterDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemResponseDto;
-import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -57,21 +57,20 @@ public class ItemController {
     return ResponseEntity.ok(itemService.findById(id));
   }
 
-  @GetMapping("/all")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Page<ItemResponseDto>> getAllItems(
-      @RequestBody ItemFilterDto filter,
-      @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
-      Pageable pageable) {
-    return ResponseEntity.ok(itemService.findAll(filter, pageable));
-  }
-
   @GetMapping
-  public ResponseEntity<Page<ItemResponseDto>> getAllActiveItems(
+  public ResponseEntity<Page<ItemResponseDto>> getAllFilteredItems(
       ItemFilterDto filter,
       @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
       Pageable pageable) {
     return ResponseEntity.ok(itemService.findFilteredItems(filter, pageable));
+  }
+
+  @GetMapping("/blacksmith/{id}")
+  public ResponseEntity<Page<ItemResponseDto>> getItemByBlacksmithId(
+      @PathVariable Long id,
+      @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
+      Pageable pageable) {
+    return ResponseEntity.ok(itemService.findByBlacksmithId(id, pageable));
   }
 
   @DeleteMapping("/{id}")

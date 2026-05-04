@@ -28,6 +28,7 @@ public class MockItem {
         .craftedBy(MockBlacksmith.blacksmith())
         .blacksmithIdSnapshot(MockBlacksmith.blacksmith().getId())
         .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
+        .ratingCount(0)
         .build();
   }
 
@@ -45,7 +46,7 @@ public class MockItem {
         .name("Birulabe")
         .basePrice(BigDecimal.valueOf(120.00))
         .finalPrice(BigDecimal.valueOf(120.00))
-        .description("Meme club")
+        .description("Meme club!")
         .weight(35.0f)
         .stock(10000)
         .type(Type.CLUB)
