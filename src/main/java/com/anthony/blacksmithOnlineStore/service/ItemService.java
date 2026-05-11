@@ -68,10 +68,12 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto update(Long id, ItemPatchUpdateDto dto) {
-    if (dto.blacksmithId() != null) {
-      blacksmithService.existsVerify(dto.blacksmithId());
-    }
     Item item = getReferenceById(id);
+    if (dto.blacksmithId() != null) {
+      Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
+      item.setBlacksmithIdSnapshot(blacksmith.getId());
+      item.setBlacksmithNameSnapshot(blacksmith.getName());
+    }
     itemUpdate.updateItemFromDto(dto, item);
     return ItemResponseDto.fromEntity(itemRepository.save(item));
   }

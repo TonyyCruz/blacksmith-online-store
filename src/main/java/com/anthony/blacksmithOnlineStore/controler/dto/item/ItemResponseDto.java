@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.controler.dto.item;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
@@ -22,7 +21,8 @@ public record ItemResponseDto(
     Integer stock,
     Type type,
     Rarity rarity,
-    BlacksmithResponseDto craftedBy,
+    Long blacksmithId,
+    String blacksmithName,
     BigDecimal ratingAverage,
     Integer ratingCount,
     Long sold,
@@ -43,7 +43,8 @@ public record ItemResponseDto(
         .stock(item.getStock())
         .type(item.getType())
         .rarity(item.getRarity())
-        .craftedBy(BlacksmithResponseDto.fromEntity(item.getCraftedBy()))
+        .blacksmithId(item.getBlacksmithIdSnapshot())
+        .blacksmithName(item.getBlacksmithNameSnapshot())
         .ratingAverage(item.getRatingAverage())
         .ratingCount(item.getRatingCount())
         .active(item.isActive())

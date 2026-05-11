@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,7 @@ import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
+import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
@@ -58,7 +60,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("Create should save item and return response when data is valid")
-    void shouldCreateItemSuccessfully() {
+    void createItem_shouldCreateItemSuccessfully_withValidData() {
       ItemRequestDto dto = MockItem.itemRequestDto();
       Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
 
@@ -68,7 +70,7 @@ public class ItemServiceTest {
       ItemResponseDto response = itemService.create(dto);
 
       assertEquals(dto.name(), response.name(), "Name must be equal to receive in dto");
-      assertEquals(dto.blacksmithId(), response.craftedBy().id(), "CraftedBy must be equal to receive in dto");
+      assertEquals(dto.blacksmithId(), response.blacksmithId(), "Blacksmith Id must be equal to receive in dto");
       assertEquals(dto.baseDefense(), response.baseDefense(), "BaseDefense must be equal to receive in dto");
       assertEquals(dto.baseDamage(), response.baseDamage(), "BaseDamage must be equal to receive in dto");
       assertEquals(dto.basePrice(), response.basePrice(), "BasePrice must be equal to receive in dto");
@@ -85,7 +87,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("Update should modify item and return response when data is valid")
-    void shouldUpdateItemSuccessfully() {
+    void updateItem_shouldUpdateItemSuccessfully_withValidData() {
       Long id = targetItem.getId();
       ItemRequestDto dto = MockItem.itemRequestDto();
       Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
@@ -98,7 +100,7 @@ public class ItemServiceTest {
       ItemResponseDto response = itemService.update(id, dto);
 
       assertEquals(dto.name(), response.name(), "Name must be equal to receive in dto");
-      assertEquals(dto.blacksmithId(), response.craftedBy().id(), "CraftedBy must be equal to receive in dto");
+      assertEquals(dto.blacksmithId(), response.blacksmithId(), "Blacksmith Id must be equal to receive in dto");
       assertEquals(dto.baseDefense(), response.baseDefense(), "BaseDefense must be equal to receive in dto");
       assertEquals(dto.baseDamage(), response.baseDamage(), "BaseDamage must be equal to receive in dto");
       assertEquals(dto.basePrice(), response.basePrice(), "BasePrice must be equal to receive in dto");
@@ -116,7 +118,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("Patch update should modify item and return response when data is valid")
-    void shouldPatchItemSuccessfully() {
+    void patchUpdate_shouldPatchItemSuccessfully_withValidData() {
       Long id = targetItem.getId();
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto();
       Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
@@ -139,7 +141,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("FindById should return item response when item exists")
-    void shouldFindItemByIdSuccessfully() {
+    void findById_shouldFindItemByIdSuccessfully_whenItemExists() {
       when(itemRepository.findById(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
 
@@ -151,7 +153,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("Delete should remove item when it exists and has no sales")
-    void shouldDeleteItemSuccessfully() {
+    void deleteItem_shouldDeleteItemSuccessfully_whenItemExists() {
       when(itemRepository.findById(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
 
@@ -162,7 +164,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("IncrementStock should increase stock when item exists")
-    void shouldIncrementStockSuccessfully() {
+    void incrementStock_shouldIncrementStockSuccessfully() {
       when(itemRepository.existsById(targetItem.getId())).thenReturn(true);
       when(itemRepository.incrementStock(targetItem.getId(), 10)).thenReturn(1);
 
@@ -173,7 +175,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("DecrementStock should decrease stock when item exists and has enough stock")
-    void shouldDecrementStockSuccessfully() {
+    void decrementStock_shouldDecrementStockSuccessfully() {
       when(itemRepository.existsById(targetItem.getId())).thenReturn(true);
       when(itemRepository.decrementStock(targetItem.getId(), 5)).thenReturn(1);
 
@@ -184,7 +186,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("PerformSale should update sold quantity when item exists and has enough stock")
-    void shouldPerformSaleSuccessfully() {
+    void performSale_shouldShouldUpdateQuantitySuccessfully() {
       when(itemRepository.findById(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
       when(itemRepository.existsById(targetItem.getId())).thenReturn(true);
@@ -200,7 +202,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("AddRating should update rating count and average when item exists")
-    void shouldAddRatingSuccessfully() {
+    void addRating_shouldAddRatingSuccessfully() {
       when(itemRepository.findById(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
 
@@ -217,7 +219,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("Create should throw InvalidItemDataException when final price is greater than base price")
-    void shouldThrowExceptionWhenFinalPriceIsGreater() {
+    void createItem_shouldThrowException_whenFinalPriceIsGreaterThanBasePrice() {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100))
           .finalPrice(BigDecimal.valueOf(200))
@@ -227,8 +229,42 @@ public class ItemServiceTest {
     }
 
     @Test
+    @DisplayName("Create should throw BlacksmithNotFoundException when blacksmith does not exist")
+    void createItem_shouldThrowExceptionWhenBlacksmith_whenBlacksmithNotFound() {
+      ItemRequestDto dto = MockItem.itemRequestDto();
+
+      when(blacksmithService.findEntityById(dto.blacksmithId()))
+          .thenThrow(new BlacksmithNotFoundException(dto.blacksmithId()));
+
+      assertThrows(BlacksmithNotFoundException.class, () -> itemService.create(dto));
+    }
+
+    @Test
+    @DisplayName("Update should throw BlacksmithNotFoundException when blacksmith does not exist")
+    void updateItem_shouldThrowExceptionWhenBlacksmith_whenBlacksmithNotFound() {
+      ItemRequestDto dto = MockItem.itemRequestDto();
+
+      when(blacksmithService.findEntityById(dto.blacksmithId()))
+          .thenThrow(new BlacksmithNotFoundException(dto.blacksmithId()));
+
+      assertThrows(BlacksmithNotFoundException.class, () -> itemService.update(1L, dto));
+    }
+
+    @Test
+    @DisplayName("Patch update should throw BlacksmithNotFoundException when blacksmith does not exist")
+    void pathUpdate_shouldThrowExceptionWhenBlacksmith_whenBlacksmithNotFound() {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto();
+
+      doThrow(new BlacksmithNotFoundException(dto.blacksmithId()))
+          .when(blacksmithService)
+          .existsVerify(dto.blacksmithId());
+
+      assertThrows(BlacksmithNotFoundException.class, () -> itemService.update(1L, dto));
+    }
+
+    @Test
     @DisplayName("Update should throw InvalidItemDataException when final price is greater than base price")
-    void shouldThrowWhenItemNotFoundOnFind() {
+    void updateItem_shouldThrowInvalidItemDataException_whenItemNotFoundOnFind() {
       when(itemRepository.findById(any())).thenReturn(Optional.empty());
 
       assertThrows(ItemNotFoundException.class,
@@ -237,7 +273,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("Update should throw ItemNotFoundException when item does not exist")
-    void shouldThrowWhenUpdatingNonExistingItem() {
+    void updateItem_shouldThrowItemNotFoundException_whenUpdatingNonExistingItem() {
       when(itemRepository.existsById(any())).thenReturn(false);
 
       assertThrows(ItemNotFoundException.class,
@@ -246,7 +282,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("Delete should throw ForbiddenOperationException when item has sales")
-    void shouldThrowWhenDeletingSoldItem() {
+    void deleteItem_shouldThrowForbiddenOperationException_whenDeletingSoldItem() {
       targetItem.addSoldQuantity(5);
 
       when(itemRepository.findById(targetItem.getId()))
@@ -258,7 +294,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("IncrementStock should throw DataModifyException when stock update fails")
-    void shouldThrowWhenIncrementStockFails() {
+    void incrementeStock_shouldThrowDataModifyException_whenIncrementStockFails() {
       when(itemRepository.existsById(targetItem.getId())).thenReturn(true);
       when(itemRepository.incrementStock(targetItem.getId(), 10)).thenReturn(0);
 
@@ -268,7 +304,7 @@ public class ItemServiceTest {
 
     @Test
     @DisplayName("DecrementStock should throw DataModifyException when stock update fails")
-    void shouldThrowWhenDecrementStockFails() {
+    void decrementeStock_shouldThrowDataModifyException_whenDecrementStockFails() {
       when(itemRepository.existsById(targetItem.getId())).thenReturn(true);
       when(itemRepository.decrementStock(targetItem.getId(), 5)).thenReturn(0);
 
