@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.Period;
 
 public class AgeValidator implements ConstraintValidator<Age, LocalDate> {
-
   private int min;
   private int max;
 
