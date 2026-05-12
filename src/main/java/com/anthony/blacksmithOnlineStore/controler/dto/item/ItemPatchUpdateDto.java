@@ -13,7 +13,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record ItemPatchUpdateDto(
     @NullOrSize(min = 2, message = "Name must have at lest 2 characters") String name,
     Material material,

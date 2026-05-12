@@ -120,6 +120,7 @@ public class ItemControllerTest extends TestBase {
     @DisplayName("Can update all fields witha PATH update successfully")
     void patchUpdate_canUpdateAllFieldsSuccessfully() throws Exception {
       ItemPatchUpdateDto itemUpdate = MockItem.itemPatchUpdateDto();
+      Blacksmith blacksmith = findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
       mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
               .header("Authorization", adminToken)
@@ -137,8 +138,9 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.stock").value(itemUpdate.stock()))
           .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
           .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
-          .andExpect(jsonPath("$.active").value(itemUpdate.active()));
-
+          .andExpect(jsonPath("$.active").value(itemUpdate.active()))
+          .andExpect(jsonPath("$.blacksmithId").value(blacksmith.getId()))
+          .andExpect(jsonPath("$.blacksmithName").value(blacksmith.getName()));
     }
 
     @Test
@@ -153,7 +155,9 @@ public class ItemControllerTest extends TestBase {
           .type(item.getType())
           .rarity(Rarity.LEGENDARY)
           .active(!item.isActive())
+          .blacksmithId(2L)
           .build();
+      Blacksmith newBlacksmith = findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
       mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
               .header("Authorization", adminToken)
@@ -171,7 +175,9 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.stock").value(item.getStock()))
           .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
           .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
-          .andExpect(jsonPath("$.active").value(itemUpdate.active()));
+          .andExpect(jsonPath("$.active").value(itemUpdate.active()))
+          .andExpect(jsonPath("$.blacksmithId").value(newBlacksmith.getId()))
+          .andExpect(jsonPath("$.blacksmithName").value(newBlacksmith.getName()));
 
     }
 
@@ -535,16 +541,20 @@ public class ItemControllerTest extends TestBase {
 
   }
 
-  Item saveItem(ItemRequestDto dto) {
+  private Item saveItem(ItemRequestDto dto) {
     if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
       throw new InvalidItemDataException("Final price cannot be greater than base price");
     }
     Item item = ItemRequestDto.toEntity(dto);
-    Blacksmith blacksmith = blacksmithRepository.findById(dto.blacksmithId())
-        .orElseThrow(() -> new IllegalStateException("Blacksmith not found in test DB"));
+    Blacksmith blacksmith = findBlacksmithById(dto.blacksmithId());
     item.setCraftedBy(blacksmith);
     item.setBlacksmithIdSnapshot(blacksmith.getId());
     item.setBlacksmithNameSnapshot(blacksmith.getName());
     return itemRepository.save(item);
+  }
+
+  private Blacksmith findBlacksmithById(Long id) {
+    return blacksmithRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("Blacksmith not found in test DB"));
   }
 }

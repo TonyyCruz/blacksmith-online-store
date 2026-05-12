@@ -47,8 +47,9 @@ public class ItemController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<ItemResponseDto> patchItemUpdate(@RequestBody ItemPatchUpdateDto dto,
-      @PathVariable Long id) {
+  public ResponseEntity<ItemResponseDto> patchItemUpdate(
+      @PathVariable Long id,
+      @RequestBody @Valid ItemPatchUpdateDto dto) {
     return ResponseEntity.ok(itemService.update(id, dto));
   }
 

@@ -13,11 +13,14 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = NullOrRangeValidator.class)
 @Documented
 public @interface NullOrRange {
+
   String message() default "{nullorrange.default}";
 
-  double min() default Double.NEGATIVE_INFINITY;
-  double max() default Double.POSITIVE_INFINITY;
+  double min() default -Double.MAX_VALUE;
+
+  double max() default Double.MAX_VALUE;
 
   Class<?>[] groups() default {};
+
   Class<? extends Payload>[] payload() default {};
 }
