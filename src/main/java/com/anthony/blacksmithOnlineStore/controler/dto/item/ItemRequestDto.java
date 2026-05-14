@@ -29,12 +29,13 @@ public record ItemRequestDto(
 
   public static Item toEntity(ItemRequestDto dto) {
     Item item = new Item();
+    item.setName(dto.name());
     item.setMaterial(dto.material());
     item.setBaseDamage(dto.baseDamage());
     item.setBaseDefense(dto.baseDefense());
-    item.setName(dto.name());
     item.setBasePrice(dto.basePrice());
     item.setFinalPrice(dto.finalPrice());
+    item.setHasDiscount(dto.finalPrice().compareTo(dto.basePrice()) < 0);
     item.setDescription(dto.description());
     item.setWeight(dto.weight());
     item.setStock(dto.stock());

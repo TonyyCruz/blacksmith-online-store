@@ -46,7 +46,7 @@ public class Blacksmith {
   @Setter(AccessLevel.NONE)
   private BigDecimal ratingAverage;
   @Version
-  private Long version;
+  private Long version = 0L;
 
   public void addRating(Integer newRating) {
     ratingCount++;
