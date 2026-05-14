@@ -63,19 +63,20 @@ public class ItemService {
     item.setCraftedBy(blacksmith);
     item.setBlacksmithIdSnapshot(dto.blacksmithId());
     item.setBlacksmithNameSnapshot(blacksmith.getName());
-    return ItemResponseDto.fromEntity(itemRepository.save(item));
+    return ItemResponseDto.fromEntity(item);
   }
 
   @Transactional
   public ItemResponseDto update(Long id, ItemPatchUpdateDto dto) {
-    Item item = getReferenceById(id);
+    Item item = findEntityById(id);
     if (dto.blacksmithId() != null) {
       Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
+      item.setCraftedBy(blacksmith);
       item.setBlacksmithIdSnapshot(blacksmith.getId());
       item.setBlacksmithNameSnapshot(blacksmith.getName());
     }
     itemUpdate.updateItemFromDto(dto, item);
-    return ItemResponseDto.fromEntity(itemRepository.save(item));
+    return ItemResponseDto.fromEntity(item);
   }
 
   public ItemResponseDto findById(Long id) {

@@ -16,9 +16,8 @@ public class NullOrSizeValidator implements ConstraintValidator<NullOrSize, Stri
 
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    if (value == null) {
-      return true;
-    }
+    if (value == null) return true;
+    if (value.isBlank()) return false;
     int length = value.length();
     return length >= min && length <= max;
   }

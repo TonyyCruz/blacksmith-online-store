@@ -38,12 +38,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Item {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  @Column(nullable = false)
+  private String name;
   @Enumerated(EnumType.STRING)
   private Material material;
   private Integer baseDamage;
   private Integer baseDefense;
-  @Column(nullable = false)
-  private String name;
   @Column(nullable = false)
   private BigDecimal basePrice;
   @Column(nullable = false)
@@ -87,7 +87,7 @@ public class Item {
   @Column(nullable = false)
   private boolean active = true;
   @Version
-  private Long version;
+  private Long version = 0L;
   @Column(nullable = false, updatable = false)
   private String blacksmithNameSnapshot;
   @Column(nullable = false, updatable = false)

@@ -61,7 +61,7 @@ public class MockItem {
         .material(Material.STEEL)
         .baseDamage(22)
         .baseDefense(10)
-        .name("Patch")
+        .name("Patch Name")
         .basePrice(BigDecimal.valueOf(100.00))
         .finalPrice(BigDecimal.valueOf(99.99))
         .description("Patch Dagger")
@@ -69,7 +69,7 @@ public class MockItem {
         .stock(5)
         .type(Type.DAGGER)
         .rarity(Rarity.RARE)
-        .blacksmithId(1L)
+        .blacksmithId(2L)
         .active(false)
         .build();
   }

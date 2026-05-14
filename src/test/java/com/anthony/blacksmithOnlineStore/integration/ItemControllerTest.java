@@ -4,21 +4,24 @@ import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemFilterDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
-import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.integration.helper.QueryHelper;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
@@ -26,7 +29,6 @@ import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,8 +36,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.MultiValueMap;
 
 @Tag("integration")
 @DisplayName("Integration test for Item controller")
@@ -66,53 +66,58 @@ public class ItemControllerTest extends TestBase {
     @Transactional
     @DisplayName("Can create a new Item successfully")
     void createItem_canCreateItemSuccessfully() throws Exception {
-      String valueAsString = objectMapper.writeValueAsString(MockItem.itemRequestDto());
+      ItemRequestDto dto = MockItem.itemRequestDto();
+      Blacksmith blacksmith = findBlacksmithById(dto.blacksmithId());
+      String valueAsString = objectMapper.writeValueAsString(dto);
       mockMvc.perform(post(item_BASE_URL)
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
           .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.name").value(MockItem.itemRequestDto().name()))
-          .andExpect(jsonPath("$.material").value(MockItem.itemRequestDto().material().toString()))
-          .andExpect(jsonPath("$.baseDamage").value(MockItem.itemRequestDto().baseDamage()))
-          .andExpect(jsonPath("$.baseDefense").value(MockItem.itemRequestDto().baseDefense()))
+          .andExpect(jsonPath("$.name").value(dto.name()))
+          .andExpect(jsonPath("$.material").value(dto.material().toString()))
+          .andExpect(jsonPath("$.baseDamage").value(dto.baseDamage()))
+          .andExpect(jsonPath("$.baseDefense").value(dto.baseDefense()))
           .andExpect(
-              jsonPath("$.basePrice").value(MockItem.itemRequestDto().basePrice().doubleValue()))
+              jsonPath("$.basePrice").value(dto.basePrice().doubleValue()))
           .andExpect(
-              jsonPath("$.finalPrice").value(MockItem.itemRequestDto().finalPrice().doubleValue()))
-          .andExpect(jsonPath("$.description").value(MockItem.itemRequestDto().description()))
-          .andExpect(jsonPath("$.weight").value(MockItem.itemRequestDto().weight().doubleValue()))
-          .andExpect(jsonPath("$.stock").value(MockItem.itemRequestDto().stock()))
-          .andExpect(jsonPath("$.type").value(MockItem.itemRequestDto().type().toString()))
-          .andExpect(jsonPath("$.rarity").value(MockItem.itemRequestDto().rarity().toString()))
-          .andExpect(jsonPath("$.active").value(MockItem.itemRequestDto().active()))
-          .andExpect(jsonPath("$.craftedBy.id").value(MockItem.itemRequestDto().blacksmithId()));
+              jsonPath("$.finalPrice").value(dto.finalPrice().doubleValue()))
+          .andExpect(jsonPath("$.description").value(dto.description()))
+          .andExpect(jsonPath("$.weight").value(dto.weight().doubleValue()))
+          .andExpect(jsonPath("$.stock").value(dto.stock()))
+          .andExpect(jsonPath("$.type").value(dto.type().toString()))
+          .andExpect(jsonPath("$.rarity").value(dto.rarity().toString()))
+          .andExpect(jsonPath("$.active").value(dto.active()))
+          .andExpect(jsonPath("$.blacksmithId").value(blacksmith.getId()))
+          .andExpect(jsonPath("$.blacksmithName").value(blacksmith.getName()));
     }
 
     @Test
     @Transactional
     @DisplayName("Can update an existing Item successfully")
     void updateItem_canUpdateItemSuccessfully() throws Exception {
-      ItemRequestDto itemUpdate = MockItem.itemRequestDto();
-      String valueAsString = objectMapper.writeValueAsString(itemUpdate);
+      ItemRequestDto dto = MockItem.itemRequestDto();
+      Blacksmith blacksmith = findBlacksmithById(dto.blacksmithId());
+      String valueAsString = objectMapper.writeValueAsString(dto);
       mockMvc.perform(put(item_BASE_URL + "/" + item.getId())
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.name").value(itemUpdate.name()))
-          .andExpect(jsonPath("$.material").value(itemUpdate.material().toString()))
-          .andExpect(jsonPath("$.baseDamage").value(itemUpdate.baseDamage()))
-          .andExpect(jsonPath("$.baseDefense").value(itemUpdate.baseDefense()))
-          .andExpect(jsonPath("$.basePrice").value(itemUpdate.basePrice().doubleValue()))
-          .andExpect(jsonPath("$.finalPrice").value(itemUpdate.finalPrice().doubleValue()))
-          .andExpect(jsonPath("$.description").value(itemUpdate.description()))
-          .andExpect(jsonPath("$.weight").value(itemUpdate.weight().doubleValue()))
-          .andExpect(jsonPath("$.stock").value(itemUpdate.stock()))
-          .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
-          .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
-          .andExpect(jsonPath("$.active").value(itemUpdate.active()))
-          .andExpect(jsonPath("$.craftedBy.id").value(itemUpdate.blacksmithId()));
+          .andExpect(jsonPath("$.name").value(dto.name()))
+          .andExpect(jsonPath("$.material").value(dto.material().toString()))
+          .andExpect(jsonPath("$.baseDamage").value(dto.baseDamage()))
+          .andExpect(jsonPath("$.baseDefense").value(dto.baseDefense()))
+          .andExpect(jsonPath("$.basePrice").value(dto.basePrice().doubleValue()))
+          .andExpect(jsonPath("$.finalPrice").value(dto.finalPrice().doubleValue()))
+          .andExpect(jsonPath("$.description").value(dto.description()))
+          .andExpect(jsonPath("$.weight").value(dto.weight().doubleValue()))
+          .andExpect(jsonPath("$.stock").value(dto.stock()))
+          .andExpect(jsonPath("$.type").value(dto.type().toString()))
+          .andExpect(jsonPath("$.rarity").value(dto.rarity().toString()))
+          .andExpect(jsonPath("$.active").value(dto.active()))
+          .andExpect(jsonPath("$.blacksmithId").value(blacksmith.getId()))
+          .andExpect(jsonPath("$.blacksmithName").value(blacksmith.getName()));
     }
 
     @Test
@@ -157,7 +162,7 @@ public class ItemControllerTest extends TestBase {
           .active(!item.isActive())
           .blacksmithId(2L)
           .build();
-      Blacksmith newBlacksmith = findBlacksmithById(itemUpdate.blacksmithId());
+      Blacksmith blacksmith = findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
       mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
               .header("Authorization", adminToken)
@@ -176,8 +181,8 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
           .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
           .andExpect(jsonPath("$.active").value(itemUpdate.active()))
-          .andExpect(jsonPath("$.blacksmithId").value(newBlacksmith.getId()))
-          .andExpect(jsonPath("$.blacksmithName").value(newBlacksmith.getName()));
+          .andExpect(jsonPath("$.blacksmithId").value(blacksmith.getId()))
+          .andExpect(jsonPath("$.blacksmithName").value(blacksmith.getName()));
 
     }
 
@@ -199,7 +204,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.type").value(item.getType().toString()))
           .andExpect(jsonPath("$.rarity").value(item.getRarity().toString()))
           .andExpect(jsonPath("$.active").value(item.isActive()))
-          .andExpect(jsonPath("$.craftedBy.id").value(item.getCraftedBy().getId()));
+          .andExpect(jsonPath("$.blacksmithId").value(item.getCraftedBy().getId()));
     }
 
     @Test
@@ -310,7 +315,7 @@ public class ItemControllerTest extends TestBase {
   class ItemControllerExceptionPath {
 
     @Test
-    @DisplayName("Should return 400 when finalPrice greater than basePrice")
+    @DisplayName("Create should return 400 when finalPrice greater than basePrice")
     void createItem_shouldReturn400_whenFinalPriceIsGreater() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100))
@@ -324,7 +329,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when name is invalid")
+    @DisplayName("Create should return 400 when name is invalid")
     void createItem_shouldReturn400_whenInvalidName() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().name("a").build();
       mockMvc.perform(post(item_BASE_URL)
@@ -335,7 +340,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when material is null")
+    @DisplayName("Create should return 400 when material is null")
     void createItem_shouldReturn400_whenMaterialIsNull() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().material(null).build();
       mockMvc.perform(post(item_BASE_URL)
@@ -346,7 +351,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when base damage is negative")
+    @DisplayName("Create should return 400 when base damage is negative")
     void createItem_shouldReturn400_whenBaseDamageIsNegative() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().baseDamage(-1).build();
       mockMvc.perform(post(item_BASE_URL)
@@ -357,7 +362,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when base defense is negative")
+    @DisplayName("Create should return 400 when base defense is negative")
     void createItem_shouldReturn400_whenBaseDefenseIsNegative() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().baseDefense(-1).build();
       mockMvc.perform(post(item_BASE_URL)
@@ -368,7 +373,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when base price is negative")
+    @DisplayName("Create should return 400 when base price is negative")
     void createItem_shouldReturn400_whenBasePriceIsNegative() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(-1)).build();
@@ -380,7 +385,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when final price is negative")
+    @DisplayName("Create should return 400 when final price is negative")
     void createItem_shouldReturn400_whenFinalPriceIsNegative() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .finalPrice(BigDecimal.valueOf(-1)).build();
@@ -392,7 +397,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when description is invalid")
+    @DisplayName("Create should return 400 when description is invalid")
     void createItem_shouldReturn400_whenInvalidDescription() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().description("aaaaaaaaa").build();
       mockMvc.perform(post(item_BASE_URL)
@@ -403,7 +408,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when weight is negative")
+    @DisplayName("Create should return 400 when weight is negative")
     void createItem_shouldReturn400_whenWeightIsNegative() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .weight(-1f).build();
@@ -415,7 +420,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when stock is negative")
+    @DisplayName("Create should return 400 when stock is negative")
     void createItem_shouldReturn400_whenStockIsNegative() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .stock(-1).build();
@@ -427,7 +432,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when type is null")
+    @DisplayName("Create should return 400 when type is null")
     void createItem_shouldReturn400_whenTypeIsNull() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().type(null).build();
       mockMvc.perform(post(item_BASE_URL)
@@ -438,7 +443,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when rarity is null")
+    @DisplayName("Create should return 400 when rarity is null")
     void createItem_shouldReturn400_whenRarityIsNull() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().rarity(null).build();
       mockMvc.perform(post(item_BASE_URL)
@@ -449,7 +454,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when blacksmith is null")
+    @DisplayName("Create should return 400 when blacksmith is null")
     void createItem_shouldReturn400_whenBlacksmithIsNull() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().blacksmithId(null).build();
       mockMvc.perform(post(item_BASE_URL)
@@ -457,6 +462,17 @@ public class ItemControllerTest extends TestBase {
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(dto)))
           .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Create should return 404 when blacksmith not exists")
+    void createItem_shouldReturn404_whenBlacksmithNotExists() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().blacksmithId(999L).build();
+      mockMvc.perform(post(item_BASE_URL)
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isNotFound());
     }
 
     @Test
@@ -470,7 +486,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 404 when item not found")
+    @DisplayName("Get item Should return 404 when item not found")
     void getItem_shouldReturn404_whenNotFound() throws Exception {
       mockMvc.perform(get(item_BASE_URL + "/999999")
               .header("Authorization", userToken))
@@ -478,7 +494,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 404 when updating non-existing item")
+    @DisplayName("Update should return 404 when updating non-existing item")
     void update_shouldReturn404_whenItemNotFound() throws Exception {
       mockMvc.perform(put(item_BASE_URL + "/999999")
               .header("Authorization", adminToken)
@@ -488,7 +504,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 400 when updating with invalid price")
+    @DisplayName("Update should return 400 when updating with invalid price")
     void update_shouldReturn400_whenInvalidPrice() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100))
@@ -502,7 +518,18 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 404 when patching non-existing item")
+    @DisplayName("Update should return 404 when blacksmith not exists")
+    void updateItem_shouldReturn404_whenBlacksmithNotExists() throws Exception {
+      ItemRequestDto dto = MockItem.itemRequestDto().toBuilder().blacksmithId(999L).build();
+      mockMvc.perform(put(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Patch update should return 404 when patching non-existing item")
     void patch_shouldReturn404_whenItemNotFound() throws Exception {
       mockMvc.perform(patch(item_BASE_URL + "/999999")
               .header("Authorization", adminToken)
@@ -512,7 +539,20 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 404 when deleting non-existing item")
+    @DisplayName("Patch update should return 400 with invalid item name")
+    void patch_shouldReturn400_withInvalidItemName() throws Exception {
+      for (String name :  new String[]{"", "  ", "a"}) {
+        ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder().name(name).build();
+        mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+                .header("Authorization", adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isBadRequest());
+      }
+    }
+
+    @Test
+    @DisplayName("Delete should return 404 when deleting non-existing item")
     void delete_shouldReturn404_whenItemNotFound() throws Exception {
       mockMvc.perform(delete(item_BASE_URL + "/999999")
               .header("Authorization", adminToken))
@@ -521,7 +561,7 @@ public class ItemControllerTest extends TestBase {
 
     @Test
     @Transactional
-    @DisplayName("Should return 403 when deleting sold item")
+    @DisplayName("Delete should return 403 when deleting sold item")
     void delete_shouldReturn403_whenItemWasSold() throws Exception {
       Item soldItem = saveItem(MockItem.itemRequestDto());
       soldItem.addSoldQuantity(10);
@@ -532,7 +572,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Should return 403 when user tries to delete an item")
+    @DisplayName("Delete should return 403 when user tries to delete an item")
     void delete_shouldReturn403_whenUserIsNotAdmin() throws Exception {
       mockMvc.perform(delete(item_BASE_URL + "/" + item.getId())
               .header("Authorization", userToken))
