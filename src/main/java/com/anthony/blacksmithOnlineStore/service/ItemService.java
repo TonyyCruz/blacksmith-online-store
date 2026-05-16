@@ -11,6 +11,7 @@ import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
+import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
 import com.anthony.blacksmithOnlineStore.security.utils.SecurityUtils;
@@ -27,6 +28,7 @@ public class ItemService {
   private final ItemRepository itemRepository;
   private final BlacksmithService blacksmithService;
   private final ItemUpdate itemUpdate;
+  private final BlacksmithRepository blacksmithRepository;
 
   @Transactional
   public ItemResponseDto create(ItemRequestDto dto) {
@@ -76,6 +78,9 @@ public class ItemService {
       item.setBlacksmithNameSnapshot(blacksmith.getName());
     }
     itemUpdate.updateItemFromDto(dto, item);
+    if (item.getFinalPrice().compareTo(item.getBasePrice()) > 0) {
+      throw new InvalidItemDataException("Final price cannot be greater than base price");
+    }
     return ItemResponseDto.fromEntity(item);
   }
 
@@ -108,34 +113,13 @@ public class ItemService {
     return itemRepository.getReferenceById(id);
   }
 
-  public Page<ItemResponseDto> findByBlacksmithId(Long blacksmithId, Pageable pageable) {
-    Page<Item> items = itemRepository.findByCraftedById(blacksmithId, pageable);
-    return items.map(ItemResponseDto::fromEntity);
-  }
-
-  @Transactional
-  public void incrementStock(Long itemId, int qty) {
-    itemExistesVerifier(itemId);
-    int modifiedLines =  itemRepository.incrementStock(itemId, qty);
-    if (modifiedLines == 0) {
-      throw new DataModifyException("Failed to increment stock for item with id: " + itemId);
-    }
-  }
-
-  @Transactional
-  public void decrementStock(Long itemId, int qty) {
-    itemExistesVerifier(itemId);
-    int modifiedLines = itemRepository.decrementStock(itemId, qty);
-    if (modifiedLines == 0) {
-      throw new DataModifyException("Failed to decrement stock for item with id: " + itemId);
-    }
-  }
-
   @Transactional
   public void performSale(Long itemId, int qty) {
-    Item item = findEntityById(itemId);
-    item.addSoldQuantity(qty);
-    decrementStock(itemId, qty);
+    itemExistesVerifier(itemId);
+    int modifiedLines = itemRepository.decrementStockAndIncrementSoldQuantity(itemId, qty);
+    if (modifiedLines == 0) {
+      throw new DataModifyException("Item have no stock for this operation: " + itemId);
+    }
   }
 
   public void itemExistesVerifier(Long id) {

@@ -66,14 +66,6 @@ public class ItemController {
     return ResponseEntity.ok(itemService.findFilteredItems(filter, pageable));
   }
 
-  @GetMapping("/blacksmith/{id}")
-  public ResponseEntity<Page<ItemResponseDto>> getItemByBlacksmithId(
-      @PathVariable Long id,
-      @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
-      Pageable pageable) {
-    return ResponseEntity.ok(itemService.findByBlacksmithId(id, pageable));
-  }
-
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
