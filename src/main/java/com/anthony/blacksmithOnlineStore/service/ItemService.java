@@ -113,15 +113,6 @@ public class ItemService {
     return itemRepository.getReferenceById(id);
   }
 
-  @Transactional
-  public void performSale(Long itemId, int qty) {
-    itemExistesVerifier(itemId);
-    int modifiedLines = itemRepository.decrementStockAndIncrementSoldQuantity(itemId, qty);
-    if (modifiedLines == 0) {
-      throw new DataModifyException("Item have no stock for this operation: " + itemId);
-    }
-  }
-
   public void itemExistesVerifier(Long id) {
     if (!itemRepository.existsById(id)) throw new ItemNotFoundException(id);
   }

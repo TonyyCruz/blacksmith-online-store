@@ -157,20 +157,6 @@ public class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("PerformSale should update sold quantity when item exists and has enough stock")
-    void performSale_shouldShouldUpdateQuantitySuccessfully() {
-      when(itemRepository.existsById(any())).thenReturn(true);
-      when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
-          .thenReturn(1);
-
-      itemService.performSale(targetItem.getId(), 2);
-
-      verify(itemRepository, times(1)).existsById(targetItem.getId());
-      verify(itemRepository, times(1))
-          .decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2);
-    }
-
-    @Test
     @DisplayName("AddRating should update rating count and average when item exists")
     void addRating_shouldAddRatingSuccessfully() {
       when(itemRepository.findById(targetItem.getId()))

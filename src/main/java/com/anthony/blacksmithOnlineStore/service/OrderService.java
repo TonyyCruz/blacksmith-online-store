@@ -19,6 +19,7 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final UserService userService;
   private final OrderItemFactory orderItemFactory;
+  private final SaleService saleService;
   private final ItemService itemService;
 
   @Transactional
@@ -27,8 +28,8 @@ public class OrderService {
     User user = userService.getUserReferenceFromAuth(auth);
     order.setUser(user);
     for (OrderItemRequestDto orderItemDto : dto.items()) {
-      itemService.performSale(orderItemDto.itemId(), orderItemDto.quantity());
-      Item item = itemService.getReferenceById(orderItemDto.itemId());
+      saleService.performSale(orderItemDto.itemId(), orderItemDto.quantity());
+      Item item = itemService.findEntityById(orderItemDto.itemId());
       order.addOrderItem(orderItemFactory.create(orderItemDto, item));
     }
     order.recalculateTotal();
