@@ -21,7 +21,6 @@ import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.integration.helper.QueryHelper;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
@@ -300,6 +299,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
+    @Transactional
     @DisplayName("Can delete an itens with admin acount")
     void deleteItem_canDeleteAnItem_WithAdminAccount() throws Exception {
       Item savedItem = saveItem(MockItem.itemRequestDto());
@@ -504,8 +504,8 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Update should return 400 when updating with invalid price")
-    void update_shouldReturn400_whenInvalidPrice() throws Exception {
+    @DisplayName("Update should return 400 when updating with final price greater than base price")
+    void update_shouldReturn400_whenFinalPriceGreaterThanBasePrice() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100))
           .finalPrice(BigDecimal.valueOf(200))
@@ -549,6 +549,96 @@ public class ItemControllerTest extends TestBase {
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isBadRequest());
       }
+    }
+
+    @Test
+    @DisplayName("Patch update should return 400 with invalid base damage")
+    void patch_shouldReturn400_withInvalidBaseDamage() throws Exception {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder().baseDamage(-1).build();
+      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Patch update should return 400 with invalid base defense")
+    void patch_shouldReturn400_withInvalidBaseDefense() throws Exception {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder().baseDefense(-1).build();
+      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Patch update should return 400 with invalid base price")
+    void patch_shouldReturn400_withInvalidBasePrice() throws Exception {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder()
+          .basePrice(BigDecimal.valueOf(-1)).build();
+      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Patch update should return 400 with invalid final price")
+    void patch_shouldReturn400_withInvalidFinalPrice() throws Exception {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto()
+          .toBuilder().finalPrice(BigDecimal.valueOf(-1)).build();
+      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Patch update should return 400 with invalid description")
+    void patch_shouldReturn400_withInvalidDescription() throws Exception {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto()
+          .toBuilder().description("Too short").build();
+      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Patch update should return 400 with invalid weight")
+    void patch_shouldReturn400_withInvalidWeight() throws Exception {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto()
+          .toBuilder().weight(-1f).build();
+      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Get item By Blacksmith id Should return 404 when blacksmith not exists")
+    void getItemByBlacksmithId_shouldReturn404_whenBlacksmithNotExists() throws Exception {
+      mockMvc.perform(get(item_BASE_URL + "/blacksmith/999999")
+              .header("Authorization", userToken))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Patch update should return 400 with invalid stock")
+    void patch_shouldReturn400_withInvalidStock() throws Exception {
+      ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto()
+          .toBuilder().stock(-1).build();
+      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+              .header("Authorization", adminToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
     }
 
     @Test
