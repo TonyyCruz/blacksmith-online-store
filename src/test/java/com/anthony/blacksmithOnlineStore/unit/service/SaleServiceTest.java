@@ -44,8 +44,8 @@ public class SaleServiceTest {
   class SaleServiceHappyPath {
 
     @Test
-    @DisplayName("PerformSale should update sold quantity when item exists and has enough stock")
-    void performSale_shouldShouldUpdateQuantitySuccessfully() {
+    @DisplayName("PerformSale should update sold quantity and reduce stock when item exists and has enough stock")
+    void performSale_shouldShouldUpdateQuantityAndReduceStockSuccessfully() {
       doNothing().when(itemService).itemExistesVerifier(any());
       when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
           .thenReturn(1);
@@ -55,6 +55,20 @@ public class SaleServiceTest {
       verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
       verify(itemRepository, times(1))
           .decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2);
+    }
+
+    @Test
+    @DisplayName("CancelSale should decrease sold quantity and increase stock when sold quantity supports")
+    void performSale_shouldShouldDecreaseSoldAndIncreaseStockSuccessfully() {
+      doNothing().when(itemService).itemExistesVerifier(any());
+      when(itemRepository.incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2))
+          .thenReturn(1);
+
+      saleService.cancelSale(targetItem.getId(), 2);
+
+      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+      verify(itemRepository, times(1))
+          .incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2);
     }
 
   }
@@ -83,6 +97,29 @@ public class SaleServiceTest {
 
       assertThrows(DataModifyException.class,
           () -> saleService.performSale(targetItem.getId(), 2));
+      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+    }
+
+    @Test
+    @DisplayName("CancelSale should throw an ItemNotFoundException when item not exists")
+    void cancelSale_shouldShouldThrowAnException_whenItemNotExists() {
+      doThrow(new ItemNotFoundException(targetItem.getId()))
+          .when(itemService).itemExistesVerifier(any());
+
+      assertThrows(ItemNotFoundException.class,
+          () -> saleService.cancelSale(targetItem.getId(), 2));
+      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+    }
+
+    @Test
+    @DisplayName("CancelSale should throw an DataModifyException when have no sufficient sold quantity")
+    void cancelSale_shouldShouldThrowAnException_whenItemHaveNoSufficientSold() {
+      doNothing().when(itemService).itemExistesVerifier(any());
+      when(itemRepository.incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2))
+          .thenReturn(0);
+
+      assertThrows(DataModifyException.class,
+          () -> saleService.cancelSale(targetItem.getId(), 2));
       verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
     }
 

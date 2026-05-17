@@ -18,4 +18,15 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
             i.id = :itemId AND i.stock >= :qty
     """)
   int decrementStockAndIncrementSoldQuantity(Long itemId, int qty);
+
+  @Modifying
+  @Query("""
+        UPDATE Item i
+        SET
+            i.stock = i.stock + :qty,
+            i.sold = i.sold - :qty
+        WHERE
+            i.id = :id AND i.sold >= :qty
+    """)
+  int incrementStockAndDecrementSoldQuantity(Long id, int qty);
 }

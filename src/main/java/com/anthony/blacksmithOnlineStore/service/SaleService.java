@@ -20,4 +20,12 @@ public class SaleService {
       throw new DataModifyException("Item have no stock for this operation: " + itemId);
     }
   }
+
+  public void cancelSale(Long itemId, int qty) {
+    itemService.itemExistesVerifier(itemId);
+    int modifiedLines = itemRepository.incrementStockAndDecrementSoldQuantity(itemId, qty);
+    if (modifiedLines == 0) {
+      throw new DataModifyException("Item have no sufficient sold for this operation: " + itemId);
+    }
+  }
 }
