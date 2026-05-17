@@ -54,15 +54,10 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Should create an order with valid data")
     void create_shouldCreateAnOrderSuccessfully() {
-//      doNothing().when(itemService).itemExistesVerifier(any());
-//      when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
-//          .thenReturn(1);
-//
-//      saleService.performSale(targetItem.getId(), 2);
-//
-//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-//      verify(itemRepository, times(1))
-//          .decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2);
+      when(userService.getUserReference()).thenReturn(user);
+
+
+
     }
 
   }
