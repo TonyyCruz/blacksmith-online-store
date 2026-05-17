@@ -32,12 +32,7 @@ public class SaleServiceTest {
   private ItemService itemService;
   @InjectMocks
   private SaleService saleService;
-  private Item targetItem;
-
-  @BeforeEach
-  void setup() {
-    targetItem = MockItem.item();
-  }
+  private final Item targetItem = MockItem.item();
 
   @Nested
   @DisplayName("Happy Path")

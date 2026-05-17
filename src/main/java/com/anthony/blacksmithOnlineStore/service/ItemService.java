@@ -6,15 +6,13 @@ import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
-import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
-import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
-import com.anthony.blacksmithOnlineStore.security.utils.SecurityUtils;
+import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +26,7 @@ public class ItemService {
   private final ItemRepository itemRepository;
   private final BlacksmithService blacksmithService;
   private final ItemUpdate itemUpdate;
-  private final BlacksmithRepository blacksmithRepository;
+  private final AuthenticatedUserService authUser;
 
   @Transactional
   public ItemResponseDto create(ItemRequestDto dto) {
@@ -93,7 +91,7 @@ public class ItemService {
   }
 
   public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
-    if (!SecurityUtils.isAdmin()) filter = filter.withActiveTrue();
+    if (!authUser.isAdmin()) filter = filter.withActiveTrue();
     Specification<Item> specification = ItemSpecifications.withFilters(filter);
     Page<Item> items = itemRepository.findAll(specification, pageable);
     return items.map(ItemResponseDto::fromEntity);

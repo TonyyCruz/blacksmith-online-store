@@ -10,9 +10,9 @@ import com.anthony.blacksmithOnlineStore.exceptions.UserNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.UsernameAlreadyExistsException;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.enums.Role;
+import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final AuthenticatedUserService authUser;
 
   public UserDto create(UserCreateDto createDto) {
     if (usernameExists(createDto.username())) throw new UsernameAlreadyExistsException();
@@ -30,19 +31,19 @@ public class UserService {
     return UserDto.fromEntity(userRepository.save(user));
   }
 
-  public UserDto updateUser(UserUpdateDto updateDto, Authentication auth) {
-    boolean isUsernameChanged = !auth.getName().equals(updateDto.username());
+  public UserDto updateUser(UserUpdateDto updateDto) {
+    boolean isUsernameChanged = !authUser.getName().equals(updateDto.username());
     if (isUsernameChanged && usernameExists(updateDto.username())) {
       throw new UsernameAlreadyExistsException();
     }
-    User user = getUserReferenceFromAuth(auth);
+    User user = getUserReference();
     user.setUsername(updateDto.username());
     user.setBirthDate(updateDto.birthDate());
     return UserDto.fromEntity(userRepository.save(user));
   }
 
-  public void updatePassword(PasswordUpdateDto passwordUpdateDto, Authentication auth) {
-    User user = getUserEntityFromAuth(auth);
+  public void updatePassword(PasswordUpdateDto passwordUpdateDto) {
+    User user = getUserEntity();
     if (!passwordEncoder.matches(passwordUpdateDto.currentPassword(), user.getPassword())) {
       throw new InvalidCredentialsException();
     }
@@ -50,18 +51,21 @@ public class UserService {
     userRepository.save(user);
   }
 
-  public User getUserEntityFromAuth(Authentication auth) {
-    UUID id = (UUID) auth.getDetails();
-    return userRepository.findById(id)
-        .orElseThrow(() -> new UserNotFoundException(id));
+  public User getUserEntity() {
+    UUID id = authUser.getAuthenticatedId();
+    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+  }
+  
+  public UserDto getUser() {
+    return UserDto.fromEntity(getUserEntity());
   }
 
-  public User getUserReferenceFromAuth(Authentication auth) {
-    return userRepository.getReferenceById((UUID) auth.getDetails());
+  public User getUserReference() {
+    return userRepository.getReferenceById(authUser.getAuthenticatedId());
   }
 
-  public void deleteUserFromAuth(Authentication auth) {
-    userRepository.deleteById((UUID) auth.getDetails());
+  public void deleteUserFromAuth() {
+    userRepository.deleteById(authUser.getAuthenticatedId());
   }
 
   private boolean usernameExists(String username) {

@@ -25,7 +25,7 @@ public class OrderService {
   @Transactional
   public OrderResponseDto create(OrderRequestDto dto, Authentication auth) {
     Order order = new Order();
-    User user = userService.getUserReferenceFromAuth(auth);
+    User user = userService.getUserReference();
     order.setUser(user);
     for (OrderItemRequestDto orderItemDto : dto.items()) {
       saleService.performSale(orderItemDto.itemId(), orderItemDto.quantity());
