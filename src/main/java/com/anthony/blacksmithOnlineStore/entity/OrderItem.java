@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.entity;
 
-import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,6 +25,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @AllArgsConstructor
 @Entity
 @Table(name = "order_items")
+@Builder(toBuilder = true)
 public class OrderItem {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -97,11 +98,18 @@ public class OrderItem {
     this.order = order;
   }
 
-  public void setRating(Rating newRating) {
-    if (!(rating == null)) throw new ForbiddenOperationException("Rating cannot be changed.");
-    rating = newRating;
-    ratingValue = newRating.getRatingValue();
-    reviewed = true;
+  public void setRating(Rating rating) {
+    if (order != null && !order.getStatus().isFinalState()) {
+      throw new IllegalStateException("Only finalized item can be rated");
+    }
+    this.rating = rating;
+    if (rating != null) {
+      ratingValue = rating.getRatingValue();
+      reviewed = true;
+    } else {
+      ratingValue = null;
+      reviewed = false;
+    }
   }
 
   public void setUserId(UUID userId) {
@@ -116,7 +124,7 @@ public class OrderItem {
 
   private void checkIfFinalized() {
     if (order != null && order.getStatus().isFinalState()) {
-      throw new IllegalStateException("Item não pode ser alterado após finalização.");
+      throw new IllegalStateException("Order item data cannot be changed after finalization");
     }
   }
 

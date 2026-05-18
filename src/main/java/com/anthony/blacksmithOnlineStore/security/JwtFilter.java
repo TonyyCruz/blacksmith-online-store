@@ -1,7 +1,6 @@
 package com.anthony.blacksmithOnlineStore.security;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidTokenException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
       SecurityContextHolder.getContext().setAuthentication(usernameAuthentication);
     }
     filterChain.doFilter(request, response);
-    } catch (JWTVerificationException e) {
+    } catch (InvalidTokenException e) {
       writeErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
     }
 

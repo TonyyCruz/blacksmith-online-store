@@ -18,7 +18,7 @@ public record ItemPatchUpdateDto(
     @NullOrSize(min = 2, message = "Name must have at lest 2 characters") String name,
     Material material,
     @NullOrRange(min = 1, message = "Base damage must be at lest 1") Integer baseDamage,
-    @NullOrRange(min = 1, message = "Base defense must be at lest 1") Integer baseDefense,
+    @Positive(message = "Base defense must not be negative") Integer baseDefense,
     @Positive(message = "Base price must not be a negative number") BigDecimal basePrice,
     @Positive(message = "Final price must not be a negative number") BigDecimal finalPrice,
     @NullOrSize(min = 10, message = "Description must have at lest 10 characters") String description,

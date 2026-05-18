@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,10 +28,11 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Table(name = "ratings")
+@Builder(toBuilder = true)
 public class Rating {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private BigInteger id;
+  private Long id;
   @Column(nullable = false)
   private UUID reviewerUserId;
   @Column(nullable = false)

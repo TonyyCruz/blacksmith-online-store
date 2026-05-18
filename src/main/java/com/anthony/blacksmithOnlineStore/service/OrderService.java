@@ -10,7 +10,6 @@ import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,16 +18,17 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final UserService userService;
   private final OrderItemFactory orderItemFactory;
+  private final SaleService saleService;
   private final ItemService itemService;
 
   @Transactional
-  public OrderResponseDto create(OrderRequestDto dto, Authentication auth) {
+  public OrderResponseDto create(OrderRequestDto dto) {
     Order order = new Order();
-    User user = userService.getUserReferenceFromAuth(auth);
+    User user = userService.getUserReference();
     order.setUser(user);
     for (OrderItemRequestDto orderItemDto : dto.items()) {
-      itemService.performSale(orderItemDto.itemId(), orderItemDto.quantity());
-      Item item = itemService.getReferenceById(orderItemDto.itemId());
+      saleService.performSale(orderItemDto.itemId(), orderItemDto.quantity());
+      Item item = itemService.findEntityById(orderItemDto.itemId());
       order.addOrderItem(orderItemFactory.create(orderItemDto, item));
     }
     order.recalculateTotal();

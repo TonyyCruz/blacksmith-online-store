@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orders")
+@Builder(toBuilder = true)
 public class Order {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +49,7 @@ public class Order {
   private LocalDateTime updatedAt;
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private OrderStatus status = OrderStatus.RECEIVED;
+  private OrderStatus status = OrderStatus.PENDING;
   @Setter(AccessLevel.NONE)
   @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST)
   private final List<OrderItem> orderItems = new ArrayList<>();

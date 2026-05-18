@@ -27,7 +27,7 @@ public class RatingService {
   @Transactional
   public void ratePurchase(RatingRequestDto dto, Authentication auth) {
     OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
-    User user = userService.getUserEntityFromAuth(auth);
+    User user = userService.getUserEntity();
     verifyUserCanRatePurchase(user.getId(), orderItem);
     blacksmithService.addRating(orderItem.getBlacksmithId(), dto.rating());
     itemService.addRating(orderItem.getItemId(), dto.rating());

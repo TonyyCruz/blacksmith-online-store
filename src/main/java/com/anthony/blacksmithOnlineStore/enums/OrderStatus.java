@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.enums;
 
 public enum OrderStatus {
-  RECEIVED("Received"),
+  PENDING("Pending"),
   PROCESSING("Processing"),
   PAYMENT_APPROVED("Payment Approved"),
   PAYMENT_REJECTED("Payment Rejected"),

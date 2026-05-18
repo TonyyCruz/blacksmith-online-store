@@ -3,7 +3,6 @@ package com.anthony.blacksmithOnlineStore.controler;
 import com.anthony.blacksmithOnlineStore.controler.dto.user.PasswordUpdateDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.controler.dto.user.UserUpdateDto;
-import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,28 +23,24 @@ public class UserController {
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> getCurrentUser(Authentication auth) {
-    User user = userService.getUserEntityFromAuth(auth);
-    return ResponseEntity.ok(UserDto.fromEntity(user));
+    return ResponseEntity.ok(userService.getUser());
   }
 
   @PutMapping("/me")
-  public ResponseEntity<UserDto> updateCurrentUser(
-      @RequestBody @Valid UserUpdateDto updateDto,
-      Authentication auth) {
-    return ResponseEntity.ok(userService.updateUser(updateDto, auth));
+  public ResponseEntity<UserDto> updateCurrentUser(@RequestBody @Valid UserUpdateDto updateDto) {
+    return ResponseEntity.ok(userService.updateUser(updateDto));
   }
 
   @PutMapping("/me/password")
   public ResponseEntity<Void> updateCurrentUserPassword(
-      @RequestBody @Valid PasswordUpdateDto passwordUpdateDto,
-      Authentication auth) {
-    userService.updatePassword(passwordUpdateDto, auth);
+      @RequestBody @Valid PasswordUpdateDto passwordUpdateDto) {
+    userService.updatePassword(passwordUpdateDto);
     return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/me")
-  public ResponseEntity<Void> deleteCurrentUser(Authentication auth) {
-    userService.deleteUserFromAuth(auth);
+  public ResponseEntity<Void> deleteCurrentUser() {
+    userService.deleteUserFromAuth();
     return ResponseEntity.noContent().build();
   }
 }
