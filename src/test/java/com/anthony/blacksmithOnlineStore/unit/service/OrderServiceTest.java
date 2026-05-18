@@ -89,56 +89,24 @@ public class OrderServiceTest {
 
   }
 
-//  @Nested
-//  @DisplayName("Exception Path")
-//  class SaleServiceExceptionPath {
-//
-//    @Test
-//    @DisplayName("PerformSale should throw an ItemNotFoundException when item not exists")
-//    void performSale_shouldShouldThrowAnException_whenItemNotExists() {
-//      doThrow(new ItemNotFoundException(targetItem.getId()))
-//          .when(itemService).itemExistesVerifier(any());
-//
-//      assertThrows(ItemNotFoundException.class,
-//          () -> saleService.performSale(targetItem.getId(), 2));
-//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-//    }
-//
-//    @Test
-//    @DisplayName("PerformSale should throw an DataModifyException when item have no stock")
-//    void performSale_shouldShouldThrowAnException_whenItemHaveNoStock() {
-//      doNothing().when(itemService).itemExistesVerifier(any());
-//      when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
-//          .thenReturn(0);
-//
-//      assertThrows(DataModifyException.class,
-//          () -> saleService.performSale(targetItem.getId(), 2));
-//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-//    }
-//
-//    @Test
-//    @DisplayName("CancelSale should throw an ItemNotFoundException when item not exists")
-//    void cancelSale_shouldShouldThrowAnException_whenItemNotExists() {
-//      doThrow(new ItemNotFoundException(targetItem.getId()))
-//          .when(itemService).itemExistesVerifier(any());
-//
-//      assertThrows(ItemNotFoundException.class,
-//          () -> saleService.cancelSale(targetItem.getId(), 2));
-//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-//    }
-//
-//    @Test
-//    @DisplayName("CancelSale should throw an DataModifyException when have no sufficient sold quantity")
-//    void cancelSale_shouldShouldThrowAnException_whenItemHaveNoSufficientSold() {
-//      doNothing().when(itemService).itemExistesVerifier(any());
-//      when(itemRepository.incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2))
-//          .thenReturn(0);
-//
-//      assertThrows(DataModifyException.class,
-//          () -> saleService.cancelSale(targetItem.getId(), 2));
-//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-//    }
-//
-//  }
+  @Nested
+  @DisplayName("Exception Path")
+  class SaleServiceExceptionPath {
+
+    @Test
+    @DisplayName("Should throw an exception when item have no stock")
+    void create_shouldThrownAnException_whenItemHaveNoStock() {
+      OrderRequestDto dto = new OrderRequestDto(List.of(
+          new OrderItemRequestDto(1L, 10)
+      ));
+
+      when(userService.getUserReference()).thenReturn(user);
+      doThrow(DataModifyException.class).when(saleService).performSale(any(), any());
+
+      assertThrows(DataModifyException.class, () -> orderService.create(dto));
+      verify(userService, times(1)).getUserReference();
+      verify(saleService, times(1)).performSale(any(), any());
+    }
+  }
 
 }
