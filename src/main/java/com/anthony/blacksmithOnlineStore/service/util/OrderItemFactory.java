@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderItemFactory {
 
-  public OrderItem create(OrderItemRequestDto dto, Item item) {
+  public OrderItem create(Item item, int quantity) {
     OrderItem orderItem = new OrderItem();
-    orderItem.setItemId(dto.itemId());
+    orderItem.setItemId(item.getId());
     orderItem.setItemName(item.getName());
     orderItem.setBasePriceAtPurchase(item.getBasePrice());
     orderItem.setPriceApplied(item.getFinalPrice());
-    orderItem.setQuantity(dto.quantity());
+    orderItem.setQuantity(quantity);
     orderItem.setBlacksmithId(item.getCraftedBy().getId());
     orderItem.calculateTotal();
     return orderItem;

@@ -29,7 +29,7 @@ public class OrderService {
     for (OrderItemRequestDto orderItemDto : dto.items()) {
       saleService.performSale(orderItemDto.itemId(), orderItemDto.quantity());
       Item item = itemService.findEntityById(orderItemDto.itemId());
-      order.addOrderItem(orderItemFactory.create(orderItemDto, item));
+      order.addOrderItem(orderItemFactory.create(item, orderItemDto.quantity()));
     }
     order.recalculateTotal();
     return OrderResponseDto.fromEntity(orderRepository.save(order));
