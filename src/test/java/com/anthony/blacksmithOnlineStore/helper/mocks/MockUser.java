@@ -10,14 +10,18 @@ import java.util.UUID;
 
 public class MockUser {
 
-  public static User user() {
+  public static User user(UUID id) {
     User user = new User();
-    user.setId(UUID.randomUUID());
+    user.setId(id);
     user.setUsername("user_one");
     user.setPassword("123456");
     user.setRole(Role.CUSTOMER);
     user.setBirthDate(LocalDate.of(1995, 5, 15));
     return user;
+  }
+
+  public static User user() {
+    return user(UUID.randomUUID());
   }
 
   public static User admin() {

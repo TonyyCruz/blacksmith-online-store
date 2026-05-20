@@ -15,23 +15,23 @@ import com.anthony.blacksmithOnlineStore.controler.dto.OrderItem.OrderItemReques
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
-import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
-import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
+import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 import com.anthony.blacksmithOnlineStore.service.SaleService;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
-import java.util.ArrayList;
 import java.util.List;
-import org.assertj.core.internal.Arrays;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Optional;
+import java.util.UUID;
+import org.hibernate.exception.DataException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,6 +52,8 @@ public class OrderServiceTest {
   private SaleService saleService;
   @Mock
   private ItemService itemService;
+  @Mock
+  private AuthenticatedUserService authUser;
   @InjectMocks
   OrderService orderService;
   private final Item targetItem = MockItem.item();
@@ -87,6 +89,25 @@ public class OrderServiceTest {
       verify(orderRepository, times(1)).save(any());
     }
 
+    @Test
+    @DisplayName("Should cancel an order with valid data")
+    void create_shouldCancelAnOrderSuccessfully() {
+      User user = MockUser.user();
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      doNothing().when(saleService).cancelSale(any(), any());
+
+
+      OrderResponseDto response = orderService.cancel(order.getId());
+
+      assertEquals(OrderStatus.CANCELLED, response.status(), "Status must be cancelled");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+      verify(saleService, times(1)).cancelSale(any(), any());
+    }
+
   }
 
   @Nested
@@ -106,6 +127,20 @@ public class OrderServiceTest {
       assertThrows(DataModifyException.class, () -> orderService.create(dto));
       verify(userService, times(1)).getUserReference();
       verify(saleService, times(1)).performSale(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should thrown an exception trying cancel a not authorized order")
+    void create_shouldThrownAnException_tryingCancelAnNotAuthorizedOrder() {
+      User user = MockUser.user(UUID.randomUUID());
+      Order order = MockOrder.orderWithItems().toBuilder().user(MockUser.user()).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+      assertThrows(DataException.class,
+          () -> orderService.cancel(order.getId()),"Should thrown an exception trying cancel an unauthorized order");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
     }
   }
 
