@@ -2,11 +2,11 @@ package com.anthony.blacksmithOnlineStore.exceptions;
 
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
 
-public class InvalidItemDataException extends BadRequestException {
-  public InvalidItemDataException() {
-    super("Invalid item data");
+public class InvalidOrderStatusException extends BadRequestException {
+  public InvalidOrderStatusException() {
+    super("Invalid Order Status");
   }
-  public InvalidItemDataException(String msg) {
+  public InvalidOrderStatusException(String msg) {
     super(msg);
   }
 }
