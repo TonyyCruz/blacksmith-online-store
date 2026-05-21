@@ -22,6 +22,6 @@ public class OrderController {
   @PostMapping
   public ResponseEntity<OrderResponseDto> create(
       @RequestBody OrderRequestDto dto, Authentication auth) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(dto, auth));
+    return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(dto));
   }
 }

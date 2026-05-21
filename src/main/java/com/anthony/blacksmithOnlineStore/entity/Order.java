@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.entity;
 
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,6 +50,7 @@ public class Order {
   private LocalDateTime updatedAt;
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
+  @Setter(AccessLevel.NONE)
   private OrderStatus status = OrderStatus.PENDING;
   @Setter(AccessLevel.NONE)
   @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST)
@@ -56,6 +58,18 @@ public class Order {
   @Setter(AccessLevel.NONE)
   @Column(nullable = false)
   private BigDecimal total;
+
+  public void setStatus(OrderStatus status) {
+    if (!this.status.canChangeTo(status)) {
+      throw new InvalidOrderStatusException(
+          "The current state "
+              .concat(this.status.getStatus())
+              .concat(" cannot be change to ")
+              .concat(status.toString())
+      );
+    }
+    this.status = status;
+  }
 
   public void addOrderItem(OrderItem item) {
     checkIfFinalized();
