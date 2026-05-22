@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.helper.mocks;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemPatchUpdateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;

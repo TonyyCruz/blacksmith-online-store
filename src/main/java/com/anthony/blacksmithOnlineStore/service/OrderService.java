@@ -1,8 +1,8 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.Order.OrderRequestDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.Order.OrderResponseDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.OrderItem.OrderItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
@@ -42,13 +42,12 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto approved(Long id) {
+  public void approve(Long id) {
     Order order = getEntityById(id);
     order.setStatus(OrderStatus.PAYMENT_APPROVED);
     for (OrderItem orderItem : order.getOrderItems()) {
       saleService.performSale(orderItem.getItemId(), orderItem.getQuantity());
     }
-    return OrderResponseDto.fromEntity(order);
   }
 
   @Transactional

@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.rating.RatingRequestDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.rating.RatingResponseDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
 import com.anthony.blacksmithOnlineStore.entity.User;

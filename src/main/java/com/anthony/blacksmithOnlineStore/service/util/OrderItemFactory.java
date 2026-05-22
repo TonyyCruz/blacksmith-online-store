@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.service.util;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.OrderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import org.springframework.stereotype.Component;

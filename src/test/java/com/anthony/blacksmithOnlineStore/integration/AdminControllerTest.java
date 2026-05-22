@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.admin.RoleUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 import com.anthony.blacksmithOnlineStore.enums.Role;

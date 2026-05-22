@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.repository.specification;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemFilterDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import org.springframework.data.jpa.domain.Specification;
 

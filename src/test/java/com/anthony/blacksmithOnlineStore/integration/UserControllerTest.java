@@ -8,9 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.login.LoginRequest;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.PasswordUpdateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.PasswordUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;

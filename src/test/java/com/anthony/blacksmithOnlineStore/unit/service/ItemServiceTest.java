@@ -11,9 +11,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemPatchUpdateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemRequestDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemResponseDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;

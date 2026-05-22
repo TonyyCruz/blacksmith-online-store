@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.admin.RoleUpdateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.UserNotFoundException;

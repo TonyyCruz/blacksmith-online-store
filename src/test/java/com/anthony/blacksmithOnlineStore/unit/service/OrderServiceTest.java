@@ -9,9 +9,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.Order.OrderRequestDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.Order.OrderResponseDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.OrderItem.OrderItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
