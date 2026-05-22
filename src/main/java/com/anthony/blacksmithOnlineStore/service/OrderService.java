@@ -42,7 +42,7 @@ public class OrderService {
   }
 
   @Transactional
-  public void approve(Long id) {
+  public void confirmOrder(Long id) {
     Order order = getEntityById(id);
     order.setStatus(OrderStatus.PAYMENT_APPROVED);
     for (OrderItem orderItem : order.getOrderItems()) {
