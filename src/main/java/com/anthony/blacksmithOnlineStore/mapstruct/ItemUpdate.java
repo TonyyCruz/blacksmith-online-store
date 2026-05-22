@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.mapstruct;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.item.ItemPatchUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

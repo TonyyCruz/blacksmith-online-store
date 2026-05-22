@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.helper.mocks;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 
 public class MockBlacksmith {

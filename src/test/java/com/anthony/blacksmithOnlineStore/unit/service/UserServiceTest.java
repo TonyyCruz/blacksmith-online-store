@@ -3,10 +3,10 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.user.PasswordUpdateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserCreateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.PasswordUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidCredentialsException;
 import com.anthony.blacksmithOnlineStore.exceptions.UsernameAlreadyExistsException;
@@ -27,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Tag("unit")

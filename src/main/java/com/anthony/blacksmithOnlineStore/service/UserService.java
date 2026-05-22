@@ -1,9 +1,9 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.user.PasswordUpdateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserCreateDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.user.UserUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.PasswordUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidCredentialsException;
 import com.anthony.blacksmithOnlineStore.exceptions.UserNotFoundException;

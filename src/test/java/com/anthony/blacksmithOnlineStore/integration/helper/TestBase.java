@@ -3,7 +3,7 @@ package com.anthony.blacksmithOnlineStore.integration.helper;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.login.LoginRequest;
+import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

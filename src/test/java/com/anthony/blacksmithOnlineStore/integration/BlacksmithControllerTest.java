@@ -4,8 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithRequestDto;
-import com.anthony.blacksmithOnlineStore.controler.dto.blacksmith.BlacksmithResponseDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
@@ -18,9 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 
 @Tag("integration")
 @DisplayName("Integration test for Blacksmith controller")

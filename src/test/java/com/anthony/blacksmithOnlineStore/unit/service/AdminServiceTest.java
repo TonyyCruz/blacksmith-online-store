@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.unit.service;
 
-import com.anthony.blacksmithOnlineStore.controler.dto.admin.RoleUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.enums.Role;
