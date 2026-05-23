@@ -82,6 +82,6 @@ public class AdminControllerTest extends TestBase {
   }
 
   private String roleUpdateUrl(UUID id) {
-    return "/admin/users/{id}/role".replace("{id}", id.toString());
+    return "/admin/users/{orderId}/role".replace("{orderId}", id.toString());
   }
 }

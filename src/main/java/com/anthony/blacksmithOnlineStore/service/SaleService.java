@@ -13,7 +13,7 @@ public class SaleService {
   private final ItemRepository itemRepository;
 
   @Transactional
-  public void performSale(Long itemId, int qty) {
+  public void performSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
     int modifiedLines = itemRepository.decrementStockAndIncrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
@@ -21,7 +21,7 @@ public class SaleService {
     }
   }
 
-  public void cancelSale(Long itemId, int qty) {
+  public void cancelSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
     int modifiedLines = itemRepository.incrementStockAndDecrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {

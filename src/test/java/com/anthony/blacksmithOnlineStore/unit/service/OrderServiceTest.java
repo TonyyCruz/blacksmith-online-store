@@ -2,6 +2,8 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -9,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -28,6 +31,7 @@ import com.anthony.blacksmithOnlineStore.service.OrderService;
 import com.anthony.blacksmithOnlineStore.service.SaleService;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,47 +69,81 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("Should create an order with valid data")
-    void create_shouldCreateAnOrderSuccessfully() {
+    void create_shouldCreateAnOrderSuccessfully_withCorrectData() {
       OrderRequestDto dto = new OrderRequestDto(List.of(
           new OrderItemRequestDto(1L, 2),
           new OrderItemRequestDto(2L, 2),
           new OrderItemRequestDto(3L, 1)
       ));
+      Item item1 = MockItem.item(1L).toBuilder().finalPrice(BigDecimal.valueOf(10)).build();
+      Item item2 = MockItem.item(2L).toBuilder().finalPrice(BigDecimal.valueOf(20)).build();
+      Item item3 = MockItem.item(3L).toBuilder().finalPrice(BigDecimal.valueOf(30)).build();
 
       when(userService.getUserReference()).thenReturn(user);
-      doNothing().when(saleService).performSale(any(), any());
-      when(itemService.findEntityById(any())).thenReturn(MockItem.item());
-      when(orderItemFactory.create(any(), any()))
-          .thenReturn(MockOrderItem.orderItem());
+      when(itemService.findEntityById(item1.getId())).thenReturn(item1);
+      when(itemService.findEntityById(item2.getId())).thenReturn(item2);
+      when(itemService.findEntityById(item3.getId())).thenReturn(item3);
+      when(orderItemFactory.create(item1, 2))
+          .thenReturn(MockOrderItem.fromItem(item1, 2));
+      when(orderItemFactory.create(item2, 2))
+          .thenReturn(MockOrderItem.fromItem(item2, 2));
+      when(orderItemFactory.create(item3, 1))
+          .thenReturn(MockOrderItem.fromItem(item3, 1));
       when(orderRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-      OrderResponseDto response = orderService.create(dto);
+      OrderPaymentDto response = orderService.create(dto);
 
-      assertEquals(3, response.items().size(), "All orderItems must be saved");
+      assertEquals(BigDecimal.valueOf(90), response.total(), "The total must have the correct price");
       verify(userService, times(1)).getUserReference();
-      verify(saleService, times(1)).performSale(any(), any());
-      verify(itemService, times(1)).findEntityById(any());
-      verify(orderItemFactory, times(3)).create(any(), any());
+      verify(itemService, times(1)).findEntityById(item1.getId());
+      verify(itemService, times(1)).findEntityById(item2.getId());
+      verify(itemService, times(1)).findEntityById(item3.getId());
+      verify(orderItemFactory, times(1)).create(item1, 2);
+      verify(orderItemFactory, times(1)).create(item2, 2);
+      verify(orderItemFactory, times(1)).create(item3, 1);
       verify(orderRepository, times(1)).save(any());
     }
 
     @Test
-    @DisplayName("Should cancel an order with valid data")
-    void create_shouldCancelAnOrderSuccessfully() {
+    @DisplayName("Should cancel an not paid order with valid data")
+    void cancel_shouldCancelANotPaidOrderSuccessfully_whenItExists() {
       User user = MockUser.user();
-      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+      Order order = MockOrder.orderWithItems()
+          .toBuilder()
+          .user(user)
+          .status(OrderStatus.PENDING)
+          .build();
 
       when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-      doNothing().when(saleService).cancelSale(any(), any());
-
 
       OrderResponseDto response = orderService.cancel(order.getId());
 
       assertEquals(OrderStatus.CANCELLED, response.status(), "Status must be cancelled");
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
-      verify(saleService, times(1)).cancelSale(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should cancel an paid order with valid data")
+    void cancel_shouldCancelAPaidOrderSuccessfully_whenItExists() {
+      User user = MockUser.user();
+      Order order = MockOrder.orderWithItems()
+          .toBuilder()
+          .user(user)
+          .status(OrderStatus.PAYMENT_APPROVED)
+          .build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      doNothing().when(saleService).cancelSale(anyLong(), anyInt());
+
+      OrderResponseDto response = orderService.cancel(order.getId());
+
+      assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+      verify(saleService, times(order.getOrderItems().size())).cancelSale(anyLong(), anyInt());
     }
 
   }

@@ -143,7 +143,7 @@ class TokenServiceTest {
     }
 
     @Test
-    @DisplayName("DecodeToken should throw InvalidTokenException when claim 'id' is missing")
+    @DisplayName("DecodeToken should throw InvalidTokenException when claim 'orderId' is missing")
     void decodeToken_ShouldThrowInvalidTokenException_WhenMissingClaimId() {
       String token = JWT.create()
           .withIssuer("test-issuer")
