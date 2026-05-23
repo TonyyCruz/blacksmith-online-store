@@ -9,9 +9,7 @@ import java.math.BigDecimal;
 public class MockOrder {
 
   public static Order pendingOrder() {
-
     User user = MockUser.user();
-
     return Order.builder()
         .id(1L)
         .user(user)
@@ -33,11 +31,8 @@ public class MockOrder {
   }
 
   public static Order orderWithItems() {
-
     Order order = pendingOrder();
-
     OrderItem item1 = MockOrderItem.orderItem(order);
-
     OrderItem item2 = MockOrderItem.orderItem(order).toBuilder()
         .id(2L)
         .itemId(20L)
@@ -45,14 +40,10 @@ public class MockOrder {
         .priceApplied(new BigDecimal("90.00"))
         .quantity(1)
         .build();
-
     item2.calculateTotal();
-
     order.addOrderItem(item1);
     order.addOrderItem(item2);
-
     order.recalculateTotal();
-
     return order;
   }
 }
