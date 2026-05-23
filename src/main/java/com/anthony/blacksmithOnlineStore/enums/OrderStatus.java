@@ -25,8 +25,8 @@ public enum OrderStatus {
 
   public boolean isFinalState() {
     return switch (this) {
-      case DELIVERED, CANCELLED, REFUNDED -> true;
-      default -> false;
+      case PENDING, PAYMENT_REJECTED -> false;
+      default -> true;
     };
   }
 
