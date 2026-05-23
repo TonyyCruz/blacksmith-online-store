@@ -31,7 +31,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

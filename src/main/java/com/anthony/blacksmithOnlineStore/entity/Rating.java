@@ -70,7 +70,7 @@ public class Rating {
   @Override
   public String toString() {
     return "Rating{" +
-        "id=" + id +
+        "orderId=" + id +
         ", reviewerUserId=" + reviewerUserId +
         ", reviewerUsername=" + reviewerUsername +
         ", orderItem=" + (orderItem == null ? null : orderItem.getId()) +

@@ -34,7 +34,7 @@ public class BlacksmithController {
     return ResponseEntity.status(HttpStatus.CREATED).body(blacksmithService.create(dto));
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/{orderId}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BlacksmithResponseDto> updateBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto, @PathVariable Long id) {
@@ -49,7 +49,7 @@ public class BlacksmithController {
     return ResponseEntity.ok(blacksmithService.findAll(pageable));
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/{orderId}")
   public ResponseEntity<BlacksmithResponseDto> findById(@PathVariable Long id) {
     return ResponseEntity.ok(blacksmithService.findById(id));
   }

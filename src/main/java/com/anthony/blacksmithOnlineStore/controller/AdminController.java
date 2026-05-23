@@ -25,7 +25,7 @@ public class AdminController {
   private final AdminService adminService;
   private final BlacksmithService blacksmithService;
 
-  @PatchMapping("/users/{id}/role")
+  @PatchMapping("/users/{orderId}/role")
   public ResponseEntity<Void> updateUserRole(@PathVariable UUID id,
       @RequestBody @Valid RoleUpdateDto roleUpdateDto,
       Authentication auth) {

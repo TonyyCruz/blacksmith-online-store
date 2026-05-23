@@ -1,5 +1,6 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -29,7 +30,7 @@ public class OrderService {
   private final AuthenticatedUserService authUser;
 
   @Transactional
-  public OrderResponseDto create(OrderRequestDto dto) {
+  public OrderPaymentDto create(OrderRequestDto dto) {
     Order order = new Order();
     User user = userService.getUserReference();
     order.setUser(user);
@@ -38,11 +39,11 @@ public class OrderService {
       order.addOrderItem(orderItemFactory.create(item, orderItemDto.quantity()));
     }
     order.recalculateTotal();
-    return OrderResponseDto.fromEntity(orderRepository.save(order));
+    return OrderPaymentDto.fromEntity(orderRepository.save(order));
   }
 
   @Transactional
-  public void confirmOrder(Long id) {
+  public void orderPaid(Long id) {
     Order order = getEntityById(id);
     order.setStatus(OrderStatus.PAYMENT_APPROVED);
     for (OrderItem orderItem : order.getOrderItems()) {
@@ -59,10 +60,13 @@ public class OrderService {
           "You cannot cancel an order that does not belong to you."
       );
     }
-    order.setStatus(OrderStatus.CANCELLED);
-    for (OrderItem orderItem : order.getOrderItems()) {
-      saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
+    if (order.getStatus().isPaid()) {
+      order.setStatus(OrderStatus.REFUND_PENDING);
+      for (OrderItem orderItem : order.getOrderItems()) {
+        saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
+      }
     }
+    else order.setStatus(OrderStatus.CANCELLED);
     return OrderResponseDto.fromEntity(order);
   }
 

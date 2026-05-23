@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ public class OrderController {
   private final OrderService orderService;
 
   @PostMapping
-  public ResponseEntity<OrderResponseDto> create(
+  public ResponseEntity<OrderPaymentDto> create(
       @RequestBody OrderRequestDto dto, Authentication auth) {
     return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(dto));
   }

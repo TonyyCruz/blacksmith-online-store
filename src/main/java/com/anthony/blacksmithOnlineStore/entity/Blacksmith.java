@@ -75,7 +75,7 @@ public class Blacksmith {
   @Override
   public String toString() {
     return "Blacksmith{" +
-        "id=" + id +
+        "orderId=" + id +
         ", name='" + name + '\'' +
         ", ratingAverage=" + ratingAverage +
         ", ratingCount=" + ratingCount +

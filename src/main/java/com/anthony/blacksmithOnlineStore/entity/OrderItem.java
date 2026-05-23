@@ -143,7 +143,7 @@ public class OrderItem {
   @Override
   public String toString() {
     return "OrderItem{" +
-        "id=" + id +
+        "orderId=" + id +
         ", productId=" + itemId +
         ", productName='" + itemName + '\'' +
         ", unitPrice=" + basePriceAtPurchase +
