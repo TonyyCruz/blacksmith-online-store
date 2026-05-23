@@ -55,6 +55,7 @@ public class OrderItem {
   @CreationTimestamp
   private LocalDateTime createdAt;
   @Column(nullable = false)
+  @Builder.Default
   private boolean reviewed = false;
 
   public void setId(Long id) {
