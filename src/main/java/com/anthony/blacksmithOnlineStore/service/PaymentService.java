@@ -11,6 +11,6 @@ public class PaymentService {
 
   @Transactional
   public void approved(Long id) {
-    orderService.confirmOrder(id);
+    orderService.orderPaid(id);
   }
 }

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RatingRepository extends JpaRepository<Rating, Long> {
 
-  Page<Rating> findAllByReviewedItemId(Long reviewedItemId, Pageable pageable);
+  Page<Rating> findAllByReviewedItemId(long reviewedItemId, Pageable pageable);
 }

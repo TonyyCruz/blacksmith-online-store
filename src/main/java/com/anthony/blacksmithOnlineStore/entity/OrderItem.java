@@ -55,6 +55,7 @@ public class OrderItem {
   @CreationTimestamp
   private LocalDateTime createdAt;
   @Column(nullable = false)
+  @Builder.Default
   private boolean reviewed = false;
 
   public void setId(Long id) {
@@ -143,7 +144,7 @@ public class OrderItem {
   @Override
   public String toString() {
     return "OrderItem{" +
-        "id=" + id +
+        "orderId=" + id +
         ", productId=" + itemId +
         ", productName='" + itemName + '\'' +
         ", unitPrice=" + basePriceAtPurchase +

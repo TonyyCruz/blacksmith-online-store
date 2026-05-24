@@ -1,5 +1,8 @@
 package com.anthony.blacksmithOnlineStore.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum OrderStatus {
   PENDING("Pending"),
   PAYMENT_APPROVED("Payment Approved"),
@@ -8,10 +11,13 @@ public enum OrderStatus {
   IN_TRANSIT("In Transit"),
   OUT_FOR_DELIVERY("Out for Delivery"),
   DELIVERED("Delivered"),
-  PAYMENT_REJECTED("Payment Rejected"),
-  CANCELLED("Cancelled"),
+  REFUND_PENDING("Refound Pending"),
   REFUNDED("Refunded"),
-  DELIVERY_FAILED("Delivery Failed");
+  RETURN_REQUESTED("Returning Request"),
+  RETURNED("Returned"),
+  DELIVERY_FAILED("Delivery Failed"),
+  PAYMENT_REJECTED("Payment Rejected"),
+  CANCELLED("Cancelled");
 
   private final String status;
 
@@ -19,14 +25,10 @@ public enum OrderStatus {
     this.status = status;
   }
 
-  public String getStatus() {
-    return status;
-  }
-
   public boolean isFinalState() {
     return switch (this) {
-      case DELIVERED, CANCELLED, REFUNDED -> true;
-      default -> false;
+      case PENDING, PAYMENT_REJECTED -> false;
+      default -> true;
     };
   }
 
@@ -36,18 +38,44 @@ public enum OrderStatus {
           || nextStatus == PAYMENT_REJECTED
           || nextStatus == CANCELLED;
       case PAYMENT_APPROVED -> nextStatus == SEPARATING
-          || nextStatus == CANCELLED;
+          || nextStatus == REFUND_PENDING;
       case SEPARATING -> nextStatus == DISPATCHED
-          || nextStatus == CANCELLED;
-      case DISPATCHED -> nextStatus == IN_TRANSIT
-          || nextStatus == DELIVERY_FAILED;
+          || nextStatus == REFUND_PENDING;
+      case DISPATCHED, DELIVERY_FAILED -> nextStatus == IN_TRANSIT
+          || nextStatus == REFUND_PENDING;
       case IN_TRANSIT -> nextStatus == OUT_FOR_DELIVERY
           || nextStatus == DELIVERY_FAILED;
       case OUT_FOR_DELIVERY -> nextStatus == DELIVERED
           || nextStatus == DELIVERY_FAILED;
-      case PAYMENT_REJECTED, DELIVERY_FAILED -> nextStatus == CANCELLED;
-      case DELIVERED, CANCELLED, REFUNDED -> false;
+      case DELIVERED -> nextStatus == RETURN_REQUESTED;
+      case RETURN_REQUESTED -> nextStatus == RETURNED;
+      case RETURNED -> nextStatus == REFUND_PENDING;
+      case REFUND_PENDING -> nextStatus == REFUNDED;
+      case PAYMENT_REJECTED -> nextStatus == CANCELLED;
+      case CANCELLED, REFUNDED -> false;
     };
+  }
+
+  public boolean canBeRefunded() {
+    return switch (this) {
+      case PAYMENT_APPROVED,
+           SEPARATING,
+           DISPATCHED,
+           DELIVERY_FAILED,
+           RETURNED -> true;
+      default -> false;
+    };
+  }
+
+  public boolean canBeCanceled() {
+    return switch (this) {
+      case PENDING, PAYMENT_REJECTED -> true;
+      default -> false;
+    };
+  }
+
+  public boolean canBeReturned() {
+    return this == DELIVERED;
   }
 
   @Override

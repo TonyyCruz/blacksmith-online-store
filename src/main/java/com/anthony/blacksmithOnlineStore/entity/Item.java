@@ -31,7 +31,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -50,6 +50,7 @@ public class Item {
   @Column(nullable = false)
   private BigDecimal finalPrice;
   @Column(nullable = false)
+  @Builder.Default
   private boolean hasDiscount = false;
   @Column(nullable = false, columnDefinition = "TEXT")
   private String description;
@@ -71,9 +72,11 @@ public class Item {
   private long sold = 0;
   @Column(nullable = false)
   @Setter(AccessLevel.NONE)
+  @Builder.Default
   private long totalRatingsSum = 0;
   @Setter(AccessLevel.NONE)
   @Column(nullable = false)
+  @Builder.Default
   private Integer ratingCount = 0;
   @Column(precision = 2, scale = 1)
   @Setter(AccessLevel.NONE)
@@ -88,6 +91,7 @@ public class Item {
   @Column(nullable = false)
   private boolean active = true;
   @Version
+  @Builder.Default
   private Long version = 0L;
   @Column(nullable = false, updatable = false)
   private String blacksmithNameSnapshot;

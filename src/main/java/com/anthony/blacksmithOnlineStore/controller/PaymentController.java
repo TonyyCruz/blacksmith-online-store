@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/payments")
 @RequiredArgsConstructor
 public class PaymentController {
   private final PaymentService paymentService;
 
-  @PostMapping("/{id}/confirmOrder")
+  @PostMapping("/orders/{orderId}/approve")
   public ResponseEntity<Void> approve(@PathVariable Long id) {
     paymentService.approved(id);
     return ResponseEntity.noContent().build();

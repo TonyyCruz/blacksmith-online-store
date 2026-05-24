@@ -53,6 +53,7 @@ public class Order {
   @Setter(AccessLevel.NONE)
   private OrderStatus status = OrderStatus.PENDING;
   @Setter(AccessLevel.NONE)
+  @Builder.Default
   @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST)
   private final List<OrderItem> orderItems = new ArrayList<>();
   @Setter(AccessLevel.NONE)
@@ -108,7 +109,7 @@ public class Order {
   @Override
   public String toString() {
     return "Order{" +
-        "id=" + id +
+        "orderId=" + id +
         ", user=" + (user == null? null : user.getId()) +
         ", createdAt=" + createdAt +
         ", status=" + status +

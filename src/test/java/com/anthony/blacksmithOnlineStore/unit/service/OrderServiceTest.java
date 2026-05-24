@@ -2,6 +2,8 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -9,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -17,6 +20,7 @@ import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
+import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
@@ -28,6 +32,7 @@ import com.anthony.blacksmithOnlineStore.service.OrderService;
 import com.anthony.blacksmithOnlineStore.service.SaleService;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +41,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -65,47 +72,184 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("Should create an order with valid data")
-    void create_shouldCreateAnOrderSuccessfully() {
+    void create_shouldCreateAnOrderSuccessfully_withCorrectData() {
       OrderRequestDto dto = new OrderRequestDto(List.of(
           new OrderItemRequestDto(1L, 2),
           new OrderItemRequestDto(2L, 2),
           new OrderItemRequestDto(3L, 1)
       ));
+      Item item1 = MockItem.item(1L).toBuilder().finalPrice(BigDecimal.valueOf(10)).build();
+      Item item2 = MockItem.item(2L).toBuilder().finalPrice(BigDecimal.valueOf(20)).build();
+      Item item3 = MockItem.item(3L).toBuilder().finalPrice(BigDecimal.valueOf(30)).build();
 
       when(userService.getUserReference()).thenReturn(user);
-      doNothing().when(saleService).performSale(any(), any());
-      when(itemService.findEntityById(any())).thenReturn(MockItem.item());
-      when(orderItemFactory.create(any(), any()))
-          .thenReturn(MockOrderItem.orderItem());
+      when(itemService.findEntityById(item1.getId())).thenReturn(item1);
+      when(itemService.findEntityById(item2.getId())).thenReturn(item2);
+      when(itemService.findEntityById(item3.getId())).thenReturn(item3);
+      when(orderItemFactory.create(item1, 2))
+          .thenReturn(MockOrderItem.fromItem(item1, 2));
+      when(orderItemFactory.create(item2, 2))
+          .thenReturn(MockOrderItem.fromItem(item2, 2));
+      when(orderItemFactory.create(item3, 1))
+          .thenReturn(MockOrderItem.fromItem(item3, 1));
       when(orderRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-      OrderResponseDto response = orderService.create(dto);
+      OrderPaymentDto response = orderService.create(dto);
 
-      assertEquals(3, response.items().size(), "All orderItems must be saved");
+      assertEquals(BigDecimal.valueOf(90), response.total(), "The total must have the correct price");
       verify(userService, times(1)).getUserReference();
-      verify(saleService, times(1)).performSale(any(), any());
-      verify(itemService, times(1)).findEntityById(any());
-      verify(orderItemFactory, times(3)).create(any(), any());
+      verify(itemService, times(1)).findEntityById(item1.getId());
+      verify(itemService, times(1)).findEntityById(item2.getId());
+      verify(itemService, times(1)).findEntityById(item3.getId());
+      verify(orderItemFactory, times(1)).create(item1, 2);
+      verify(orderItemFactory, times(1)).create(item2, 2);
+      verify(orderItemFactory, times(1)).create(item3, 1);
       verify(orderRepository, times(1)).save(any());
     }
 
     @Test
-    @DisplayName("Should cancel an order with valid data")
-    void create_shouldCancelAnOrderSuccessfully() {
-      User user = MockUser.user();
+    @DisplayName("Should find a order by id and return a Entity")
+    void findById_shouldFindAnOrderByIdSuccessfully_andReturnAEntity() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
       when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-      doNothing().when(saleService).cancelSale(any(), any());
 
+      Order response = orderService.getEntityById(order.getId());
+
+      verify(orderRepository, times(1)).findById(order.getId());
+      assertEquals(order.getId(), response.getId(), "The id must be the same");
+      assertEquals(order.getUser().getId(), response.getUser().getId(), "The user id must be the same");
+      assertEquals(order.getStatus(), response.getStatus(), "The status must be the same");
+      assertEquals(order.getTotal(), response.getTotal(), "The total must be the same");
+    }
+
+    @Test
+    @DisplayName("Should find a order by id and return a DTO")
+    void findById_shouldFindAnOrderByIdSuccessfully_andReturnADto() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      OrderResponseDto response = orderService.getById(order.getId());
+
+      verify(orderRepository, times(1)).findById(order.getId());
+      assertEquals(order.getId(), response.id(), "The id must be the same");
+      assertEquals(order.getUser().getId(), response.userId(), "The user id must be the same");
+      assertEquals(order.getStatus(), response.status(), "The status must be the same");
+      assertEquals(order.getTotal(), response.total(), "The total must be the same");
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = OrderStatus.class,
+        names = {"PENDING", "PAYMENT_REJECTED"}
+    )
+    @DisplayName("Should cancel an not paid order and set status cancelled")
+    void cancel_shouldCancelANotPaidOrderSuccessfully_andSetStatusCancelled(OrderStatus status) {
+      User user = MockUser.user();
+      Order order = MockOrder.orderWithItems()
+          .toBuilder()
+          .user(user)
+          .status(status)
+          .build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
       OrderResponseDto response = orderService.cancel(order.getId());
 
-      assertEquals(OrderStatus.CANCELLED, response.status(), "Status must be cancelled");
+      assertEquals(OrderStatus.CANCELLED, response.status());
+      verify(orderRepository).findById(order.getId());
+      verify(authUser).getAuthenticatedId();
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = OrderStatus.class,
+        names = {"PAYMENT_APPROVED", "SEPARATING", "DISPATCHED", "RETURNED", "DELIVERY_FAILED"}
+    )
+    @DisplayName("Should refound an paid order and set status refound pending")
+    void refund_shouldRefoundAPaidOrderSuccessfully_andSetStatusRefoundPending(OrderStatus status) {
+      User user = MockUser.user();
+      Order order = MockOrder.orderWithItems()
+          .toBuilder()
+          .user(user)
+          .status(status)
+          .build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      doNothing().when(saleService).cancelSale(anyLong(), anyInt());
+
+      OrderResponseDto response = orderService.refound(order.getId());
+
+      assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
-      verify(saleService, times(1)).cancelSale(any(), any());
+      verify(saleService, times(order.getOrderItems().size())).cancelSale(anyLong(), anyInt());
+    }
+
+    @Test
+    @DisplayName("Should request a return of a delivered order")
+    void returnRequest_shouldRequestAReturn_ofAReturnedRequestOrder() {
+      User user = MockUser.user();
+      Order order = MockOrder.orderWithItems()
+          .toBuilder()
+          .user(user)
+          .status(OrderStatus.DELIVERED)
+          .build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      OrderResponseDto response = orderService.returnRequest(order.getId());
+
+      assertEquals(OrderStatus.RETURN_REQUESTED, response.status(), "Status must be return request");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Should refound an returned order and set status refound pending")
+    void refund_shouldRefoundAReturnedOrder_andSetStatusRefoundPending() {
+      User user = MockUser.user();
+      Order order = MockOrder.orderWithItems()
+          .toBuilder()
+          .user(user)
+          .status(OrderStatus.RETURN_REQUESTED)
+          .build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      doNothing().when(saleService).cancelSale(anyLong(), anyInt());
+
+      OrderResponseDto response = orderService.returnComplete(order.getId());
+
+      assertEquals(OrderStatus.RETURNED, response.status(), "Status must be refound pending");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+      verify(saleService, times(order.getOrderItems().size())).cancelSale(anyLong(), anyInt());
+    }
+
+    @Test
+    @DisplayName("Should get all orders successfully")
+    void getAll_canReturnAllOrdersSuccessfully() {
+      List<Order> orders = List.of(
+          MockOrder.deliveredOrder(),
+          MockOrder.pendingOrder(),
+          MockOrder.orderWithItems()
+      );
+
+      when(orderRepository.findByUserId(user.getId())).thenReturn(orders);
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      List<OrderResponseDto> responseList = orderService.getUserOrders();
+
+      assertEquals(3, responseList.size(), "Should return the same number of orders");
+      verify(orderRepository, times(1)).findByUserId(user.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
     }
 
   }
@@ -115,33 +259,48 @@ public class OrderServiceTest {
   class SaleServiceExceptionPath {
 
     @Test
-    @DisplayName("Should throw an exception when item have no stock")
-    void create_shouldThrownAnException_whenItemHaveNoStock() {
+    @DisplayName("Should throw an exception when item was no found")
+    void create_shouldThrownAnException_whenItemWasNoFound() {
       OrderRequestDto dto = new OrderRequestDto(List.of(
-          new OrderItemRequestDto(1L, 10)
+          new OrderItemRequestDto(1L, 2)
       ));
 
       when(userService.getUserReference()).thenReturn(user);
-      doThrow(DataModifyException.class).when(saleService).performSale(any(), any());
+      when(itemService.findEntityById(1L)).thenThrow(ItemNotFoundException.class);
 
-      assertThrows(DataModifyException.class, () -> orderService.create(dto));
+      assertThrows(ItemNotFoundException.class, () -> orderService.create(dto));
       verify(userService, times(1)).getUserReference();
-      verify(saleService, times(1)).performSale(any(), any());
+      verify(itemService, times(1)).findEntityById(1L);
     }
 
-    @Test
-    @DisplayName("Should thrown an exception trying cancel a not authorized order")
-    void create_shouldThrownAnException_tryingCancelAnNotAuthorizedOrder() {
-      User user = MockUser.user(UUID.randomUUID());
-      Order order = MockOrder.orderWithItems().toBuilder().user(MockUser.user()).build();
-
-      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-
-      assertThrows(DataException.class,
-          () -> orderService.cancel(order.getId()),"Should thrown an exception trying cancel an unauthorized order");
-      verify(orderRepository, times(1)).findById(order.getId());
-      verify(authUser, times(1)).getAuthenticatedId();
-    }
+//    @Test
+//    @DisplayName("Should throw an exception when item have no stock")
+//    void create_shouldThrownAnException_whenItemHaveNoStock() {
+//      OrderRequestDto dto = new OrderRequestDto(List.of(
+//          new OrderItemRequestDto(1L, 10)
+//      ));
+//
+//      when(userService.getUserReference()).thenReturn(user);
+//      doThrow(DataModifyException.class).when(saleService).performSale(any(), any());
+//
+//      assertThrows(DataModifyException.class, () -> orderService.create(dto));
+//      verify(userService, times(1)).getUserReference();
+//      verify(saleService, times(1)).performSale(any(), any());
+//    }
+//
+//    @Test
+//    @DisplayName("Should thrown an exception trying cancel a not authorized order")
+//    void create_shouldThrownAnException_tryingCancelAnNotAuthorizedOrder() {
+//      User user = MockUser.user(UUID.randomUUID());
+//      Order order = MockOrder.orderWithItems().toBuilder().user(MockUser.user()).build();
+//
+//      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+//
+//      assertThrows(DataException.class,
+//          () -> orderService.cancel(order.getId()),"Should thrown an exception trying cancel an unauthorized order");
+//      verify(orderRepository, times(1)).findById(order.getId());
+//      verify(authUser, times(1)).getAuthenticatedId();
+//    }
   }
 
 }

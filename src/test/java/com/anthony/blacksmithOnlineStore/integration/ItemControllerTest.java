@@ -186,7 +186,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can get an Item by id successfully")
+    @DisplayName("Can get an Item by orderId successfully")
     void getItemById_canGetItemSuccessfully() throws Exception {
       mockMvc.perform(get(item_BASE_URL + "/" + item.getId())
               .header("Authorization", userToken))
@@ -622,7 +622,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Get item By Blacksmith id Should return 404 when blacksmith not exists")
+    @DisplayName("Get item By Blacksmith orderId Should return 404 when blacksmith not exists")
     void getItemByBlacksmithId_shouldReturn404_whenBlacksmithNotExists() throws Exception {
       mockMvc.perform(get(item_BASE_URL + "/blacksmith/999999")
               .header("Authorization", userToken))

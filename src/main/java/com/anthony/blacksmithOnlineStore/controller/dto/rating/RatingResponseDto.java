@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public record RatingResponseDto(
-    BigInteger id,
+    Long id,
     String purchaseUsername,
     int rating,
     String review,

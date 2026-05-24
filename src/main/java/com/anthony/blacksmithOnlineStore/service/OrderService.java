@@ -1,5 +1,6 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -9,12 +10,13 @@ import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
 import jakarta.transaction.Transactional;
-import java.util.UUID;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,7 @@ public class OrderService {
   private final AuthenticatedUserService authUser;
 
   @Transactional
-  public OrderResponseDto create(OrderRequestDto dto) {
+  public OrderPaymentDto create(OrderRequestDto dto) {
     Order order = new Order();
     User user = userService.getUserReference();
     order.setUser(user);
@@ -38,11 +40,11 @@ public class OrderService {
       order.addOrderItem(orderItemFactory.create(item, orderItemDto.quantity()));
     }
     order.recalculateTotal();
-    return OrderResponseDto.fromEntity(orderRepository.save(order));
+    return OrderPaymentDto.fromEntity(orderRepository.save(order));
   }
 
   @Transactional
-  public void confirmOrder(Long id) {
+  public void orderPaid(Long id) {
     Order order = getEntityById(id);
     order.setStatus(OrderStatus.PAYMENT_APPROVED);
     for (OrderItem orderItem : order.getOrderItems()) {
@@ -53,20 +55,68 @@ public class OrderService {
   @Transactional
   public OrderResponseDto cancel(Long id) {
     Order order = getEntityById(id);
-    UUID authenticatedId = authUser.getAuthenticatedId();
-    if (!order.getUser().getId().equals(authenticatedId)) {
-      throw new ForbiddenOperationException(
-          "You cannot cancel an order that does not belong to you."
-      );
+    if (!order.getStatus().canBeCanceled()) {
+      throw new InvalidOrderStatusException("Only pending orders can be cancelled.");
     }
     order.setStatus(OrderStatus.CANCELLED);
+    return OrderResponseDto.fromEntity(order);
+  }
+
+  @Transactional
+  public OrderResponseDto refound(Long id) {
+    Order order = getEntityById(id);
+    if (!order.getStatus().canBeRefunded()) {
+      throw new InvalidOrderStatusException("This order cannot be refunded");
+    }
+    order.setStatus(OrderStatus.REFUND_PENDING);
     for (OrderItem orderItem : order.getOrderItems()) {
       saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
     }
     return OrderResponseDto.fromEntity(order);
   }
 
+  @Transactional
+  public OrderResponseDto returnRequest(Long id) {
+    Order order = getEntityById(id);
+    if (!order.getStatus().canBeReturned()) {
+      throw new InvalidOrderStatusException("Only delivered orders can be returned.");
+    }
+    order.setStatus(OrderStatus.RETURN_REQUESTED);
+    return OrderResponseDto.fromEntity(order);
+  }
+
+  @Transactional
+  public OrderResponseDto returnComplete(Long id) {
+    Order order = getEntityById(id);
+    if (order.getStatus() != OrderStatus.RETURN_REQUESTED) {
+      throw new InvalidOrderStatusException("Only return requested orders can be returned.");
+    }
+    order.setStatus(OrderStatus.RETURNED);
+    for (OrderItem orderItem : order.getOrderItems()) {
+      saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
+    }
+    return OrderResponseDto.fromEntity(order);
+  }
+
+  public OrderResponseDto getById(Long id) {
+    return OrderResponseDto.fromEntity(getEntityById(id));
+  }
+
+  public List<OrderResponseDto> getUserOrders() {
+    return orderRepository.findByUserId(authUser.getAuthenticatedId())
+        .stream()
+        .map(OrderResponseDto::fromEntity)
+        .toList();
+  }
+
   public Order getEntityById(Long id) {
-    return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
+    Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
+    if (authUser.isAdmin()) return order;
+    if (!order.getUser().getId().equals(authUser.getAuthenticatedId())) {
+      throw new ForbiddenOperationException(
+          "You cannot cannot access this order."
+      );
+    }
+    return order;
   }
 }
