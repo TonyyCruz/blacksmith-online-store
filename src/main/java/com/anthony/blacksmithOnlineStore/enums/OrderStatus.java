@@ -13,6 +13,8 @@ public enum OrderStatus {
   DELIVERED("Delivered"),
   REFUND_PENDING("Refound Pending"),
   REFUNDED("Refunded"),
+  RETURN_REQUESTED("Returning Request"),
+  RETURNED("Returned"),
   DELIVERY_FAILED("Delivery Failed"),
   PAYMENT_REJECTED("Payment Rejected"),
   CANCELLED("Cancelled");
@@ -39,32 +41,41 @@ public enum OrderStatus {
           || nextStatus == REFUND_PENDING;
       case SEPARATING -> nextStatus == DISPATCHED
           || nextStatus == REFUND_PENDING;
-      case DISPATCHED -> nextStatus == IN_TRANSIT
-          || nextStatus == DELIVERY_FAILED;
+      case DISPATCHED, DELIVERY_FAILED -> nextStatus == IN_TRANSIT
+          || nextStatus == REFUND_PENDING;
       case IN_TRANSIT -> nextStatus == OUT_FOR_DELIVERY
           || nextStatus == DELIVERY_FAILED;
       case OUT_FOR_DELIVERY -> nextStatus == DELIVERED
           || nextStatus == DELIVERY_FAILED;
-      case DELIVERY_FAILED -> nextStatus == IN_TRANSIT
-          || nextStatus == REFUND_PENDING;
-      case DELIVERED -> nextStatus == REFUND_PENDING;
+      case DELIVERED -> nextStatus == RETURN_REQUESTED;
+      case RETURN_REQUESTED -> nextStatus == RETURNED;
+      case RETURNED -> nextStatus == REFUND_PENDING;
       case REFUND_PENDING -> nextStatus == REFUNDED;
       case PAYMENT_REJECTED -> nextStatus == CANCELLED;
       case CANCELLED, REFUNDED -> false;
     };
   }
 
-  public boolean isPaid() {
+  public boolean canBeRefunded() {
     return switch (this) {
       case PAYMENT_APPROVED,
            SEPARATING,
            DISPATCHED,
-           IN_TRANSIT,
-           OUT_FOR_DELIVERY,
-           DELIVERED,
-           REFUND_PENDING-> true;
+           DELIVERY_FAILED,
+           RETURNED -> true;
       default -> false;
     };
+  }
+
+  public boolean canBeCanceled() {
+    return switch (this) {
+      case PENDING, PAYMENT_REJECTED -> true;
+      default -> false;
+    };
+  }
+
+  public boolean canBeReturned() {
+    return this == DELIVERED;
   }
 
   @Override
