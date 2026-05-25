@@ -18,5 +18,8 @@ public interface ItemUpdate {
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "ratingAverage", ignore = true)
+  @Mapping(target = "hasDiscount", ignore = true)
+  @Mapping(target = "blacksmithNameSnapshot", ignore = true)
+  @Mapping(target = "blacksmithIdSnapshot", ignore = true)
   void updateItemFromDto(ItemPatchUpdateDto dto, @MappingTarget Item item);
 }

@@ -69,6 +69,7 @@ public class Item {
   private Blacksmith craftedBy;
   @Column(nullable = false)
   @Setter(AccessLevel.NONE)
+  @Builder.Default
   private long sold = 0;
   @Column(nullable = false)
   @Setter(AccessLevel.NONE)
@@ -89,6 +90,7 @@ public class Item {
   @Setter(AccessLevel.NONE)
   private LocalDateTime updatedAt;
   @Column(nullable = false)
+  @Builder.Default
   private boolean active = true;
   @Version
   @Builder.Default
