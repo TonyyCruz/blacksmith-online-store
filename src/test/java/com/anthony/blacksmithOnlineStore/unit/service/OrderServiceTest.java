@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,8 +18,9 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
@@ -35,8 +35,6 @@ import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import org.hibernate.exception.DataException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -97,6 +95,7 @@ public class OrderServiceTest {
       OrderPaymentDto response = orderService.create(dto);
 
       assertEquals(BigDecimal.valueOf(90), response.total(), "The total must have the correct price");
+      assertEquals(OrderStatus.PENDING, response.status(), "The status must be pending");
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(item1.getId());
       verify(itemService, times(1)).findEntityById(item2.getId());
@@ -108,8 +107,25 @@ public class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("Should set the order status to paid")
+    void orderPaid_shouldSetOrderStatusToPaid() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      doNothing().when(saleService).performSale(anyLong(), anyInt());
+
+      orderService.orderPaid(1L);
+
+      assertEquals(OrderStatus.PAYMENT_APPROVED, order.getStatus(), "The status must be payment approved");
+      verify(orderRepository, times(1)).findById(1L);
+      verify(authUser, times(1)).getAuthenticatedId();
+      verify(saleService, times(order.getOrderItems().size())).performSale(anyLong(), anyInt());
+    }
+
+    @Test
     @DisplayName("Should find a order by id and return a Entity")
-    void findById_shouldFindAnOrderByIdSuccessfully_andReturnAEntity() {
+    void findEntityById_shouldFindAnOrderByIdSuccessfully_andReturnAEntity() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
       when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
@@ -259,18 +275,76 @@ public class OrderServiceTest {
   class SaleServiceExceptionPath {
 
     @Test
-    @DisplayName("Should throw an exception when item was no found")
+    @DisplayName("Create should throw an exception when item was no found")
     void create_shouldThrownAnException_whenItemWasNoFound() {
       OrderRequestDto dto = new OrderRequestDto(List.of(
-          new OrderItemRequestDto(1L, 2)
+          new OrderItemRequestDto(999L, 2)
       ));
 
       when(userService.getUserReference()).thenReturn(user);
-      when(itemService.findEntityById(1L)).thenThrow(ItemNotFoundException.class);
+      when(itemService.findEntityById(999L)).thenThrow(ItemNotFoundException.class);
 
       assertThrows(ItemNotFoundException.class, () -> orderService.create(dto));
       verify(userService, times(1)).getUserReference();
-      verify(itemService, times(1)).findEntityById(1L);
+      verify(itemService, times(1)).findEntityById(999L);
+    }
+
+    @Test
+    @DisplayName("Order paid should throw an exception when order was no found")
+    void orderPaid_shouldThrownAnException_whenOrderWasNoFound() {
+      when(orderRepository.findById(999L)).thenThrow(OrderNotFoundException.class);
+
+      assertThrows(OrderNotFoundException.class, () -> orderService.orderPaid(999L));
+      verify(orderRepository, times(1)).findById(999L);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = OrderStatus.class,
+        names = { "PAYMENT_APPROVED", "SEPARATING", "DISPATCHED", "IN_TRANSIT", "OUT_FOR_DELIVERY",
+            "DELIVERED", "REFUND_PENDING", "REFUNDED", "RETURN_REQUESTED", "RETURNED",
+            "DELIVERY_FAILED", "PAYMENT_REJECTED", "CANCELLED"
+             }
+    )
+    @DisplayName("Order paid should throw an exception when order must not be paid")
+    void orderPaid_shouldThrownAnException_whenOrderMustNotBePaid(OrderStatus status) {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      assertThrows(InvalidOrderStatusException.class, () -> orderService.orderPaid(order.getId()));
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Cancel should throw an exception when order was no found")
+    void cancel_shouldThrownAnException_whenOrderWasNoFound() {
+      when(orderRepository.findById(999L)).thenThrow(OrderNotFoundException.class);
+
+      assertThrows(OrderNotFoundException.class, () -> orderService.cancel(999L));
+      verify(orderRepository, times(1)).findById(999L);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = OrderStatus.class,
+        names = { "PAYMENT_APPROVED", "SEPARATING", "DISPATCHED", "IN_TRANSIT", "OUT_FOR_DELIVERY",
+            "DELIVERED", "REFUND_PENDING", "REFUNDED", "RETURN_REQUESTED", "RETURNED",
+            "DELIVERY_FAILED", "CANCELLED"
+        }
+    )
+    @DisplayName("Cancel should throw an exception when order must not be cancelled")
+    void cancel_shouldThrownAnException_whenOrderMustNotBeCancelled(OrderStatus status) {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      assertThrows(InvalidOrderStatusException.class, () -> orderService.cancel(order.getId()));
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
     }
 
 //    @Test
