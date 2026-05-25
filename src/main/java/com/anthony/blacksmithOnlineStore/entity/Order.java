@@ -51,6 +51,7 @@ public class Order {
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   @Setter(AccessLevel.NONE)
+  @Builder.Default
   private OrderStatus status = OrderStatus.PENDING;
   @Setter(AccessLevel.NONE)
   @Builder.Default
