@@ -51,7 +51,8 @@ public enum OrderStatus {
       case RETURN_REQUESTED -> nextStatus == RETURNED;
       case RETURNED -> nextStatus == REFUND_PENDING;
       case REFUND_PENDING -> nextStatus == REFUNDED;
-      case PAYMENT_REJECTED -> nextStatus == CANCELLED;
+      case PAYMENT_REJECTED -> nextStatus == CANCELLED
+          || nextStatus == PAYMENT_APPROVED;
       case CANCELLED, REFUNDED -> false;
     };
   }
