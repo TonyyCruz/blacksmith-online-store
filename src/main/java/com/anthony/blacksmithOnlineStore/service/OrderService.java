@@ -63,9 +63,12 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto refound(Long id) {
+  public OrderResponseDto refoundRequest(Long id) {
     Order order = getEntityById(id);
     if (!order.getStatus().canBeRefunded()) {
+      if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
+        throw new InvalidOrderStatusException("This order is already pending for refund.");
+      }
       throw new InvalidOrderStatusException("This order cannot be refunded");
     }
     order.setStatus(OrderStatus.REFUND_PENDING);

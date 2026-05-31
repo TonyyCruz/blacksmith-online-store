@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -106,10 +106,11 @@ public class OrderServiceTest {
       verify(orderRepository, times(1)).save(any());
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Should set the order status to paid")
-    void orderPaid_shouldSetOrderStatusToPaid() {
-      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.mocks.OrderStatusHelper#payable")
+    void orderPaid_shouldSetOrderStatusToPaid(OrderStatus status) {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
       when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
@@ -158,13 +159,9 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(
-        value = OrderStatus.class,
-        names = {"PENDING", "PAYMENT_REJECTED"}
-    )
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.mocks.OrderStatusHelper#cancelable")
     @DisplayName("Should cancel an not paid order and set status cancelled")
     void cancel_shouldCancelANotPaidOrderSuccessfully_andSetStatusCancelled(OrderStatus status) {
-      User user = MockUser.user();
       Order order = MockOrder.orderWithItems()
           .toBuilder()
           .user(user)
@@ -182,12 +179,9 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(
-        value = OrderStatus.class,
-        names = {"PAYMENT_APPROVED", "SEPARATING", "DISPATCHED", "RETURNED", "DELIVERY_FAILED"}
-    )
-    @DisplayName("Should refound an paid order and set status refound pending")
-    void refund_shouldRefoundAPaidOrderSuccessfully_andSetStatusRefoundPending(OrderStatus status) {
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.mocks.OrderStatusHelper#refundable")
+    @DisplayName("Should request a refound of a paid order and set status refound pending")
+    void refundRequest_shouldSetRefoundRequestAPaidOrderSuccessfully_andSetStatusRefoundPending(OrderStatus status) {
       User user = MockUser.user();
       Order order = MockOrder.orderWithItems()
           .toBuilder()
@@ -199,7 +193,7 @@ public class OrderServiceTest {
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       doNothing().when(saleService).cancelSale(anyLong(), anyInt());
 
-      OrderResponseDto response = orderService.refound(order.getId());
+      OrderResponseDto response = orderService.refoundRequest(order.getId());
 
       assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
       verify(orderRepository, times(1)).findById(order.getId());
@@ -228,8 +222,8 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Should refound an returned order and set status refound pending")
-    void refund_shouldRefoundAReturnedOrder_andSetStatusRefoundPending() {
+    @DisplayName("Should return an returned order and set status refound pending")
+    void returnComplete_shouldCompleteAReturnedOrder_andSetStatusRefoundPending() {
       User user = MockUser.user();
       Order order = MockOrder.orderWithItems()
           .toBuilder()
@@ -292,20 +286,14 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Order paid should throw an exception when order was no found")
     void orderPaid_shouldThrownAnException_whenOrderWasNoFound() {
-      when(orderRepository.findById(999L)).thenThrow(OrderNotFoundException.class);
+      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 
       assertThrows(OrderNotFoundException.class, () -> orderService.orderPaid(999L));
       verify(orderRepository, times(1)).findById(999L);
     }
 
     @ParameterizedTest
-    @EnumSource(
-        value = OrderStatus.class,
-        names = { "PAYMENT_APPROVED", "SEPARATING", "DISPATCHED", "IN_TRANSIT", "OUT_FOR_DELIVERY",
-            "DELIVERED", "REFUND_PENDING", "REFUNDED", "RETURN_REQUESTED", "RETURNED",
-            "DELIVERY_FAILED", "PAYMENT_REJECTED", "CANCELLED"
-             }
-    )
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.mocks.OrderStatusHelper#nonPayable")
     @DisplayName("Order paid should throw an exception when order must not be paid")
     void orderPaid_shouldThrownAnException_whenOrderMustNotBePaid(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
@@ -321,20 +309,14 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Cancel should throw an exception when order was no found")
     void cancel_shouldThrownAnException_whenOrderWasNoFound() {
-      when(orderRepository.findById(999L)).thenThrow(OrderNotFoundException.class);
+      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 
       assertThrows(OrderNotFoundException.class, () -> orderService.cancel(999L));
       verify(orderRepository, times(1)).findById(999L);
     }
 
     @ParameterizedTest
-    @EnumSource(
-        value = OrderStatus.class,
-        names = { "PAYMENT_APPROVED", "SEPARATING", "DISPATCHED", "IN_TRANSIT", "OUT_FOR_DELIVERY",
-            "DELIVERED", "REFUND_PENDING", "REFUNDED", "RETURN_REQUESTED", "RETURNED",
-            "DELIVERY_FAILED", "CANCELLED"
-        }
-    )
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.mocks.OrderStatusHelper#nonCancelable")
     @DisplayName("Cancel should throw an exception when order must not be cancelled")
     void cancel_shouldThrownAnException_whenOrderMustNotBeCancelled(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
@@ -343,6 +325,56 @@ public class OrderServiceTest {
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
       assertThrows(InvalidOrderStatusException.class, () -> orderService.cancel(order.getId()));
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Refound request should thrown an exception when order was no found")
+    void refoundRequest_shouldThrownAnException_whenOrderWasNoFound() {
+      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
+
+      assertThrows(OrderNotFoundException.class, () -> orderService.refoundRequest(999L),
+          "Must thrown an exception with a non existing order");
+      verify(orderRepository, times(1)).findById(999L);
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.mocks.OrderStatusHelper#nonRefundable")
+    @DisplayName("Refound request should throw an exception when order status are incorrect")
+    void refoundRequest_shouldThrownAnException_whenOrderStatusAreIncorrect(OrderStatus status) {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      assertThrows(InvalidOrderStatusException.class,
+          () -> orderService.refoundRequest(order.getId()));
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Return request should thrown an exception when order was no found")
+    void returnRequest_shouldThrownAnException_whenOrderWasNoFound() {
+      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
+
+      assertThrows(OrderNotFoundException.class, () -> orderService.returnRequest(999L),
+          "Must thrown an exception with a non existing order");
+      verify(orderRepository, times(1)).findById(999L);
+    }
+
+    @ParameterizedTest
+    @DisplayName("Return request should throw an exception when order must not be returned")
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.mocks.OrderStatusHelper#nonReturnable")
+    void returnRequest_shouldThrownAnException_whenOrderMustNotBeReturned(OrderStatus status) {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      assertThrows(InvalidOrderStatusException.class,
+          () -> orderService.returnRequest(order.getId()));
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
     }
