@@ -33,6 +33,7 @@ import com.anthony.blacksmithOnlineStore.service.SaleService;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -244,7 +245,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Should get all orders successfully")
+    @DisplayName("Get all should get all orders successfully")
     void getAll_canReturnAllOrdersSuccessfully() {
       List<Order> orders = List.of(
           MockOrder.deliveredOrder(),
@@ -258,6 +259,21 @@ public class OrderServiceTest {
       List<OrderResponseDto> responseList = orderService.getUserOrders();
 
       assertEquals(3, responseList.size(), "Should return the same number of orders");
+      verify(orderRepository, times(1)).findByUserId(user.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Get all should return an empty list when user have no orders")
+    void getAll_canReturnAnEmptyOrdersList_whenUserHaveNoOrders() {
+      List<Order> orders = new ArrayList<>();
+
+      when(orderRepository.findByUserId(user.getId())).thenReturn(orders);
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      List<OrderResponseDto> responseList = orderService.getUserOrders();
+
+      assertEquals(0, responseList.size(), "Should return an empty list");
       verify(orderRepository, times(1)).findByUserId(user.getId());
       verify(authUser, times(1)).getAuthenticatedId();
     }
@@ -377,6 +393,51 @@ public class OrderServiceTest {
           () -> orderService.returnRequest(order.getId()));
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Return complete should thrown an exception when order was no found")
+    void returnComplete_shouldThrownAnException_whenOrderWasNoFound() {
+      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
+
+      assertThrows(OrderNotFoundException.class, () -> orderService.returnComplete(999L),
+          "Must thrown an exception with a non existing order");
+      verify(orderRepository, times(1)).findById(999L);
+    }
+
+    @ParameterizedTest
+    @DisplayName("Return complete should throw an exception when order return  must not be completed")
+    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#nonReturnCompletable")
+    void returnComplete_shouldThrownAnException_whenOrderReturnMustNotBeCompleted(OrderStatus status) {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      assertThrows(InvalidOrderStatusException.class,
+          () -> orderService.returnComplete(order.getId()));
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Get by id should thrown an exception when order was no found")
+    void getById_shouldThrownAnException_whenOrderWasNoFound() {
+      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
+
+      assertThrows(OrderNotFoundException.class, () -> orderService.getById(999L),
+          "Must thrown an exception with a non existing order");
+      verify(orderRepository, times(1)).findById(999L);
+    }
+
+    @Test
+    @DisplayName("Get entity by id should thrown an exception when order was no found")
+    void getEntityById_shouldThrownAnException_whenOrderWasNoFound() {
+      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
+
+      assertThrows(OrderNotFoundException.class, () -> orderService.getEntityById(999L),
+          "Must thrown an exception with a non existing order");
+      verify(orderRepository, times(1)).findById(999L);
     }
 
 //    @Test
