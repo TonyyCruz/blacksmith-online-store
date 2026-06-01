@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,8 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
+import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
@@ -36,6 +39,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -323,6 +327,23 @@ public class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("Order paid should throw an exception when item have no stock")
+    void orderPaid_shouldThrownAnException_whenItemHaveNoStock() {
+      Order order = MockOrder.orderWithItems().toBuilder()
+          .status(OrderStatus.PENDING).user(user).build();
+
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      doThrow(DataModifyException.class).when(saleService).performSale(any(), any());
+
+      assertThrows(DataModifyException.class, () -> orderService.orderPaid(order.getId())
+          , "Must thrown an exception when item have no stock");
+      verify(authUser, times(1)).getAuthenticatedId();
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(saleService, times(1)).performSale(any(), any());
+    }
+
+    @Test
     @DisplayName("Cancel should throw an exception when order was no found")
     void cancel_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.findById(999L)).thenReturn(Optional.empty());
@@ -440,34 +461,95 @@ public class OrderServiceTest {
       verify(orderRepository, times(1)).findById(999L);
     }
 
-//    @Test
-//    @DisplayName("Should throw an exception when item have no stock")
-//    void create_shouldThrownAnException_whenItemHaveNoStock() {
-//      OrderRequestDto dto = new OrderRequestDto(List.of(
-//          new OrderItemRequestDto(1L, 10)
-//      ));
-//
-//      when(userService.getUserReference()).thenReturn(user);
-//      doThrow(DataModifyException.class).when(saleService).performSale(any(), any());
-//
-//      assertThrows(DataModifyException.class, () -> orderService.create(dto));
-//      verify(userService, times(1)).getUserReference();
-//      verify(saleService, times(1)).performSale(any(), any());
-//    }
-//
-//    @Test
-//    @DisplayName("Should thrown an exception trying cancel a not authorized order")
-//    void create_shouldThrownAnException_tryingCancelAnNotAuthorizedOrder() {
-//      User user = MockUser.user(UUID.randomUUID());
-//      Order order = MockOrder.orderWithItems().toBuilder().user(MockUser.user()).build();
-//
-//      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-//
-//      assertThrows(DataException.class,
-//          () -> orderService.cancel(order.getId()),"Should thrown an exception trying cancel an unauthorized order");
-//      verify(orderRepository, times(1)).findById(order.getId());
-//      verify(authUser, times(1)).getAuthenticatedId();
-//    }
+    @Test
+    @DisplayName("Should thrown an exception trying pay a not authorized order")
+    void orderPaid_shouldThrownAnException_tryingPayANotAuthorizedOrder() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
+
+      assertThrows(ForbiddenOperationException.class,
+          () -> orderService.orderPaid(order.getId()),
+          "Should thrown an exception trying cancel an unauthorized order");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Should thrown an exception trying cancel a not authorized order")
+    void cancel_shouldThrownAnException_tryingCancelANotAuthorizedOrder() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
+
+      assertThrows(ForbiddenOperationException.class,
+          () -> orderService.cancel(order.getId()),
+          "Should thrown an exception trying cancel an unauthorized order");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Should thrown an exception trying refound request a not authorized order")
+    void refoundRequest_shouldThrownAnException_tryingRefoundRequestANotAuthorizedOrder() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
+
+      assertThrows(ForbiddenOperationException.class,
+          () -> orderService.refoundRequest(order.getId()),
+          "Should thrown an exception trying cancel an unauthorized order");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Should thrown an exception trying return request a not authorized order")
+    void returnRequest_shouldThrownAnException_tryingReturnRequestANotAuthorizedOrder() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
+
+      assertThrows(ForbiddenOperationException.class,
+          () -> orderService.returnRequest(order.getId()),
+          "Should thrown an exception trying cancel an unauthorized order");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Should thrown an exception trying get by id a not authorized order")
+    void getById_shouldThrownAnException_tryingGetANotAuthorizedOrder() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
+
+      assertThrows(ForbiddenOperationException.class,
+          () -> orderService.getById(order.getId()),
+          "Should thrown an exception trying cancel an unauthorized order");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
+
+    @Test
+    @DisplayName("Should thrown an exception trying get entity by id of a not authorized order")
+    void getEntityById_shouldThrownAnException_tryingGetEntityOfANotAuthorizedOrder() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
+
+      assertThrows(ForbiddenOperationException.class,
+          () -> orderService.getById(order.getId()),
+          "Should thrown an exception trying cancel an unauthorized order");
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
   }
 
 }
