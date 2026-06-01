@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.helper.mocks;
+package com.anthony.blacksmithOnlineStore.helper;
 
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import java.util.Arrays;
