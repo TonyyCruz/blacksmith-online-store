@@ -23,7 +23,7 @@ public class OrderController {
 
   @PostMapping
   public ResponseEntity<OrderPaymentDto> create(
-      @RequestBody OrderRequestDto dto, Authentication auth) {
+      @RequestBody OrderRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(dto));
   }
 
@@ -33,7 +33,7 @@ public class OrderController {
   }
 
   @GetMapping
-  public ResponseEntity<List<OrderResponseDto>> getOrders(Authentication auth) {
+  public ResponseEntity<List<OrderResponseDto>> getOrders() {
     return ResponseEntity.ok(orderService.getUserOrders());
   }
 }

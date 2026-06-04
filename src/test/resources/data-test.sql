@@ -1,4 +1,5 @@
 -- password_user: 123456
+-- password_user2: 123456
 -- password_admin: loginAdmin
 
 INSERT INTO USERS (id, username, password, role, birth_date)
@@ -15,6 +16,12 @@ VALUES
       '$2a$10$GaeCNDGHa.u6vNAPS6xUee/3PoWsN.nVxaDHmNK5LMheS7ZDqa6TG',
       'CUSTOMER',
       '1995-05-15'
+    ), (
+        '7b87f809-d142-4dfa-8802-87644d774dd4',
+        'user2',
+        '$2a$10$GaeCNDGHa.u6vNAPS6xUee/3PoWsN.nVxaDHmNK5LMheS7ZDqa6TG',
+        'CUSTOMER',
+        '1990-02-05'
     );
 
 INSERT INTO BLACKSMITHS (name, description, total_ratings_sum, rating_count, rating_average, version)
@@ -102,3 +109,24 @@ VALUES
      12, 'CROSSBOW', 'Uncommon', 4, 28, 7, 4.25, '2025-11-15', '2026-02-25', 2, false,
      'Tyrion o Perdido', 2, 0
     );
+
+INSERT INTO ORDERS (user_id, created_at, updated_at, status, total)
+VALUES
+    ('7b87f809-d142-4dfa-8802-87644d774dd5', '2025-11-15', '2025-11-15',
+     'DELIVERED', 260.00),
+    ('7b87f809-d142-4dfa-8802-87644d774dd4', '2025-11-15', '2025-11-15',
+     'DELIVERED', 135.00);
+
+INSERT INTO ORDER_ITEMS (item_id, item_name, base_price_at_purchase, price_applied, quantity,
+                         total_price, order_id, rating_id, rating_value, user_id, blacksmith_id,
+                         created_at, reviewed)
+VALUES
+    (1, 'Sword of Valor', 100.00, 90.00, 2,
+     180.00, 1, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     1, '2025-11-15', false),
+    (2, 'Dagger of Night', 80.00, 80.00, 1,
+     80.00, 1, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     2, '2025-11-15', false),
+    (3, 'Axe of Light', 150.00, 135.00, 1,
+     135.00, 2, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd4',
+     2, '2025-11-15', false);

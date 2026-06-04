@@ -22,7 +22,7 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping("/me")
-  public ResponseEntity<UserDto> getCurrentUser(Authentication auth) {
+  public ResponseEntity<UserDto> getCurrentUser() {
     return ResponseEntity.ok(userService.getUser());
   }
 

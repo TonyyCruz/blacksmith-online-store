@@ -113,7 +113,7 @@ public class OrderServiceTest {
 
     @ParameterizedTest
     @DisplayName("Should set the order status to paid")
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#payable")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#payable")
     void orderPaid_shouldSetOrderStatusToPaid(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
@@ -123,7 +123,8 @@ public class OrderServiceTest {
 
       orderService.orderPaid(1L);
 
-      assertEquals(OrderStatus.PAYMENT_APPROVED, order.getStatus(), "The status must be payment approved");
+      assertEquals(OrderStatus.PAYMENT_APPROVED, order.getStatus(),
+          "The status must be payment approved");
       verify(orderRepository, times(1)).findById(1L);
       verify(authUser, times(1)).getAuthenticatedId();
       verify(saleService, times(order.getOrderItems().size())).performSale(anyLong(), anyInt());
@@ -164,7 +165,7 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#cancelable")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#cancelable")
     @DisplayName("Should cancel an not paid order and set status cancelled")
     void cancel_shouldCancelANotPaidOrderSuccessfully_andSetStatusCancelled(OrderStatus status) {
       Order order = MockOrder.orderWithItems()
@@ -184,7 +185,7 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#refundable")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#refundable")
     @DisplayName("Should request a refound of a paid order and set status refound pending")
     void refundRequest_shouldSetRefoundRequestAPaidOrderSuccessfully_andSetStatusRefoundPending(OrderStatus status) {
       User user = MockUser.user();
@@ -313,7 +314,7 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#nonPayable")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#nonPayable")
     @DisplayName("Order paid should throw an exception when order must not be paid")
     void orderPaid_shouldThrownAnException_whenOrderMustNotBePaid(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
@@ -334,13 +335,13 @@ public class OrderServiceTest {
 
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-      doThrow(DataModifyException.class).when(saleService).performSale(any(), any());
+      doThrow(DataModifyException.class).when(saleService).performSale(anyLong(), anyInt());
 
       assertThrows(DataModifyException.class, () -> orderService.orderPaid(order.getId())
           , "Must thrown an exception when item have no stock");
       verify(authUser, times(1)).getAuthenticatedId();
       verify(orderRepository, times(1)).findById(order.getId());
-      verify(saleService, times(1)).performSale(any(), any());
+      verify(saleService, times(1)).performSale(anyLong(), anyInt());
     }
 
     @Test
@@ -353,7 +354,7 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#nonCancelable")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#nonCancelable")
     @DisplayName("Cancel should throw an exception when order must not be cancelled")
     void cancel_shouldThrownAnException_whenOrderMustNotBeCancelled(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
@@ -377,7 +378,7 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#nonRefundable")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#nonRefundable")
     @DisplayName("Refound request should throw an exception when order status are incorrect")
     void refoundRequest_shouldThrownAnException_whenOrderStatusAreIncorrect(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
@@ -403,7 +404,7 @@ public class OrderServiceTest {
 
     @ParameterizedTest
     @DisplayName("Return request should throw an exception when order must not be returned")
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#nonReturnable")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#nonReturnable")
     void returnRequest_shouldThrownAnException_whenOrderMustNotBeReturned(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
@@ -427,8 +428,8 @@ public class OrderServiceTest {
     }
 
     @ParameterizedTest
-    @DisplayName("Return complete should throw an exception when order return  must not be completed")
-    @MethodSource("com.anthony.blacksmithOnlineStore.helper.OrderStatusHelper#nonReturnCompletable")
+    @DisplayName("Return complete should throw an exception when order return must not be completed")
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#nonReturnCompletable")
     void returnComplete_shouldThrownAnException_whenOrderReturnMustNotBeCompleted(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
