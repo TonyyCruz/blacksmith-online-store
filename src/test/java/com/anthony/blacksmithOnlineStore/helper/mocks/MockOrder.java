@@ -1,10 +1,14 @@
 package com.anthony.blacksmithOnlineStore.helper.mocks;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class MockOrder {
 
@@ -45,5 +49,14 @@ public class MockOrder {
     order.addOrderItem(item2);
     order.recalculateTotal();
     return order;
+  }
+
+  public static OrderRequestDto orderRequestDto() {
+    return new OrderRequestDto(
+        List.of(
+            new OrderItemRequestDto(1L, 1),
+            new OrderItemRequestDto(3L, 2)
+        )
+    );
   }
 }

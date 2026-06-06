@@ -26,25 +26,24 @@ public class BlacksmithControllerTest extends TestBase {
   private BlacksmithRepository blacksmithRepository;
   private final String BLACKSMITH_BASE_URL = "/blacksmiths";
   private Blacksmith blacksmith;
+  private String userToken;
 
   @BeforeEach
   void setUp() {
     blacksmith = blacksmithRepository.findById(1L)
         .orElseThrow(() -> new IllegalStateException("Blacksmith not found in test DB"));
+    userToken = performLogin(userLogin);
   }
 
   @Nested
   @Transactional
   @DisplayName("Happy Path")
   class BlacksmithControllerHappyPath {
-
     private String adminToken;
-    private String userToken;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
       adminToken = performLogin(adminLogin);
-      userToken = performLogin(userLogin);
     }
 
     @Test
@@ -130,13 +129,6 @@ public class BlacksmithControllerTest extends TestBase {
   @Nested
   @DisplayName("Exception Path")
   class BlacksmithControllerExceptionPath {
-
-    private String userToken;
-
-    @BeforeEach
-    void setUp() throws Exception {
-      userToken = performLogin(userLogin);
-    }
 
     @Test
     @DisplayName("Cannot create blacksmith with user role")
