@@ -32,7 +32,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "USERS")
+@Table(name = "users")
 public class User implements UserDetails {
   @Id @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;

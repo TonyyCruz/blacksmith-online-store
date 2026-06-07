@@ -36,7 +36,7 @@ public class ItemController {
     return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(dto));
   }
 
-  @PutMapping("/{orderId}")
+  @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ItemResponseDto> updateItem(
       @PathVariable Long id,
@@ -44,7 +44,7 @@ public class ItemController {
     return ResponseEntity.ok(itemService.update(id, dto));
   }
 
-  @PatchMapping("/{orderId}")
+  @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ItemResponseDto> patchItemUpdate(
       @PathVariable Long id,
@@ -52,7 +52,7 @@ public class ItemController {
     return ResponseEntity.ok(itemService.update(id, dto));
   }
 
-  @GetMapping("/{orderId}")
+  @GetMapping("/{id}")
   public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long id) {
     return ResponseEntity.ok(itemService.findById(id));
   }
@@ -65,7 +65,7 @@ public class ItemController {
     return ResponseEntity.ok(itemService.findFilteredItems(filter, pageable));
   }
 
-  @DeleteMapping("/{orderId}")
+  @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
     itemService.deleteItem(id);

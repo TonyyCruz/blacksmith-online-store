@@ -1,7 +1,6 @@
-package com.anthony.blacksmithOnlineStore.helper;
+package com.anthony.blacksmithOnlineStore.unit.service.helper;
 
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OrderStatusHelper {
@@ -38,7 +37,7 @@ public class OrderStatusHelper {
 
   public static OrderStatus[] nonReturnCompletable() {
     return Arrays.stream(OrderStatus.values())
-        .filter(status -> status != OrderStatus.RETURNED)
+        .filter(status -> status != OrderStatus.RETURN_REQUESTED)
         .toArray(OrderStatus[]::new);
   }
 

@@ -55,10 +55,10 @@ public class Order {
   private OrderStatus status = OrderStatus.PENDING;
   @Setter(AccessLevel.NONE)
   @Builder.Default
-  @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST)
+  @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST, orphanRemoval = true)
   private final List<OrderItem> orderItems = new ArrayList<>();
   @Setter(AccessLevel.NONE)
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 2)
   private BigDecimal total;
 
   public void setStatus(OrderStatus status) {
