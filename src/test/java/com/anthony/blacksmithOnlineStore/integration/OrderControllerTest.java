@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.integration;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -8,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Order;
+import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
@@ -86,5 +88,37 @@ public class OrderControllerTest extends TestBase {
       assertThat(orderItemResponseDtoTwo.quantity()).isEqualTo(2);
       assertThat(orderItemResponseDtoTwo.totalPrice()).isEqualByComparingTo("270.00");
     }
+  }
+
+  @Test
+  @DisplayName("Can get an existing order successfully")
+  void getById_canGetOrderSuccessfully() throws Exception {
+    mockMvc.perform(get(ORDER_BASE_URL + "/{id}", 1L)
+            .header("Authorization", userToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1L))
+        .andExpect(jsonPath("$.status").value(OrderStatus.DELIVERED.name()))
+        .andExpect(jsonPath("$.items").isArray())
+        .andExpect(jsonPath("$.items.size()").value(2))
+        .andExpect(jsonPath("$.total").value(260.00));
+  }
+
+  @Test
+  @DisplayName("Can get all existing order successfully")
+  void getAll_canGetAllOrdersSuccessfully() throws Exception {
+    mockMvc.perform(get(ORDER_BASE_URL)
+            .header("Authorization", userToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", Matchers.hasSize(2)))
+        .andExpect(jsonPath("$[0].id").value(1L))
+        .andExpect(jsonPath("$[0].status").value(OrderStatus.DELIVERED.name()))
+        .andExpect(jsonPath("$[0].items").isArray())
+        .andExpect(jsonPath("$[0].items.size()").value(2))
+        .andExpect(jsonPath("$[0].total").value(260.00))
+        .andExpect(jsonPath("$[1].id").value(2L))
+        .andExpect(jsonPath("$[1].status").value(OrderStatus.PENDING.name()))
+        .andExpect(jsonPath("$[1].items").isArray())
+        .andExpect(jsonPath("$[1].items.size()").value(1))
+        .andExpect(jsonPath("$[1].total").value(135.00));
   }
 }
