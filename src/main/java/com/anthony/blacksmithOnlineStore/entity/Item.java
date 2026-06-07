@@ -45,9 +45,9 @@ public class Item {
   private Material material;
   private Integer baseDamage;
   private Integer baseDefense;
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 2)
   private BigDecimal basePrice;
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 2)
   private BigDecimal finalPrice;
   @Column(nullable = false)
   @Builder.Default

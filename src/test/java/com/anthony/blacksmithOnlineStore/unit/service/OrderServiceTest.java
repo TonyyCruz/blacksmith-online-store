@@ -95,12 +95,25 @@ public class OrderServiceTest {
           .thenReturn(MockOrderItem.fromItem(item2, 2));
       when(orderItemFactory.create(item3, 1))
           .thenReturn(MockOrderItem.fromItem(item3, 1));
-      when(orderRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+      when(orderRepository.save(any()))
+          .thenAnswer(invocation -> invocation.getArgument(0));
 
       OrderPaymentDto response = orderService.create(dto);
 
-      assertEquals(BigDecimal.valueOf(90), response.total(), "The total must have the correct price");
-      assertEquals(OrderStatus.PENDING, response.status(), "The status must be pending");
+      assertEquals(BigDecimal.valueOf(90), response.total(),
+          "The total must have the correct price");
+      assertEquals(OrderStatus.PENDING, response.status(),
+          "The status must be pending");
+      assertEquals(response.userId(), user.getId(),
+          "The user id must be the same");
+      assertEquals(3, response.items().size(),
+          "The order must have 3 items");
+      assertEquals(item1.getId(), response.items().get(0).productId(),
+          "The first item id must be the same");
+      assertEquals(item2.getId(), response.items().get(1).productId(),
+          "The second item id must be the same");
+      assertEquals(item3.getId(), response.items().get(2).productId(),
+          "The third item id must be the same");
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(item1.getId());
       verify(itemService, times(1)).findEntityById(item2.getId());
@@ -187,7 +200,7 @@ public class OrderServiceTest {
     @ParameterizedTest
     @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#refundable")
     @DisplayName("Should request a refound of a paid order and set status refound pending")
-    void refundRequest_shouldSetRefoundRequestAPaidOrderSuccessfully_andSetStatusRefoundPending(OrderStatus status) {
+    void refundRequest_shouldSetRefoundRequestAndSetStatusRefoundPending(OrderStatus status) {
       User user = MockUser.user();
       Order order = MockOrder.orderWithItems()
           .toBuilder()

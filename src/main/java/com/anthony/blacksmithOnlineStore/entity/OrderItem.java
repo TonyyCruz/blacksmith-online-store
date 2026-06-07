@@ -33,13 +33,13 @@ public class OrderItem {
   private Long itemId;
   @Column(nullable = false)
   private String itemName;
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 2)
   private BigDecimal basePriceAtPurchase;
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 2)
   private BigDecimal priceApplied;
   @Column(nullable = false)
   private Integer quantity;
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 2)
   private BigDecimal totalPrice;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id", nullable = false)

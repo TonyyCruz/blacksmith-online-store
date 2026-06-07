@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record OrderItemResponseDto(
     Long id,
+    Long orderId,
     UUID UserId,
     Long productId,
     String productName,
@@ -17,6 +18,7 @@ public record OrderItemResponseDto(
   public static OrderItemResponseDto fromEntity(OrderItem orderItem) {
     return new OrderItemResponseDto(
         orderItem.getId(),
+        orderItem.getOrder().getId(),
         orderItem.getUserId(),
         orderItem.getItemId(),
         orderItem.getItemName(),
