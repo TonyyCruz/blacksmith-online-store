@@ -1,4 +1,4 @@
-# 🛒 Order Management API
+# 🛒 Blacksmith Online Store API
 
 ## 📖 Sobre o Projeto
 
@@ -161,6 +161,8 @@ Ou diretamente na sua IDE favorita.
 
 `PUT /weapons/{id}`    # ADMIN
 
+`PATCH /weapons/{id}`  # ADMIN
+
 `DELETE /weapons/{id}` # ADMIN
 
 ### Ferreiros
@@ -179,11 +181,7 @@ Ou diretamente na sua IDE favorita.
 
 `GET /orders/{ID}`      # ADMIN / CUSTOMER (somente seus pedidos)
 
-`GET /orders/all`       # ADMIN
-
 ### Avaliação
 - `POST /api/avaliacoes` → Avaliar arma (apenas compradores)
 
 - `GET /api/armas/{id}/avaliacoes` → Listar avaliações de uma arma
-
-
