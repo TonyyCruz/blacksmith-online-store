@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,16 +25,16 @@ public class RatingController {
 
   @PostMapping
   public ResponseEntity<Void> createRating(
-      @Valid @RequestBody RatingRequestDto dto, Authentication auth) {
-    ratingService.ratePurchase(dto, auth);
+      @Valid @RequestBody RatingRequestDto dto) {
+    ratingService.ratePurchase(dto);
     return ResponseEntity.ok().build();
   }
 
-  @GetMapping("/item/{orderId}")
-  public ResponseEntity<Page<RatingResponseDto>> getRatingsForItem(
+  @GetMapping("/item/{itemId}")
+  public ResponseEntity<Page<RatingResponseDto>> getRatingsFromItemId(
       @PathVariable Long id,
       @PageableDefault(page = 0, size = 5, sort = "id", direction = Direction.DESC)
       Pageable pageable) {
-    return ResponseEntity.ok(ratingService.getRatingsForItemId(id, pageable));
+    return ResponseEntity.ok(ratingService.getRatingsFromItemId(id, pageable));
   }
 }

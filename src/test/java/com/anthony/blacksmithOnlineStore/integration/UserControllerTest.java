@@ -35,12 +35,11 @@ public class UserControllerTest extends TestBase {
   }
 
   @Nested
-  @Transactional
   @DisplayName("Happy Path")
   class UserControllerHappyPath {
 
     @Test
-    @DisplayName("Get Current User returns user data successfully")
+    @DisplayName("Get Current User returns userWithId data successfully")
     void getCurrentUser_returnsUserDataSuccessfully() throws Exception {
       mockMvc.perform(get(USER_URL)
               .header("Authorization", userToken))
@@ -53,7 +52,7 @@ public class UserControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Update Current User updates user data successfully")
+    @DisplayName("Update Current User updates userWithId data successfully")
     void updateCurrentUser_updatesUserDataSuccessfully() throws Exception {
       UserUpdateDto dto = MockUser.userUpdateDto();
       String valueAsString = objectMapper.writeValueAsString(dto);
@@ -107,7 +106,7 @@ public class UserControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Delete Current User deletes user successfully")
+    @DisplayName("Delete Current User deletes userWithId successfully")
     void deleteCurrentUser_deletesUserSuccessfully() throws Exception {
       mockMvc.perform(delete(USER_URL)
               .header("Authorization", userToken))
@@ -180,10 +179,9 @@ public class UserControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Update Current User returns 400 when username is already taken")
     void updateCurrentUser_returns400_whenUsernameIsAlreadyTaken() throws Exception {
-      User anotherUser = performSaveUser(MockUser.user());
+      User anotherUser = performSaveUser(MockUser.userWithId());
       UserUpdateDto dto = new UserUpdateDto(anotherUser.getUsername(),
           LocalDate.parse("1900-01-01"));
       String valueAsString = objectMapper.writeValueAsString(dto);
@@ -200,7 +198,7 @@ public class UserControllerTest extends TestBase {
     void updateCurrentUser_returns400_whenUsernameIsInvalid() throws Exception {
       String[] wrongUsername = {"", "   ", null};
       for (String usrName : wrongUsername) {
-        UserUpdateDto dto = new UserUpdateDto(usrName, MockUser.user().getBirthDate());
+        UserUpdateDto dto = new UserUpdateDto(usrName, MockUser.userWithId().getBirthDate());
         String valueAsString = objectMapper.writeValueAsString(dto);
         mockMvc.perform(put(USER_URL)
                 .header("Authorization", userToken)
@@ -222,7 +220,7 @@ public class UserControllerTest extends TestBase {
           LocalDate.now()
       };
       for (LocalDate date : invalidDates) {
-        UserUpdateDto dto = new UserUpdateDto(MockUser.user().getUsername(), date);
+        UserUpdateDto dto = new UserUpdateDto(MockUser.userWithId().getUsername(), date);
         String valueAsString = objectMapper.writeValueAsString(dto);
         mockMvc.perform(put(USER_URL)
                 .header("Authorization", userToken)

@@ -25,7 +25,7 @@ public class RatingService {
   private final UserService userService;
 
   @Transactional
-  public void ratePurchase(RatingRequestDto dto, Authentication auth) {
+  public void ratePurchase(RatingRequestDto dto) {
     OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
     User user = userService.getUserEntity();
     verifyUserCanRatePurchase(user.getId(), orderItem);
@@ -40,7 +40,7 @@ public class RatingService {
     ratingRepository.save(rating);
   }
 
-  public Page<RatingResponseDto> getRatingsForItemId(Long itemId, Pageable pageable) {
+  public Page<RatingResponseDto> getRatingsFromItemId(Long itemId, Pageable pageable) {
     itemService.itemExistesVerifier(itemId);
     Page<Rating> ratings = ratingRepository.findAllByReviewedItemId(itemId, pageable);
     return ratings.map(RatingResponseDto::fromEntity);

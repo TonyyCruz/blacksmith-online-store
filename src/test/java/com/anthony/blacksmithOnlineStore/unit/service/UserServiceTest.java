@@ -41,7 +41,7 @@ class UserServiceTest {
 
   @BeforeEach
   void setup() {
-    targetUser = MockUser.user();
+    targetUser = MockUser.userWithId();
   }
 
   @Nested
@@ -49,7 +49,7 @@ class UserServiceTest {
   class UserServiceHappyPath {
 
     @Test
-    @DisplayName("Create should encode password and save user when username is available")
+    @DisplayName("Create should encode password and save userWithId when username is available")
     void create_shouldEncodePasswordAndSaveUser_whenUsernameIsAvailable() {
       UserCreateDto dto = MockUser.userCreateDto();
 

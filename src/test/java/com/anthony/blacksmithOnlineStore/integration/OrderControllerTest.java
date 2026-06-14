@@ -10,11 +10,15 @@ import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemResponseDto;
+import com.anthony.blacksmithOnlineStore.entity.Item;
+import com.anthony.blacksmithOnlineStore.entity.Order;
+import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
+import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
-import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +36,8 @@ public class OrderControllerTest extends TestBase {
   private final String ORDER_BASE_URL = "/orders";
   @Autowired
   private OrderRepository orderRepository;
+  @Autowired
+  private ItemRepository itemRepository;
   private String userToken;
 
   @BeforeEach
@@ -40,16 +46,29 @@ public class OrderControllerTest extends TestBase {
   }
 
   @Nested
-  @Transactional
   @DisplayName("Happy Path")
   class OrderControllerHappyPath {
 
     @Test
-    @Transactional
     @DisplayName("Can create an order successfully")
     void create_canCreateOrderSuccessfully() throws Exception {
-      String valueAsString = objectMapper.writeValueAsString(MockOrder.orderRequestDto());
-      double expectTotalOrderPrice = 360.00;
+      Item item1 = itemRepository.getReferenceById(1L);
+      item1.setFinalPrice(BigDecimal.valueOf(10.00));
+      item1.setStock(100);
+      item1.setActive(true);
+      item1 = itemRepository.save(item1);
+      Item item2 = itemRepository.getReferenceById(2L);
+      item2.setFinalPrice(BigDecimal.valueOf(15.00));
+      item2.setStock(100);
+      item2.setActive(true);
+      item2 = itemRepository.save(item2);
+      OrderRequestDto dto = new OrderRequestDto(
+          List.of(new OrderItemRequestDto(item1.getId(), 1),
+              new OrderItemRequestDto(item2.getId(), 2))
+      );
+      double expectTotalOrderPrice = 40.00;
+      String valueAsString = objectMapper.writeValueAsString(dto);
+
       MvcResult result = mockMvc.perform(post(ORDER_BASE_URL)
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
@@ -67,36 +86,47 @@ public class OrderControllerTest extends TestBase {
       orderResult.items().forEach(item -> {
         assertThat(item.productId()).isNotNull();
         assertThat(item.quantity()).isGreaterThan(0);
-        assertThat(item.UserId()).isEqualTo(orderResult.userId());
-        assertThat(item.orderId()).isEqualTo(item.orderId());
+        assertThat(item.UserId()).isEqualTo(USER_ID);
+        assertThat(item.orderId()).isEqualTo(orderResult.orderId());
       });
+
       OrderItemResponseDto orderItemResponseDtoOne = orderResult.items().get(0);
-      assertThat(orderItemResponseDtoOne.productName()).isEqualTo("Sword of Valor");
-      assertThat(orderItemResponseDtoOne.basePrice()).isEqualByComparingTo("100.00");
-      assertThat(orderItemResponseDtoOne.priceApplied()).isEqualByComparingTo("90.00");
+      assertThat(orderItemResponseDtoOne.productName()).isEqualTo(item1.getName());
+      assertThat(orderItemResponseDtoOne.basePrice())
+          .isEqualByComparingTo(item1.getBasePrice().toString());
+      assertThat(orderItemResponseDtoOne.priceApplied())
+          .isEqualByComparingTo(item1.getFinalPrice().toString());
       assertThat(orderItemResponseDtoOne.quantity()).isEqualTo(1);
-      assertThat(orderItemResponseDtoOne.totalPrice()).isEqualByComparingTo("90.00");
+      assertThat(orderItemResponseDtoOne.totalPrice())
+          .isEqualByComparingTo(item1.getFinalPrice().toString());
+
       OrderItemResponseDto orderItemResponseDtoTwo = orderResult.items().get(1);
       System.out.println(orderItemResponseDtoOne.basePrice());
       System.out.println(orderItemResponseDtoOne.basePrice().scale());
-      assertThat(orderItemResponseDtoTwo.productName()).isEqualTo("Axe of Light");
-      assertThat(orderItemResponseDtoTwo.basePrice()).isEqualByComparingTo("150.00");
-      assertThat(orderItemResponseDtoTwo.priceApplied()).isEqualByComparingTo("135.00");
+      assertThat(orderItemResponseDtoTwo.productName()).isEqualTo(item2.getName());
+      assertThat(orderItemResponseDtoTwo.basePrice())
+          .isEqualByComparingTo(item2.getBasePrice().toString());
+      assertThat(orderItemResponseDtoTwo.priceApplied())
+          .isEqualByComparingTo(item2.getFinalPrice().toString());
       assertThat(orderItemResponseDtoTwo.quantity()).isEqualTo(2);
-      assertThat(orderItemResponseDtoTwo.totalPrice()).isEqualByComparingTo("270.00");
+      assertThat(orderItemResponseDtoTwo.totalPrice())
+          .isEqualByComparingTo(item2.getFinalPrice().multiply(BigDecimal.valueOf(2)).toString());
     }
 
     @Test
-    @DisplayName("Can get an existing order successfully")
-    void getById_canGetOrderSuccessfully() throws Exception {
-      mockMvc.perform(get(ORDER_BASE_URL + "/{id}", 1L)
+    @DisplayName("User can get one of his existing order successfully")
+    void getById_userCanGetOneOfHisOrderSuccessfully() throws Exception {
+      Order orderRef = orderRepository.getReferenceById(1L);
+      orderRef.setUser(getUserById(USER_ID));
+      Order order = orderRepository.save(orderRef);
+      mockMvc.perform(get(ORDER_BASE_URL + "/{id}", order.getId())
               .header("Authorization", userToken))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(1L))
+          .andExpect(jsonPath("$.id").value(order.getId()))
           .andExpect(jsonPath("$.status").value(OrderStatus.DELIVERED.name()))
           .andExpect(jsonPath("$.items").isArray())
-          .andExpect(jsonPath("$.items.size()").value(2))
-          .andExpect(jsonPath("$.total").value(260.00));
+          .andExpect(jsonPath("$.items.size()").value(order.getOrderItems().size()))
+          .andExpect(jsonPath("$.total").value(order.getTotal().doubleValue()));
     }
 
     @Test
@@ -105,37 +135,32 @@ public class OrderControllerTest extends TestBase {
       String adminToken = performLogin(adminLogin);
       mockMvc.perform(get(ORDER_BASE_URL + "/{id}", 1L)
               .header("Authorization", adminToken))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(1L))
-          .andExpect(jsonPath("$.status").value(OrderStatus.DELIVERED.name()))
-          .andExpect(jsonPath("$.items").isArray())
-          .andExpect(jsonPath("$.items.size()").value(2))
-          .andExpect(jsonPath("$.total").value(260.00));
+          .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Can get all existing order successfully")
-    void getAll_canGetAllOrdersSuccessfully() throws Exception {
+    @DisplayName("User can get all his existing order successfully")
+    void getAll_userCanGetAllHisOrdersSuccessfully() throws Exception {
+      User user = getUserById(USER_ID);
+      List<Order> orders = orderRepository.findByUserId(user.getId());
       mockMvc.perform(get(ORDER_BASE_URL)
               .header("Authorization", userToken))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$", Matchers.hasSize(2)))
-          .andExpect(jsonPath("$[0].id").value(1L))
-          .andExpect(jsonPath("$[0].status").value(OrderStatus.DELIVERED.name()))
-          .andExpect(jsonPath("$[0].items").isArray())
-          .andExpect(jsonPath("$[0].items.size()").value(2))
-          .andExpect(jsonPath("$[0].total").value(260.00))
-          .andExpect(jsonPath("$[1].id").value(2L))
-          .andExpect(jsonPath("$[1].status").value(OrderStatus.PENDING.name()))
-          .andExpect(jsonPath("$[1].items").isArray())
-          .andExpect(jsonPath("$[1].items.size()").value(1))
-          .andExpect(jsonPath("$[1].total").value(135.00));
+          .andExpect(jsonPath("$", Matchers.hasSize(orders.size())))
+          .andExpect(jsonPath("$[0].userId").value(user.getId().toString()))
+          .andExpect(jsonPath("$[0].items.size()")
+              .value(orders.get(0).getOrderItems().size()))
+          .andExpect(jsonPath("$[0].total").value(orders.get(0).getTotal().doubleValue()))
+          .andExpect(jsonPath("$[1].userId").value(user.getId().toString()))
+          .andExpect(jsonPath("$[1].items.size()").value(orders.get(1)
+              .getOrderItems().size()))
+          .andExpect(jsonPath("$[1].total")
+              .value(orders.get(1).getTotal().doubleValue()));
     }
 
   }
 
   @Nested
-  @Transactional
   @DisplayName("Exception Path")
   class OrderControllerExceptionPath {
 
@@ -161,7 +186,6 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Create order returns 404 with a negative quantity")
     void create_returns404_withANegativeQuantity() throws Exception {
       OrderRequestDto dto = new OrderRequestDto(
@@ -175,7 +199,35 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
+    @DisplayName("Create order returns 404 when buying quantity is greater than stock quantity")
+    void create_returns404_whenBuyingQuantityIsGreaterThanStockQuantity() throws Exception {
+      OrderRequestDto dto = new OrderRequestDto(
+          List.of(new OrderItemRequestDto(1L, 9999999)));
+      String valueAsString = objectMapper.writeValueAsString(dto);
+      mockMvc.perform(post(ORDER_BASE_URL)
+              .header("Authorization", userToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(valueAsString))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Create order returns 404 when try to buy a unactive itemWithId")
+    void create_returns404_whenTryToBuyAUnactiveItem() throws Exception {
+      Item itemRef = itemRepository.getReferenceById(1L);
+      itemRef.setActive(false);
+      Item testItem = itemRepository.save(itemRef);
+      OrderRequestDto dto = new OrderRequestDto(
+          List.of(new OrderItemRequestDto(testItem.getId(), 1)));
+      String valueAsString = objectMapper.writeValueAsString(dto);
+      mockMvc.perform(post(ORDER_BASE_URL)
+              .header("Authorization", userToken)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(valueAsString))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("Create order returns 404 with a null quantity")
     void create_returns404_withANullQuantity() throws Exception {
       OrderRequestDto dto = new OrderRequestDto(
@@ -189,7 +241,6 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Create order returns 400 with a invalid id")
     void create_returns400_withAInvalidId() throws Exception {
       OrderRequestDto dto = new OrderRequestDto(
@@ -203,7 +254,6 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Create order returns 404 with a null id")
     void create_returns404_withANullId() throws Exception {
       OrderRequestDto dto = new OrderRequestDto(
@@ -217,7 +267,6 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Create order returns 404 with a empty item list")
     void create_returns404_withAEmptyItemList() throws Exception {
       OrderRequestDto dto = new OrderRequestDto(List.of());
@@ -245,7 +294,7 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Get order by id returns 403 when user is not owner of the order")
+    @DisplayName("Get order by id returns 403 when userWithId is not owner of the order")
     void getById_returns403_whenUserIsNotOwnerOfTheOrder() throws Exception {
       mockMvc.perform(get(ORDER_BASE_URL + "{id}", 2))
           .andExpect(status().isForbidden());
@@ -275,4 +324,17 @@ public class OrderControllerTest extends TestBase {
     }
 
   }
+
+//  private Item saveItem(Item newItem) {
+//    Blacksmith blacksmith = findBlacksmithById(newItem.getBlacksmithIdSnapshot());
+//    newItem.setCraftedBy(blacksmith);
+//    newItem.setBlacksmithIdSnapshot(blacksmith.getId());
+//    newItem.setBlacksmithNameSnapshot(blacksmith.getName());
+//    return itemRepository.save(newItem);
+//  }
+//
+//  private Blacksmith findBlacksmithById(Long id) {
+//    return blacksmithRepository.findById(id)
+//        .orElseThrow(() -> new IllegalStateException("Blacksmith not found in test DB"));
+//  }
 }

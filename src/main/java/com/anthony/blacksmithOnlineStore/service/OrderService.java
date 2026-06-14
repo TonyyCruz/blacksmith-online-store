@@ -10,6 +10,7 @@ import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
@@ -37,6 +38,13 @@ public class OrderService {
     order.setUser(user);
     for (OrderItemRequestDto orderItemDto : dto.items()) {
       Item item = itemService.findEntityById(orderItemDto.itemId());
+      if (!item.isActive()) {
+        throw new InvalidOrderException("Item %d is unactive".formatted(item.getId()));
+      }
+      if (orderItemDto.quantity() > item.getStock()) {
+        throw new InvalidOrderException(
+            "Item %d does not have enough stock".formatted(item.getId()));
+      }
       OrderItem orderItem = orderItemFactory.create(item, orderItemDto.quantity());
       orderItem.setOrder(order);
       orderItem.setUserId(user.getId());

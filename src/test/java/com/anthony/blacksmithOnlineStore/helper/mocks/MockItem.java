@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 public class MockItem {
 
-  public static Item item(Long id) {
+  public static Item itemWithId(Long id) {
     return Item.builder()
         .id(id)
         .material(Material.ADAMANTIUM)
@@ -32,8 +32,29 @@ public class MockItem {
         .build();
   }
 
+  public static Item itemWithId() {
+    return itemWithId(999L);
+  }
+
   public static Item item() {
-    return item(999L);
+    return Item.builder()
+        .material(Material.ADAMANTIUM)
+        .baseDamage(1000)
+        .baseDefense(500)
+        .name("Avalon blade")
+        .basePrice(BigDecimal.valueOf(9999.99))
+        .finalPrice(BigDecimal.valueOf(9999.99))
+        .hasDiscount(false)
+        .description("The sword of dreams")
+        .weight(35.0f)
+        .stock(1)
+        .type(Type.LONG_SWORD)
+        .rarity(Rarity.LEGENDARY)
+        .craftedBy(MockBlacksmith.blacksmith())
+        .blacksmithIdSnapshot(MockBlacksmith.blacksmith().getId())
+        .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
+        .ratingCount(0)
+        .build();
   }
 
   // ========== DTOs ==========

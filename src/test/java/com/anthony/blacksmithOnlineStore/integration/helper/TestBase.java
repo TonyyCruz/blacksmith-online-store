@@ -7,6 +7,8 @@ import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
+import java.util.UUID;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @ContextConfiguration
+@Transactional
 public class TestBase {
   @Autowired
   protected MockMvc mockMvc;
@@ -32,6 +35,8 @@ public class TestBase {
   @Autowired
   PasswordEncoder passwordEncoder;
   protected final String AUTH_LOGIN_URL = "/auth/login";
+  protected final UUID USER_ID = UUID.fromString("7b87f809-d142-4dfa-8802-87644d774dd5");
+  protected final UUID ADMIN_ID = UUID.fromString("c0c4a69a-9dda-4b50-ab59-d896ce0a5c6e");
   protected LoginRequest userLogin = new LoginRequest("user", "123456");
   protected LoginRequest adminLogin = new LoginRequest("admin", "loginAdmin");
 
@@ -55,5 +60,10 @@ public class TestBase {
     entity.setId(null);
     entity.setPassword(passwordEncoder.encode(entity.getPassword()));
     return userRepository.save(entity);
+  }
+
+  public User getUserById(UUID id) {
+    return userRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("User not found in test DB"));
   }
 }

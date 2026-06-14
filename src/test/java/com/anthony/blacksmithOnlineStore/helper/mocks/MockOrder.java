@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.helper.mocks;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Order;
@@ -13,7 +12,7 @@ import java.util.List;
 public class MockOrder {
 
   public static Order pendingOrder() {
-    User user = MockUser.user();
+    User user = MockUser.userWithId();
     return Order.builder()
         .id(1L)
         .user(user)
@@ -24,7 +23,7 @@ public class MockOrder {
 
   public static Order deliveredOrder() {
 
-    User user = MockUser.user();
+    User user = MockUser.userWithId();
 
     return Order.builder()
         .id(2L)

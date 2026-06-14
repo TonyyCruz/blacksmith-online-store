@@ -28,7 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
   private TokenService tokenService;
-  private final User user = MockUser.user();
+  private final User user = MockUser.userWithId();
 
   @BeforeEach
   void setup() {
@@ -159,7 +159,7 @@ class TokenServiceTest {
     void decodeToken_ShouldThrowInvalidTokenException_WhenMissingClaimRole() {
       String token = JWT.create()
           .withIssuer("test-issuer")
-          .withSubject("test-user")
+          .withSubject("test-userWithId")
           .withClaim("id", user.getId().toString())
           .sign(Algorithm.HMAC256("test-secret"));
 
