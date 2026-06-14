@@ -14,13 +14,13 @@ Esta aplicação, foi idealizada como um **projeto pessoal**, focando em **boas 
 - Implementação de **Spring Security** com **JWT (Auth0 Java JWT)**.
 - Controle de acesso baseado em **roles** (`ADMIN` e `CUSTOMER`).
 - Apenas `ADMIN` pode gerenciar produtos, ferreiros e visualizar todos os pedidos.
-- Usuarios `CUSTOMER` podem criar e visualizar apenas seus próprios pedidos.
+- Usuários `CUSTOMER` podem criar e visualizar apenas os seus próprios pedidos.
 - Criptografia de senhas com **BCryptPasswordEncoder**.
 
 ### 🧍 Usuários (`User`)
-- Cadastro e autenticação de usuarios.
+- Cadastro e autenticação de usuários.
 - Validação de idade mínima (18 anos).
-- Senha deve possuir os caracteres obrigatorios.
+- Senha deve possuir os caracteres obrigatórios.
 - Para atualizar a senha deve enviar a senha antiga para validação.
 
 ### 📦 Armas (`Weapon`)
@@ -71,7 +71,7 @@ com.anthony.blacksmithOnlineStore <br>
 ├── entity → Mapeamento JPA das entidades<br>
 ├── enums → Enumerações (ex: Role)<br>
 ├── exception → Exceções personalizadas e handlers globais<br>
-└── mapstruct → Mapeadores para atualização parcial de entidades
+└── mapstruct → Para atualização parcial de entidades
 
 
 Essa estrutura garante:
@@ -84,7 +84,7 @@ Essa estrutura garante:
 ## 🔐 Segurança
 
 A autenticação é baseada em **JWT (JSON Web Token)**.  
-Após o login bem-sucedido, o usuario recebe um token que deve ser enviado no cabeçalho `Authorization` de cada requisição:
+Após o login bem-sucedido, o usuário recebe um token que deve ser enviado no cabeçalho `Authorization` de cada requisição:
 `Authorization: Bearer <seu_token_aqui>`
 
 
@@ -130,17 +130,15 @@ Ou diretamente na sua IDE favorita.
 
 - Tratamento de exceções personalizado, retornando respostas claras e padronizadas para o cliente.
 
-- Optional + Exceptions customizadas no serviço para evitar null e if aninhados.
-
 - Validações com Bean Validation (ex: idade mínima para cadastro).
-
-- Uso do padrão Builder para criação de entidades complexas (ex: Weapon).
 
 - Specifications para filtros dinâmicos em consultas (ex: busca de armas).
 
-- Embora o escopo de transação salve automaticamente, estou a usar o método save() para maior controle nos testes unitários.
-
 - Adicionei nome e ‘id’ do ferreiro em memória na entidade ‘item’ e mudei o fetch para lazy, deixando a consulta de itens mais performática.
+
+- Adicionei métodos de validação de status no OrderStatus para garantir transições de status válidas e centralizar as validações.
+
+- Pelo fato de trabalhar com itens únicos e de pouco estoque, resolvi fazer a dedução do estoque apenas no momento do pagamento, evitando o bloqueio temporário dos itens que ocorreria em caso de dedução imediata do mesmo.
 
 ---
 
@@ -177,11 +175,11 @@ Ou diretamente na sua IDE favorita.
 ### Pedidos
 `POST /orders`          # CUSTOMER
 
-`GET /orders`           # CUSTOMER (somente seus pedidos)
+`GET /orders`           # CUSTOMER (somente os seus pedidos)
 
-`GET /orders/{ID}`      # ADMIN / CUSTOMER (somente seus pedidos)
+`GET /orders/{ID}`      # ADMIN / CUSTOMER (somente os seus pedidos)
 
 ### Avaliação
-- `POST /api/avaliacoes` → Avaliar arma (apenas compradores)
+- `POST /api/avaliacoes` → Avaliar arma (apenas os compradores)
 
 - `GET /api/armas/{id}/avaliacoes` → Listar avaliações de uma arma

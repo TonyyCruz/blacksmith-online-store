@@ -57,12 +57,10 @@ public class ItemControllerTest extends TestBase {
   }
 
   @Nested
-  @Transactional
   @DisplayName("Happy Path")
   class ItemControllerHappyPath {
 
     @Test
-    @Transactional
     @DisplayName("Can create a new Item successfully")
     void createItem_canCreateItemSuccessfully() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto();
@@ -92,7 +90,6 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Can update an existing Item successfully")
     void updateItem_canUpdateItemSuccessfully() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto();
@@ -120,7 +117,6 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Can update all fields witha PATH update successfully")
     void patchUpdate_canUpdateAllFieldsSuccessfully() throws Exception {
       ItemPatchUpdateDto itemUpdate = MockItem.itemPatchUpdateDto();
@@ -148,7 +144,6 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Can do a partial update successfully")
     void patchUpdate_canDoPartialUpdateSuccessfully() throws Exception {
       ItemPatchUpdateDto itemUpdate = ItemPatchUpdateDto.builder()
@@ -207,7 +202,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can get all active itens with user acount when filter is empty")
+    @DisplayName("Can get all active itens with userWithId acount when filter is empty")
     void getAllActiveItems_canGetAllActiveItensSuccessfully_withUserAccount() throws Exception {
       mockMvc.perform(get(item_BASE_URL)
               .header("Authorization", userToken))
@@ -299,7 +294,6 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Can delete an itens with admin acount")
     void deleteItem_canDeleteAnItem_WithAdminAccount() throws Exception {
       Item savedItem = saveItem(MockItem.itemRequestDto());
@@ -476,7 +470,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Create item should return 403 when user is not admin")
+    @DisplayName("Create itemWithId should return 403 when userWithId is not admin")
     void createItem_shouldReturn403_whenUserIsNotAdmin() throws Exception {
       mockMvc.perform(post(item_BASE_URL)
               .header("Authorization", userToken)
@@ -486,7 +480,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Get item Should return 404 when item not found")
+    @DisplayName("Get itemWithId Should return 404 when itemWithId not found")
     void getItem_shouldReturn404_whenNotFound() throws Exception {
       mockMvc.perform(get(item_BASE_URL + "/999999")
               .header("Authorization", userToken))
@@ -494,7 +488,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Update should return 404 when updating non-existing item")
+    @DisplayName("Update should return 404 when updating non-existing itemWithId")
     void update_shouldReturn404_whenItemNotFound() throws Exception {
       mockMvc.perform(put(item_BASE_URL + "/999999")
               .header("Authorization", adminToken)
@@ -529,7 +523,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Patch update should return 404 when patching non-existing item")
+    @DisplayName("Patch update should return 404 when patching non-existing itemWithId")
     void patch_shouldReturn404_whenItemNotFound() throws Exception {
       mockMvc.perform(patch(item_BASE_URL + "/999999")
               .header("Authorization", adminToken)
@@ -539,7 +533,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Patch update should return 400 with invalid item name")
+    @DisplayName("Patch update should return 400 with invalid itemWithId name")
     void patch_shouldReturn400_withInvalidItemName() throws Exception {
       for (String name :  new String[]{"", "  ", "a"}) {
         ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder().name(name).build();
@@ -622,7 +616,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Get item By Blacksmith orderId Should return 404 when blacksmith not exists")
+    @DisplayName("Get itemWithId By Blacksmith orderId Should return 404 when blacksmith not exists")
     void getItemByBlacksmithId_shouldReturn404_whenBlacksmithNotExists() throws Exception {
       mockMvc.perform(get(item_BASE_URL + "/blacksmith/999999")
               .header("Authorization", userToken))
@@ -642,7 +636,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Delete should return 404 when deleting non-existing item")
+    @DisplayName("Delete should return 404 when deleting non-existing itemWithId")
     void delete_shouldReturn404_whenItemNotFound() throws Exception {
       mockMvc.perform(delete(item_BASE_URL + "/999999")
               .header("Authorization", adminToken))
@@ -650,8 +644,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
-    @DisplayName("Delete should return 403 when deleting sold item")
+    @DisplayName("Delete should return 403 when deleting sold itemWithId")
     void delete_shouldReturn403_whenItemWasSold() throws Exception {
       Item soldItem = saveItem(MockItem.itemRequestDto());
       soldItem.addSoldQuantity(10);
@@ -662,7 +655,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Delete should return 403 when user tries to delete an item")
+    @DisplayName("Delete should return 403 when userWithId tries to delete an itemWithId")
     void delete_shouldReturn403_whenUserIsNotAdmin() throws Exception {
       mockMvc.perform(delete(item_BASE_URL + "/" + item.getId())
               .header("Authorization", userToken))

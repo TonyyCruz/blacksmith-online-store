@@ -15,7 +15,6 @@ import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
 import com.anthony.blacksmithOnlineStore.service.SaleService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,14 +31,14 @@ public class SaleServiceTest {
   private ItemService itemService;
   @InjectMocks
   private SaleService saleService;
-  private final Item targetItem = MockItem.item();
+  private final Item targetItem = MockItem.itemWithId();
 
   @Nested
   @DisplayName("Happy Path")
   class SaleServiceHappyPath {
 
     @Test
-    @DisplayName("PerformSale should update sold quantity and reduce stock when item exists and has enough stock")
+    @DisplayName("PerformSale should update sold quantity and reduce stock when itemWithId exists and has enough stock")
     void performSale_shouldShouldUpdateQuantityAndReduceStockSuccessfully() {
       doNothing().when(itemService).itemExistesVerifier(any());
       when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
@@ -73,7 +72,7 @@ public class SaleServiceTest {
   class SaleServiceExceptionPath {
 
     @Test
-    @DisplayName("PerformSale should throw an ItemNotFoundException when item not exists")
+    @DisplayName("PerformSale should throw an ItemNotFoundException when itemWithId not exists")
     void performSale_shouldShouldThrowAnException_whenItemNotExists() {
       doThrow(new ItemNotFoundException(targetItem.getId()))
           .when(itemService).itemExistesVerifier(any());
@@ -84,7 +83,7 @@ public class SaleServiceTest {
     }
 
     @Test
-    @DisplayName("PerformSale should throw an DataModifyException when item have no stock")
+    @DisplayName("PerformSale should throw an DataModifyException when itemWithId have no stock")
     void performSale_shouldShouldThrowAnException_whenItemHaveNoStock() {
       doNothing().when(itemService).itemExistesVerifier(any());
       when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
@@ -96,7 +95,7 @@ public class SaleServiceTest {
     }
 
     @Test
-    @DisplayName("CancelSale should throw an ItemNotFoundException when item not exists")
+    @DisplayName("CancelSale should throw an ItemNotFoundException when itemWithId not exists")
     void cancelSale_shouldShouldThrowAnException_whenItemNotExists() {
       doThrow(new ItemNotFoundException(targetItem.getId()))
           .when(itemService).itemExistesVerifier(any());

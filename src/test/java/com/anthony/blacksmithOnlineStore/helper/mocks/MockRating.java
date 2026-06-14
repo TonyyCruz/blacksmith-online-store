@@ -34,7 +34,7 @@ public class MockRating {
         .orderItem(orderItem)
         .reviewerUsername("angryCustomer")
         .ratingValue(1)
-        .review("Terrible item")
+        .review("Terrible itemWithId")
         .build();
   }
 }

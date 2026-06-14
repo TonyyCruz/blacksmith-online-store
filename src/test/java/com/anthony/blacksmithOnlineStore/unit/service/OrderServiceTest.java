@@ -66,8 +66,8 @@ public class OrderServiceTest {
   private AuthenticatedUserService authUser;
   @InjectMocks
   OrderService orderService;
-  private final Item targetItem = MockItem.item();
-  private final User user = MockUser.user();
+  private final Item targetItem = MockItem.itemWithId();
+  private final User user = MockUser.userWithId();
 
   @Nested
   @DisplayName("Happy Path")
@@ -81,9 +81,9 @@ public class OrderServiceTest {
           new OrderItemRequestDto(2L, 2),
           new OrderItemRequestDto(3L, 1)
       ));
-      Item item1 = MockItem.item(1L).toBuilder().finalPrice(BigDecimal.valueOf(10)).build();
-      Item item2 = MockItem.item(2L).toBuilder().finalPrice(BigDecimal.valueOf(20)).build();
-      Item item3 = MockItem.item(3L).toBuilder().finalPrice(BigDecimal.valueOf(30)).build();
+      Item item1 = MockItem.itemWithId(1L).toBuilder().finalPrice(BigDecimal.valueOf(10)).build();
+      Item item2 = MockItem.itemWithId(2L).toBuilder().finalPrice(BigDecimal.valueOf(20)).build();
+      Item item3 = MockItem.itemWithId(3L).toBuilder().finalPrice(BigDecimal.valueOf(30)).build();
 
       when(userService.getUserReference()).thenReturn(user);
       when(itemService.findEntityById(item1.getId())).thenReturn(item1);
@@ -105,15 +105,15 @@ public class OrderServiceTest {
       assertEquals(OrderStatus.PENDING, response.status(),
           "The status must be pending");
       assertEquals(response.userId(), user.getId(),
-          "The user id must be the same");
+          "The userWithId id must be the same");
       assertEquals(3, response.items().size(),
           "The order must have 3 items");
       assertEquals(item1.getId(), response.items().get(0).productId(),
-          "The first item id must be the same");
+          "The first itemWithId id must be the same");
       assertEquals(item2.getId(), response.items().get(1).productId(),
-          "The second item id must be the same");
+          "The second itemWithId id must be the same");
       assertEquals(item3.getId(), response.items().get(2).productId(),
-          "The third item id must be the same");
+          "The third itemWithId id must be the same");
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(item1.getId());
       verify(itemService, times(1)).findEntityById(item2.getId());
@@ -155,7 +155,7 @@ public class OrderServiceTest {
 
       verify(orderRepository, times(1)).findById(order.getId());
       assertEquals(order.getId(), response.getId(), "The id must be the same");
-      assertEquals(order.getUser().getId(), response.getUser().getId(), "The user id must be the same");
+      assertEquals(order.getUser().getId(), response.getUser().getId(), "The userWithId id must be the same");
       assertEquals(order.getStatus(), response.getStatus(), "The status must be the same");
       assertEquals(order.getTotal(), response.getTotal(), "The total must be the same");
     }
@@ -172,7 +172,7 @@ public class OrderServiceTest {
 
       verify(orderRepository, times(1)).findById(order.getId());
       assertEquals(order.getId(), response.id(), "The id must be the same");
-      assertEquals(order.getUser().getId(), response.userId(), "The user id must be the same");
+      assertEquals(order.getUser().getId(), response.userId(), "The userWithId id must be the same");
       assertEquals(order.getStatus(), response.status(), "The status must be the same");
       assertEquals(order.getTotal(), response.total(), "The total must be the same");
     }
@@ -201,7 +201,7 @@ public class OrderServiceTest {
     @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#refundable")
     @DisplayName("Should request a refound of a paid order and set status refound pending")
     void refundRequest_shouldSetRefoundRequestAndSetStatusRefoundPending(OrderStatus status) {
-      User user = MockUser.user();
+      User user = MockUser.userWithId();
       Order order = MockOrder.orderWithItems()
           .toBuilder()
           .user(user)
@@ -223,7 +223,7 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Should request a return of a delivered order")
     void returnRequest_shouldRequestAReturn_ofAReturnedRequestOrder() {
-      User user = MockUser.user();
+      User user = MockUser.userWithId();
       Order order = MockOrder.orderWithItems()
           .toBuilder()
           .user(user)
@@ -243,7 +243,7 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Should return an returned order and set status refound pending")
     void returnComplete_shouldCompleteAReturnedOrder_andSetStatusRefoundPending() {
-      User user = MockUser.user();
+      User user = MockUser.userWithId();
       Order order = MockOrder.orderWithItems()
           .toBuilder()
           .user(user)
@@ -282,7 +282,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Get all should return an empty list when user have no orders")
+    @DisplayName("Get all should return an empty list when userWithId have no orders")
     void getAll_canReturnAnEmptyOrdersList_whenUserHaveNoOrders() {
       List<Order> orders = new ArrayList<>();
 
@@ -303,7 +303,7 @@ public class OrderServiceTest {
   class SaleServiceExceptionPath {
 
     @Test
-    @DisplayName("Create should throw an exception when item was no found")
+    @DisplayName("Create should throw an exception when itemWithId was no found")
     void create_shouldThrownAnException_whenItemWasNoFound() {
       OrderRequestDto dto = new OrderRequestDto(List.of(
           new OrderItemRequestDto(999L, 2)
@@ -341,7 +341,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Order paid should throw an exception when item have no stock")
+    @DisplayName("Order paid should throw an exception when itemWithId have no stock")
     void orderPaid_shouldThrownAnException_whenItemHaveNoStock() {
       Order order = MockOrder.orderWithItems().toBuilder()
           .status(OrderStatus.PENDING).user(user).build();
@@ -351,7 +351,7 @@ public class OrderServiceTest {
       doThrow(DataModifyException.class).when(saleService).performSale(anyLong(), anyInt());
 
       assertThrows(DataModifyException.class, () -> orderService.orderPaid(order.getId())
-          , "Must thrown an exception when item have no stock");
+          , "Must thrown an exception when itemWithId have no stock");
       verify(authUser, times(1)).getAuthenticatedId();
       verify(orderRepository, times(1)).findById(order.getId());
       verify(saleService, times(1)).performSale(anyLong(), anyInt());

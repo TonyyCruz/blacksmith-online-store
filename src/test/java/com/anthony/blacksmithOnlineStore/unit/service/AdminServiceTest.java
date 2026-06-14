@@ -37,7 +37,7 @@ class AdminServiceTest {
 
   @BeforeEach
   void setup() {
-    targetUser = MockUser.user();
+    targetUser = MockUser.userWithId();
     adminUser = MockUser.admin();
   }
 
@@ -46,16 +46,16 @@ class AdminServiceTest {
   class AdminServiceHappyPath {
 
     @Test
-    @DisplayName("GetById should return user when exists")
+    @DisplayName("GetById should return userWithId when exists")
     void getById_ShouldReturnUser_WhenExists() {
       when(userRepository.findById(targetUser.getId())).thenReturn(Optional.of(targetUser));
       User found = adminService.getEntityById(targetUser.getId());
-      assertEquals(targetUser, found, "The found user should match the target user");
+      assertEquals(targetUser, found, "The found userWithId should match the target userWithId");
       verify(userRepository, times(1)).findById(targetUser.getId());
     }
 
     @Test
-    @DisplayName("UpdateRole should update user role when username is valid")
+    @DisplayName("UpdateRole should update userWithId role when username is valid")
     void updateRole_ShouldUpdateUserRole_WhenUsernameIsValid() {
       UUID targetId = targetUser.getId();
       UUID adminId = adminUser.getId();
@@ -77,7 +77,7 @@ class AdminServiceTest {
   class AdminServiceExceptionPath {
 
     @Test
-    @DisplayName("UpdateRole should throw UserNotFoundException when user not found")
+    @DisplayName("UpdateRole should throw UserNotFoundException when userWithId not found")
     void updateRole_ShouldThrowUserNotFoundException_WhenUserNotFound() {
       UUID fakeId = UUID.randomUUID();
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
@@ -99,7 +99,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("GetById should throw UserNotFoundException when user not found")
+    @DisplayName("GetById should throw UserNotFoundException when userWithId not found")
     void getById_ShouldThrowUserNotFoundException_WhenNotFound() {
       UUID fakeId = UUID.randomUUID();
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());

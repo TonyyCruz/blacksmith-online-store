@@ -36,7 +36,6 @@ public class BlacksmithControllerTest extends TestBase {
   }
 
   @Nested
-  @Transactional
   @DisplayName("Happy Path")
   class BlacksmithControllerHappyPath {
     private String adminToken;
@@ -47,7 +46,6 @@ public class BlacksmithControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Can create blacksmith successfully")
     void createBlacksmith_canCreateBlacksmithSuccessfully() throws Exception {
       String valueAsString = objectMapper.writeValueAsString(MockBlacksmith.requestDto());
@@ -63,7 +61,6 @@ public class BlacksmithControllerTest extends TestBase {
     }
 
     @Test
-    @Transactional
     @DisplayName("Can update blacksmith successfully")
     void updateBlacksmith_canUpdateBlacksmithSuccessfully() throws Exception {
       var updateDto = new BlacksmithRequestDto("Updated Name", "Updated Description");
@@ -131,7 +128,7 @@ public class BlacksmithControllerTest extends TestBase {
   class BlacksmithControllerExceptionPath {
 
     @Test
-    @DisplayName("Cannot create blacksmith with user role")
+    @DisplayName("Cannot create blacksmith with userWithId role")
     void createBlacksmith_cannotCreateBlacksmithWithUserRole() throws Exception {
       String valueAsString = objectMapper.writeValueAsString(MockBlacksmith.requestDto());
       mockMvc.perform(post(BLACKSMITH_BASE_URL)
@@ -142,7 +139,7 @@ public class BlacksmithControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Cannot update blacksmith with user role")
+    @DisplayName("Cannot update blacksmith with userWithId role")
     void updateBlacksmith_cannotUpdateBlacksmithWithUserRole() throws Exception {
       var updateDto = new BlacksmithRequestDto("Updated Name", "Updated Description");
       String valueAsString = objectMapper.writeValueAsString(updateDto);

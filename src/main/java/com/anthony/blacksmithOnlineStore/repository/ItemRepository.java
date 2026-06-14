@@ -29,4 +29,9 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
             i.id = :id AND i.sold >= :qty
     """)
   int incrementStockAndDecrementSoldQuantity(long id, int qty);
+
+  @Query("""
+        SELECT i.active FROM Item i WHERE i.id = :id
+    """)
+  boolean isItemActive(long id);
 }

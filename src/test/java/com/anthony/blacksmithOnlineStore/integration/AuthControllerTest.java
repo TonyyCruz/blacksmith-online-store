@@ -39,12 +39,11 @@ class AuthControllerTest extends TestBase {
   }
 
   @Nested
-  @Transactional
   @DisplayName("Happy Path")
   class AuthControllerHappyPath {
 
     @Test
-    @DisplayName("Register creates a new user successfully")
+    @DisplayName("Register creates a new userWithId successfully")
     void register_createsNewUserSuccessfully() throws Exception {
       UserCreateDto dto = MockUser.userCreateDto();
       String valueAsString = objectMapper.writeValueAsString(dto);
@@ -84,7 +83,7 @@ class AuthControllerTest extends TestBase {
   class AuthControllerExceptionPath {
 
     @Test
-    @DisplayName("Login returns 401 when username not matching any user")
+    @DisplayName("Login returns 401 when username not matching any userWithId")
     void login_shouldReturn401_whenUsernameNotMatchAnyUser() throws Exception {
       String valueAsString = objectMapper.writeValueAsString(
           new LoginRequest("invalid", userLogin.password()));

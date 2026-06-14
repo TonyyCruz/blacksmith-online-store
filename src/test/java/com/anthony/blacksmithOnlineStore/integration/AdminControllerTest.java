@@ -34,12 +34,11 @@ public class AdminControllerTest extends TestBase {
   }
 
   @Nested
-  @Transactional
   @DisplayName("Happy Path")
   class AdminControllerHappyPath {
 
     @Test
-    @DisplayName("Admin can update an user role successfully")
+    @DisplayName("Admin can update an userWithId role successfully")
     void updateRole_adminCanUpdateAnUserRoleSuccessfully() throws Exception {
       String valueAsString = objectMapper.writeValueAsString(new RoleUpdateDto(Role.ADMIN));
       mockMvc.perform(patch(roleUpdateUrl(user.getId()))

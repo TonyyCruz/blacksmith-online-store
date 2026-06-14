@@ -10,7 +10,16 @@ import java.util.UUID;
 
 public class MockUser {
 
-  public static User user(UUID id) {
+  public static User user() {
+    User user = new User();
+    user.setUsername("user_one");
+    user.setPassword("123456");
+    user.setRole(Role.CUSTOMER);
+    user.setBirthDate(LocalDate.of(1995, 5, 15));
+    return user;
+  }
+
+  public static User userWithId(UUID id) {
     User user = new User();
     user.setId(id);
     user.setUsername("user_one");
@@ -20,8 +29,8 @@ public class MockUser {
     return user;
   }
 
-  public static User user() {
-    return user(UUID.randomUUID());
+  public static User userWithId() {
+    return userWithId(UUID.randomUUID());
   }
 
   public static User admin() {
