@@ -17,7 +17,7 @@ public record ItemResponseDto(
     BigDecimal basePrice,
     BigDecimal finalPrice,
     String description,
-    Float weight,
+    Double weight,
     Integer stock,
     Type type,
     Rarity rarity,

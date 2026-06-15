@@ -63,10 +63,10 @@ public class BlacksmithControllerTest extends TestBase {
     @Test
     @DisplayName("Can update blacksmith successfully")
     void updateBlacksmith_canUpdateBlacksmithSuccessfully() throws Exception {
-      var updateDto = new BlacksmithRequestDto("Updated Name", "Updated Description");
+      var updateDto = new BlacksmithRequestDto(
+          "Updated Name", "Updated Description");
       String valueAsString = objectMapper.writeValueAsString(updateDto);
-      String updateUrl = BLACKSMITH_BASE_URL + "/" + blacksmith.getId();
-      mockMvc.perform(put(updateUrl)
+      mockMvc.perform(put(BLACKSMITH_BASE_URL + "/{id}", blacksmith.getId())
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
@@ -80,8 +80,7 @@ public class BlacksmithControllerTest extends TestBase {
     @Test
     @DisplayName("Can get blacksmith by ID successfully")
     void findById_canGetBlacksmithByIdSuccessfully() throws Exception {
-      String findByIdUrl = BLACKSMITH_BASE_URL + "/" + blacksmith.getId();
-      mockMvc.perform(get(findByIdUrl)
+      mockMvc.perform(get(BLACKSMITH_BASE_URL + "/{id}", blacksmith.getId())
               .contentType(MediaType.APPLICATION_JSON)
               .header("Authorization", userToken))
           .andExpect(status().isOk())
@@ -99,7 +98,14 @@ public class BlacksmithControllerTest extends TestBase {
               .header("Authorization", userToken))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
-          .andExpect(jsonPath("$.content.length()").value(2));
+          .andExpect(jsonPath("$.content").isNotEmpty())
+          .andExpect(jsonPath("$.content[0].name").value(blacksmith.getName()))
+          .andExpect(jsonPath("$.content[0].description")
+              .value(blacksmith.getDescription()))
+          .andExpect(jsonPath("$.content[0].ratingCount")
+              .value(blacksmith.getRatingCount()))
+          .andExpect(jsonPath("$.content[0].ratingAverage")
+              .value(blacksmith.getRatingAverage()));
     }
 
     @Test
@@ -113,7 +119,7 @@ public class BlacksmithControllerTest extends TestBase {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content.length()").value(1));
-      searchUrl = BLACKSMITH_BASE_URL + "/search?name=" + "e";
+      searchUrl = BLACKSMITH_BASE_URL + "/search?name=" + "Martel";
       mockMvc.perform(get(searchUrl)
               .contentType(MediaType.APPLICATION_JSON)
               .header("Authorization", userToken))

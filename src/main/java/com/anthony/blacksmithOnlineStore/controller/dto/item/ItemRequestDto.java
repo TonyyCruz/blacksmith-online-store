@@ -19,7 +19,7 @@ public record ItemRequestDto(
     @Positive(message = "Base price must not be a negative number") BigDecimal basePrice,
     @Positive(message = "Final price must not be a negative number") BigDecimal finalPrice,
     @Size(min = 10, message = "Description must have at lest 10 characters") String description,
-    @Positive(message = "Weight price must not be a negative number") Float weight,
+    @Positive(message = "Weight price must not be a negative number") Double weight,
     @Positive(message = "Stock price must not be a negative number") Integer stock,
     @NotNull(message = "Type must not be null") Type type,
     @NotNull(message = "Rarity must not be null") Rarity rarity,
