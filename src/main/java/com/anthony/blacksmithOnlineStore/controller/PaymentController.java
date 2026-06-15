@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
   private final PaymentService paymentService;
 
-  @PostMapping("/orders/{orderId}/approve")
+  @PostMapping("/orders/{id}/approve")
   public ResponseEntity<Void> approve(@PathVariable Long id) {
     paymentService.approved(id);
     return ResponseEntity.noContent().build();
