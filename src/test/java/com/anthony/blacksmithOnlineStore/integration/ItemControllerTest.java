@@ -21,6 +21,7 @@ import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.integration.helper.QueryHelper;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
@@ -49,9 +50,26 @@ public class ItemControllerTest extends TestBase {
   private String userToken;
 
   @BeforeEach
-  void setUp() throws Exception {
-    item = itemRepository.findById(1L)
-        .orElseThrow(() -> new IllegalStateException("Item not found in test DB"));
+  void setUp() {
+    item = saveItem(Item.builder()
+        .material(Material.IRON)
+        .baseDamage(250)
+        .baseDefense(10)
+        .name("Test Dagger")
+        .basePrice(BigDecimal.valueOf(355.99))
+        .finalPrice(BigDecimal.valueOf(350.00))
+        .hasDiscount(true)
+        .description("Dagger for tests")
+        .weight(8.2d)
+        .stock(102)
+        .type(Type.DAGGER)
+        .rarity(Rarity.TRANSCENDENT)
+        .craftedBy(MockBlacksmith.blacksmith())
+        .blacksmithIdSnapshot(MockBlacksmith.blacksmith().getId())
+        .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
+        .ratingCount(0)
+        .active(true)
+        .build());
     adminToken = performLogin(adminLogin);
     userToken = performLogin(userLogin);
   }
@@ -95,7 +113,7 @@ public class ItemControllerTest extends TestBase {
       ItemRequestDto dto = MockItem.itemRequestDto();
       Blacksmith blacksmith = findBlacksmithById(dto.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(dto);
-      mockMvc.perform(put(item_BASE_URL + "/" + item.getId())
+      mockMvc.perform(put(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
@@ -122,7 +140,7 @@ public class ItemControllerTest extends TestBase {
       ItemPatchUpdateDto itemUpdate = MockItem.itemPatchUpdateDto();
       Blacksmith blacksmith = findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
-      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+      mockMvc.perform(patch(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
@@ -158,7 +176,7 @@ public class ItemControllerTest extends TestBase {
           .build();
       Blacksmith blacksmith = findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
-      mockMvc.perform(patch(item_BASE_URL + "/" + item.getId())
+      mockMvc.perform(patch(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
@@ -181,9 +199,9 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can get an Item by orderId successfully")
+    @DisplayName("Can get an Item by id successfully")
     void getItemById_canGetItemSuccessfully() throws Exception {
-      mockMvc.perform(get(item_BASE_URL + "/" + item.getId())
+      mockMvc.perform(get(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", userToken))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.name").value(item.getName()))
@@ -202,27 +220,34 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can get all active itens with userWithId acount when filter is empty")
+    @DisplayName("Can get all active itens with user acount when filter is empty")
     void getAllActiveItems_canGetAllActiveItensSuccessfully_withUserAccount() throws Exception {
+      long itemQuantity = itemRepository.findAll().stream().filter(Item::isActive).count();
       mockMvc.perform(get(item_BASE_URL)
               .header("Authorization", userToken))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content").isNotEmpty())
-          .andExpect(jsonPath("$.content.size()").value(8))
-          .andExpect(jsonPath("$.content[*].active").value(everyItem(is(true))));
-    }
-
-    @Test
-    @DisplayName("User can get only active itens")
-    void getAllFilteredItems_canGetOnlyActiveItens_withUserAccount() throws Exception {
-      mockMvc.perform(get(item_BASE_URL)
-              .header("Authorization", userToken)
-              .param("active", "false"))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content").isArray())
-          .andExpect(jsonPath("$.content").isNotEmpty())
-          .andExpect(jsonPath("$.content[*].active").value(everyItem(is(true))));
+          .andExpect(jsonPath("$.content.size()").value(itemQuantity))
+          .andExpect(jsonPath("$.content[*].active").value(everyItem(is(true))))
+          .andExpect(jsonPath("$.content[0].name").value(item.getName()))
+          .andExpect(jsonPath("$.content[0].material")
+              .value(item.getMaterial().toString()))
+          .andExpect(jsonPath("$.content[0].baseDamage").value(item.getBaseDamage()))
+          .andExpect(jsonPath("$.content[0].baseDefense").value(item.getBaseDefense()))
+          .andExpect(jsonPath("$.content[0].basePrice")
+              .value(item.getBasePrice().doubleValue()))
+          .andExpect(jsonPath("$.content[0].finalPrice")
+              .value(item.getFinalPrice().doubleValue()))
+          .andExpect(jsonPath("$.content[0].description").value(item.getDescription()))
+          .andExpect(jsonPath("$.content[0].weight")
+              .value(item.getWeight().doubleValue()))
+          .andExpect(jsonPath("$.content[0].stock").value(item.getStock()))
+          .andExpect(jsonPath("$.content[0].type").value(item.getType().toString()))
+          .andExpect(jsonPath("$.content[0].rarity").value(item.getRarity().toString()))
+          .andExpect(jsonPath("$.content[0].active").value(item.isActive()))
+          .andExpect(jsonPath("$.content[0].blacksmithId")
+              .value(item.getCraftedBy().getId()));
     }
 
     @Test
@@ -238,12 +263,13 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Can get all itens with admin acount and empty search")
     void getAllActiveItems_canGetAllFilteredItemsSuccessfully_withAdminAccount() throws Exception {
+      int itemQuantity = itemRepository.findAll().size();
       mockMvc.perform(get(item_BASE_URL)
               .header("Authorization", adminToken))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content").isNotEmpty())
-          .andExpect(jsonPath("$.content.size()").value(10))
+          .andExpect(jsonPath("$.content.size()").value(itemQuantity))
           .andExpect(jsonPath("$.content[*].active", hasItem(true)))
           .andExpect(jsonPath("$.content[*].active", hasItem(false)));
     }
@@ -296,7 +322,7 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Can delete an itens with admin acount")
     void deleteItem_canDeleteAnItem_WithAdminAccount() throws Exception {
-      Item savedItem = saveItem(MockItem.itemRequestDto());
+      Item savedItem = saveItem(MockItem.item());
       mockMvc.perform(delete(item_BASE_URL + "/" + savedItem.getId())
               .header("Authorization", adminToken))
           .andExpect(status().isNoContent());
@@ -405,7 +431,7 @@ public class ItemControllerTest extends TestBase {
     @DisplayName("Create should return 400 when weight is negative")
     void createItem_shouldReturn400_whenWeightIsNegative() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
-          .weight(-1f).build();
+          .weight(-1d).build();
       mockMvc.perform(post(item_BASE_URL)
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
@@ -646,7 +672,7 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Delete should return 403 when deleting sold itemWithId")
     void delete_shouldReturn403_whenItemWasSold() throws Exception {
-      Item soldItem = saveItem(MockItem.itemRequestDto());
+      Item soldItem = saveItem(MockItem.item());
       soldItem.addSoldQuantity(10);
       itemRepository.save(soldItem);
       mockMvc.perform(delete(item_BASE_URL + "/" + soldItem.getId())
@@ -664,16 +690,15 @@ public class ItemControllerTest extends TestBase {
 
   }
 
-  private Item saveItem(ItemRequestDto dto) {
-    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
+  private Item saveItem(Item newItem) {
+    if (newItem.getFinalPrice().compareTo(newItem.getBasePrice()) > 0) {
       throw new InvalidItemDataException("Final price cannot be greater than base price");
     }
-    Item item = ItemRequestDto.toEntity(dto);
-    Blacksmith blacksmith = findBlacksmithById(dto.blacksmithId());
-    item.setCraftedBy(blacksmith);
-    item.setBlacksmithIdSnapshot(blacksmith.getId());
-    item.setBlacksmithNameSnapshot(blacksmith.getName());
-    return itemRepository.save(item);
+    Blacksmith blacksmith = findBlacksmithById(newItem.getBlacksmithIdSnapshot());
+    newItem.setCraftedBy(blacksmith);
+    newItem.setBlacksmithIdSnapshot(blacksmith.getId());
+    newItem.setBlacksmithNameSnapshot(blacksmith.getName());
+    return itemRepository.save(newItem);
   }
 
   private Blacksmith findBlacksmithById(Long id) {

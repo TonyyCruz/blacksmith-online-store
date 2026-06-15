@@ -3,7 +3,6 @@ package com.anthony.blacksmithOnlineStore.controller;
 import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.service.AdminService;
-import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin")
 public class AdminController {
   private final AdminService adminService;
-  private final BlacksmithService blacksmithService;
 
-  @PatchMapping("/users/{orderId}/role")
+  @PatchMapping("/users/{id}/role")
   public ResponseEntity<Void> updateUserRole(@PathVariable UUID id,
-      @RequestBody @Valid RoleUpdateDto roleUpdateDto,
-      Authentication auth) {
-    adminService.updateRole(id, roleUpdateDto, auth);
+      @RequestBody @Valid RoleUpdateDto roleUpdateDto) {
+    adminService.updateRole(id, roleUpdateDto);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 

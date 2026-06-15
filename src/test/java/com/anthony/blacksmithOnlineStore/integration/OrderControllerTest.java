@@ -130,7 +130,7 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Admin can get an existing order  by id successfully")
+    @DisplayName("Admin can get an existing order by id successfully")
     void admin_canGetOrderByIdSuccessfully() throws Exception {
       String adminToken = performLogin(adminLogin);
       mockMvc.perform(get(ORDER_BASE_URL + "/{id}", 1L)
@@ -324,17 +324,4 @@ public class OrderControllerTest extends TestBase {
     }
 
   }
-
-//  private Item saveItem(Item newItem) {
-//    Blacksmith blacksmith = findBlacksmithById(newItem.getBlacksmithIdSnapshot());
-//    newItem.setCraftedBy(blacksmith);
-//    newItem.setBlacksmithIdSnapshot(blacksmith.getId());
-//    newItem.setBlacksmithNameSnapshot(blacksmith.getName());
-//    return itemRepository.save(newItem);
-//  }
-//
-//  private Blacksmith findBlacksmithById(Long id) {
-//    return blacksmithRepository.findById(id)
-//        .orElseThrow(() -> new IllegalStateException("Blacksmith not found in test DB"));
-//  }
 }

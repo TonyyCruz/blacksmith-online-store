@@ -47,8 +47,7 @@ public class UserControllerTest extends TestBase {
           .andExpect(jsonPath("$.role").value(user.getRole().name()))
           .andExpect(jsonPath("$.birthDate").value(user.getBirthDate().toString()))
           .andExpect(jsonPath("$.username").value(user.getUsername()))
-          .andExpect(jsonPath("$.password").doesNotExist())
-          .andDo(print());
+          .andExpect(jsonPath("$.password").doesNotExist());
     }
 
     @Test

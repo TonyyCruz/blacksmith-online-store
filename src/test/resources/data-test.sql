@@ -34,7 +34,7 @@ VALUES
         4.5,
         0
     ), (
-        'Tyrion o Perdido',
+        'Tyrion o Perdido do Martelo',
         'Custom knives and blades forged with precision.',
         30,
         8,

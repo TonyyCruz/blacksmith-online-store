@@ -55,7 +55,7 @@ public class Item {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String description;
   @Column(nullable = false)
-  private Float weight;
+  private Double weight;
   @Column(nullable = false)
   private Integer stock;
   @Column(nullable = false)
@@ -70,11 +70,11 @@ public class Item {
   @Column(nullable = false)
   @Setter(AccessLevel.NONE)
   @Builder.Default
-  private long sold = 0;
+  private Long sold = 0L;
   @Column(nullable = false)
   @Setter(AccessLevel.NONE)
   @Builder.Default
-  private long totalRatingsSum = 0;
+  private Long totalRatingsSum = 0L;
   @Setter(AccessLevel.NONE)
   @Column(nullable = false)
   @Builder.Default
@@ -110,13 +110,6 @@ public class Item {
 
   public void addSoldQuantity(int quantity) {
     this.sold += quantity;
-  }
-
-  public void removeSoldQuantity(int quantity) {
-    if (quantity > sold) {
-      throw new InvalidItemDataException("Cannot remove more sold quantity than currently sold");
-    }
-    this.sold -= quantity;
   }
 
   @Override

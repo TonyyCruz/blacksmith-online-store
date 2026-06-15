@@ -7,6 +7,7 @@ import com.anthony.blacksmithOnlineStore.enums.Role;
 import com.anthony.blacksmithOnlineStore.exceptions.UserNotFoundException;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
+import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.AdminService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +20,6 @@ import org.mockito.*;
 import java.util.Optional;
 import java.util.UUID;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
   @Mock private UserRepository userRepository;
-  @Mock private Authentication auth;
+  @Mock private AuthenticatedUserService authUser;
   @InjectMocks private AdminService adminService;
   private User targetUser;
   private User adminUser;
@@ -62,9 +62,9 @@ class AdminServiceTest {
       RoleUpdateDto dto = new RoleUpdateDto(Role.ADMIN);
 
       when(userRepository.findById(targetId)).thenReturn(Optional.of(targetUser));
-      when(auth.getDetails()).thenReturn(adminId);
+      when(authUser.getAuthenticatedId()).thenReturn(adminId);
 
-      adminService.updateRole(targetId, dto, auth);
+      adminService.updateRole(targetId, dto);
 
       assertEquals(Role.ADMIN, targetUser.getRole());
       verify(userRepository, times(1)).findById(targetId);
@@ -81,9 +81,9 @@ class AdminServiceTest {
     void updateRole_ShouldThrowUserNotFoundException_WhenUserNotFound() {
       UUID fakeId = UUID.randomUUID();
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
-      when(auth.getDetails()).thenReturn(adminUser.getId());
+      when(authUser.getAuthenticatedId()).thenReturn(adminUser.getId());
       RoleUpdateDto dto = new RoleUpdateDto(Role.ADMIN);
-      assertThrows(UserNotFoundException.class, () -> adminService.updateRole(fakeId, dto, auth));
+      assertThrows(UserNotFoundException.class, () -> adminService.updateRole(fakeId, dto));
       verify(userRepository, never()).save(any());
     }
 
@@ -92,9 +92,9 @@ class AdminServiceTest {
     void updateRole_ShouldThrowUnauthorizedOperationException_WhenAdminTriesToChangeOwnRole() {
       UUID adminId = adminUser.getId();
       RoleUpdateDto dto = new RoleUpdateDto(Role.CUSTOMER);
-      when(auth.getDetails()).thenReturn(adminId);
+      when(authUser.getAuthenticatedId()).thenReturn(adminId);
       assertThrows(ForbiddenOperationException.class,
-          () -> adminService.updateRole(adminId, dto, auth));
+          () -> adminService.updateRole(adminId, dto));
       verify(userRepository, never()).save(any());
     }
 
