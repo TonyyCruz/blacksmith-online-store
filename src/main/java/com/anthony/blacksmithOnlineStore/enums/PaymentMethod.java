@@ -4,8 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentMethod {
-    DEBIT("Debit"),
-    CREDIT("Credit");
+    DEBIT_CARD("Debit card"),
+    CREDIT_CARD("Credit card"),
+    PIX("Pix"),
+    BANK_SLIP("BankSlip");
 
     private final String status;
 
