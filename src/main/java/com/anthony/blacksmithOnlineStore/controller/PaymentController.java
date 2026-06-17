@@ -1,5 +1,7 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentResponseDto;
 import com.anthony.blacksmithOnlineStore.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
   private final PaymentService paymentService;
 
-  @PostMapping("/orders/{id}/approve")
-  public ResponseEntity<Void> approve(@PathVariable Long id) {
-    paymentService.approved(id);
-    return ResponseEntity.noContent().build();
-  }
+  //@PostMapping("/orders/{id}/approve")
+  //public ResponseEntity<Void> approve(@PathVariable Long id) {
+  //  paymentService.approved(id);
+  //  return ResponseEntity.noContent().build();
+  //}
 
-  @PostMapping
-    public ResponseEntity<PaymentModel> create(
-            @RequestBody CreatePaymentDTO dto) {
-
-        PaymentModel payment =
-                service.createPayment(dto);
-
-        return ResponseEntity.ok(payment);
+   @PostMapping("/orders/{id}/approve")
+    public ResponseEntity<PaymentResponseDto> create(@PathVariable Long id, 
+      @RequestBody PaymentCreateDto dto) {
+        return ResponseEntity.ok(paymentService.createPayment(id, dto));
     }
 }

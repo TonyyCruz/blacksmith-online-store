@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
+import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,6 +42,8 @@ public class Payment {
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
+    private String transactionId;
+    private PaymentStatus paymentStatus;
     @CreationTimestamp
     @Setter(AccessLevel.NONE)
     private LocalDateTime createdAt;

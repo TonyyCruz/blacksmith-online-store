@@ -1,23 +1,23 @@
 package com.anthony.blacksmithOnlineStore.payment;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Component;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
-import com.anthony.blacksmithOnlineStore.payment.interface.PaymentProcessor;
 
 @Component
 public class PixProcessor implements PaymentProcessor {
+    private final PaymentMethod paymentMethod = PaymentMethod.PIX;
 
     @Override
-    //public PaymentResult process(CreatePaymentDTO dto) {
-    public void process(PaymentCreateDto dto) {
+    public PaymentResult process(PaymentCreateDto dto) {
+        return new PaymentResult(dto.pix().isApproved(), UUID.randomUUID().toString());
+    }
 
-        // integração PIX
-
-        //return new PaymentResult(
-        //        true,
-        //        UUID.randomUUID().toString()
-        //);
+    @Override
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
     }
 }

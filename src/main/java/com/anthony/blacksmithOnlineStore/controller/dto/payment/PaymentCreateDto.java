@@ -9,6 +9,6 @@ public record PaymentCreateDto(
         BigDecimal amount,
         CardDto card,
         PixDTO pix,
-        BankSlipDto boleto
+        BankSlipDto bankSlip
 ) {
 }

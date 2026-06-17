@@ -64,6 +64,11 @@ public class OrderService {
   }
 
   @Transactional
+  public void paymentRefused(Long id) {
+    
+  }
+
+  @Transactional
   public OrderResponseDto cancel(Long id) {
     Order order = getEntityById(id);
     if (!order.getStatus().canBeCanceled()) {
