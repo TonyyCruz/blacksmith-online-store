@@ -53,6 +53,8 @@ public class Order {
   @Setter(AccessLevel.NONE)
   @Builder.Default
   private OrderStatus status = OrderStatus.PENDING;
+  @OneToMany(mappedBy = "payment")
+  private final List<Payment> payments = new ArrayList<>();
   @Setter(AccessLevel.NONE)
   @Builder.Default
   @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST, orphanRemoval = true)
