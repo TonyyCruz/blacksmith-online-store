@@ -11,13 +11,13 @@ import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
 public class CreditCardProcessor implements PaymentProcessor {
 private final PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
 
-    @Override
-    public PaymentResult process(PaymentCreateDto dto) {
-        return new PaymentResult(dto.pix().isApproved(), UUID.randomUUID().toString());
-    }
+	@Override
+	public PaymentResult process(PaymentCreateDto dto) {
+		return new PaymentResult(dto.credit().isApproved(), UUID.randomUUID().toString());
+	}
 
-    @Override
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
+	@Override
+	public PaymentMethod getPaymentMethod() {
+		return paymentMethod;
+	}
 }

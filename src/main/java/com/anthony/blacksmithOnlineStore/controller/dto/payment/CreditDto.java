@@ -1,4 +1,4 @@
 package com.anthony.blacksmithOnlineStore.controller.dto.payment;
 
-public record CardDto(boolean isApproved) {
+public record CreditDto(boolean isApproved) {
 }

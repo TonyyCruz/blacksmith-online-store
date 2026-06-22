@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -53,8 +54,8 @@ public class Order {
   @Setter(AccessLevel.NONE)
   @Builder.Default
   private OrderStatus status = OrderStatus.PENDING;
-  @OneToMany(mappedBy = "payment")
-  private final List<Payment> payments = new ArrayList<>();
+  @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
+  private final Payment payment;
   @Setter(AccessLevel.NONE)
   @Builder.Default
   @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST, orphanRemoval = true)
@@ -115,7 +116,9 @@ public class Order {
         "orderId=" + id +
         ", user=" + (user == null? null : user.getId()) +
         ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
         ", status=" + status +
+        ", payment=" + payment +
         ", orderItems=" + orderItems +
         ", total=" + total +
         '}';

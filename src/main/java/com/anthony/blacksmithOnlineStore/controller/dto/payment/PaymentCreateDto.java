@@ -7,7 +7,8 @@ import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
 public record PaymentCreateDto(
         PaymentMethod method,
         BigDecimal amount,
-        CardDto card,
+        DebitDto debit,
+        CreditDto credit,
         PixDTO pix,
         BankSlipDto bankSlip
 ) {

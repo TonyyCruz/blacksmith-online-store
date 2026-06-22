@@ -8,12 +8,12 @@ import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
 
 @Component
-public class PixProcessor implements PaymentProcessor {
-  private final PaymentMethod paymentMethod = PaymentMethod.PIX;
+public class DebitProcessor implements PaymentProcessor {
+  private final PaymentMethod paymentMethod = PaymentMethod.DEBIT_CARD;
 
   @Override
   public PaymentResult process(PaymentCreateDto dto) {
-      return new PaymentResult(dto.pix().isApproved(), UUID.randomUUID().toString());
+      return new PaymentResult(dto.debit().isApproved(), UUID.randomUUID().toString());
   }
 
   @Override

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
@@ -18,7 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,7 +36,7 @@ import lombok.Setter;
 public class Payment {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
     @Column(nullable = false, scale = 2)
@@ -47,6 +48,9 @@ public class Payment {
     @CreationTimestamp
     @Setter(AccessLevel.NONE)
     private LocalDateTime createdAt;
+    @UpdateTimestamp
+    @Setter(AccessLevel.NONE)
+    private LocalDateTime updatedAt;
 
     @Override
     public boolean equals(Object o) {
@@ -68,6 +72,7 @@ public class Payment {
         ", amound=" + amount +
         ", paymentMethod=" + paymentMethod +
         ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
         '}';
     }
 }
