@@ -55,7 +55,7 @@ public class OrderService {
   }
 
   @Transactional
-  public void orderPaid(Long id) {
+  public void orderPaid(long id) {
     Order order = getEntityById(id);
     order.setStatus(OrderStatus.PAYMENT_APPROVED);
     for (OrderItem orderItem : order.getOrderItems()) {
@@ -64,7 +64,7 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto cancel(Long id) {
+  public OrderResponseDto cancel(long id) {
     Order order = getEntityById(id);
     if (!order.getStatus().canBeCanceled()) {
       throw new InvalidOrderStatusException("Only pending orders can be cancelled.");
@@ -74,7 +74,7 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto refoundRequest(Long id) {
+  public OrderResponseDto refoundRequest(long id) {
     Order order = getEntityById(id);
     if (!order.getStatus().canBeRefunded()) {
       if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
@@ -90,7 +90,7 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto returnRequest(Long id) {
+  public OrderResponseDto returnRequest(long id) {
     Order order = getEntityById(id);
     if (!order.getStatus().canBeReturned()) {
       throw new InvalidOrderStatusException("Only delivered orders can be returned.");
@@ -100,7 +100,7 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto returnComplete(Long id) {
+  public OrderResponseDto returnComplete(long id) {
     Order order = getEntityById(id);
     if (order.getStatus() != OrderStatus.RETURN_REQUESTED) {
       throw new InvalidOrderStatusException("Only return requested orders can be returned.");
@@ -112,7 +112,7 @@ public class OrderService {
     return OrderResponseDto.fromEntity(order);
   }
 
-  public OrderResponseDto getById(Long id) {
+  public OrderResponseDto getById(long id) {
     return OrderResponseDto.fromEntity(getEntityById(id));
   }
 
@@ -123,7 +123,7 @@ public class OrderService {
         .toList();
   }
 
-  public Order getEntityById(Long id) {
+  public Order getEntityById(long id) {
     Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
     if (authUser.isAdmin()) return order;
     if (!order.getUser().getId().equals(authUser.getAuthenticatedId())) {

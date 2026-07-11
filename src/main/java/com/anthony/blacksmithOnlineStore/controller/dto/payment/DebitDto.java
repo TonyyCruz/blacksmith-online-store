@@ -1,4 +1,4 @@
 package com.anthony.blacksmithOnlineStore.controller.dto.payment;
 
-public record PixDTO(boolean isApproved) {
+public record DebitDto(boolean isApproved) {
 }
