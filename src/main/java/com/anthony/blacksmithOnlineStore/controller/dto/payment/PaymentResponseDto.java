@@ -6,6 +6,9 @@ import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
 public record PaymentResponseDto(Long id, PaymentMethod method, String status) {
 
     public static PaymentResponseDto fromEntity(Payment payment) {
-        return new PaymentResponseDto(payment.getId(), payment.getPaymentMethod(), payment.getPaymentStatus().name());
+        return new PaymentResponseDto(
+            payment.getId(),
+            payment.getPaymentMethod(),
+            payment.getPaymentStatus().name());
     }
 }
