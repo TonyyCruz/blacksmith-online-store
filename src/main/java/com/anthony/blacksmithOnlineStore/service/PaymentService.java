@@ -1,5 +1,6 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import org.springframework.stereotype.Service;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
@@ -27,17 +28,18 @@ public class PaymentService {
     Order order = orderService.getEntityById(orderId);
     PaymentProcessor processor = paymentFactory.getProcessor(dto.method());
     PaymentResult result = processor.process(dto);
-    Payment payment = new Payment();
-    payment.setAmount(dto.amount());
-    payment.setPaymentMethod(dto.method());
+    Payment payment = PaymentCreateDto.toEntity(dto);
     payment.setTransactionId(result.transactionId());
     payment.setOrder(order);
-    // =========> MODIFICAR PARA ENVIAR UM EVENTO NO LUGAR DE CHAMAR O ORDERSERVICE <========
-    OrderStatus orderStatus = result.isApproved() ? OrderStatus.PAYMENT_APPROVED : OrderStatus.PAYMENT_REJECTED;
-    order.setStatus(orderStatus);
+    // =========> MODIFICAR PARA ENVIAR UM EVENTO NO LUGAR DE CHAMAR O ORDER SERVICE <========
     if (result.isApproved()) {
-      orderService.orderPaid(orderId);
-     }
+      order.setStatus(OrderStatus.PAYMENT_APPROVED);
+      payment.setPaymentStatus(PaymentStatus.APPROVED);
+      orderService.orderConfirmed(orderId);
+    } else {
+      order.setStatus(OrderStatus.PAYMENT_REJECTED);
+      payment.setPaymentStatus(PaymentStatus.REJECTED);
+    }
     return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
     }
 }
