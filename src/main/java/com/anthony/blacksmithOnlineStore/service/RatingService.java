@@ -6,6 +6,7 @@ import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.RatingException;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
@@ -27,6 +28,9 @@ public class RatingService {
   @Transactional
   public void ratePurchase(RatingRequestDto dto) {
     OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
+    if (orderItem.getOrder().getDeliveredAt() == null) {
+      throw new RatingException("You cannot rate a item that has not been delivered.");
+    }
     User user = userService.getUserEntity();
     verifyUserCanRatePurchase(user.getId(), orderItem);
     blacksmithService.addRating(orderItem.getBlacksmithId(), dto.rating());
@@ -37,6 +41,7 @@ public class RatingService {
     rating.setReviewerUsername(user.getUsername());
     rating.setReviewedItemId(orderItem.getItemId());
     rating.setReviewedBlacksmithId(orderItem.getBlacksmithId());
+    rating.setReview(rating.getReview());
     ratingRepository.save(rating);
   }
 

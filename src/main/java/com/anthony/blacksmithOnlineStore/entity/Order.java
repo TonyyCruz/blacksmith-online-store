@@ -54,8 +54,8 @@ public class Order {
   @Setter(AccessLevel.NONE)
   @Builder.Default
   private OrderStatus status = OrderStatus.PENDING;
-  @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
-  private final Payment payment;
+  @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+  private Payment payment;
   @Setter(AccessLevel.NONE)
   @Builder.Default
   @OneToMany(mappedBy = "order", cascade =  CascadeType.PERSIST, orphanRemoval = true)
@@ -63,6 +63,7 @@ public class Order {
   @Setter(AccessLevel.NONE)
   @Column(nullable = false, scale = 2)
   private BigDecimal total;
+  private LocalDateTime deliveredAt;
 
   public void setStatus(OrderStatus status) {
     if (!this.status.canChangeTo(status)) {

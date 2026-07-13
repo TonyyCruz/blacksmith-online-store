@@ -96,7 +96,7 @@ public class AdminControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Get user b y id returns 404 when username not exists")
+    @DisplayName("Get user by id returns 404 when username not exists")
     void register_shouldReturn400_whenUsernameIsInvalid() throws Exception {
       mockMvc.perform(get("/admin/users?username=unexistentUserName")
           .header("Authorization", adminToken))

@@ -134,7 +134,7 @@ public class OrderServiceTest {
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       doNothing().when(saleService).performSale(anyLong(), anyInt());
 
-      orderService.orderPaid(1L);
+      orderService.orderConfirmed(1L);
 
       assertEquals(OrderStatus.PAYMENT_APPROVED, order.getStatus(),
           "The status must be payment approved");
@@ -322,7 +322,7 @@ public class OrderServiceTest {
     void orderPaid_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.orderPaid(999L));
+      assertThrows(OrderNotFoundException.class, () -> orderService.orderConfirmed(999L));
       verify(orderRepository, times(1)).findById(999L);
     }
 
@@ -335,7 +335,7 @@ public class OrderServiceTest {
       when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
-      assertThrows(InvalidOrderStatusException.class, () -> orderService.orderPaid(order.getId()));
+      assertThrows(InvalidOrderStatusException.class, () -> orderService.orderConfirmed(order.getId()));
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
     }
@@ -350,7 +350,7 @@ public class OrderServiceTest {
       when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
       doThrow(DataModifyException.class).when(saleService).performSale(anyLong(), anyInt());
 
-      assertThrows(DataModifyException.class, () -> orderService.orderPaid(order.getId())
+      assertThrows(DataModifyException.class, () -> orderService.orderConfirmed(order.getId())
           , "Must thrown an exception when itemWithId have no stock");
       verify(authUser, times(1)).getAuthenticatedId();
       verify(orderRepository, times(1)).findById(order.getId());
@@ -484,7 +484,7 @@ public class OrderServiceTest {
       when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
 
       assertThrows(ForbiddenOperationException.class,
-          () -> orderService.orderPaid(order.getId()),
+          () -> orderService.orderConfirmed(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
