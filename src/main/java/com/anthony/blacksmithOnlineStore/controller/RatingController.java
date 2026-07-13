@@ -24,7 +24,7 @@ public class RatingController {
   private final RatingService ratingService;
 
   @PostMapping
-  public ResponseEntity<Void> createRating(
+  public ResponseEntity<Void> rate(
       @Valid @RequestBody RatingRequestDto dto) {
     ratingService.ratePurchase(dto);
     return ResponseEntity.ok().build();

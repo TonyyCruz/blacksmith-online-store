@@ -30,6 +30,7 @@ public class OrderService {
   private final SaleService saleService;
   private final ItemService itemService;
   private final AuthenticatedUserService authUser;
+  private final DeliverService deliverService;
 
   @Transactional
   public OrderPaymentDto create(OrderRequestDto dto) {
@@ -55,12 +56,13 @@ public class OrderService {
   }
 
   @Transactional
-  public void orderPaid(long id) {
-    Order order = getEntityById(id);
-    order.setStatus(OrderStatus.PAYMENT_APPROVED);
+  public void orderConfirmed(long orderId) {
+    Order order = getEntityById(orderId);
     for (OrderItem orderItem : order.getOrderItems()) {
       saleService.performSale(orderItem.getItemId(), orderItem.getQuantity());
     }
+    // =========> MODIFICAR PARA ENVIAR UM EVENTO NO LUGAR DE CHAMAR O DELIVER SERVICE <========
+//    deliverService.deliverRequest(order);
   }
 
   @Transactional
