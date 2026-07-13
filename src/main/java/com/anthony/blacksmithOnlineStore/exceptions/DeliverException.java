@@ -2,12 +2,12 @@ package com.anthony.blacksmithOnlineStore.exceptions;
 
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
 
-public class RatingException extends BadRequestException {
-  public RatingException() {
-    super("Rating invalid");
+public class DeliverException extends BadRequestException {
+  public DeliverException() {
+    super("Deliver invalid");
   }
 
-  public RatingException(String msg) {
+  public DeliverException(String msg) {
       super(msg);
     }
 }
