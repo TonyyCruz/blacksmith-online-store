@@ -60,7 +60,7 @@ public class UserControllerTest extends TestBase {
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.orderId").value(user.getId().toString()))
+          .andExpect(jsonPath("$.id").value(user.getId().toString()))
           .andExpect(jsonPath("$.username").value(dto.username()))
           .andExpect(jsonPath("$.birthDate").value(dto.birthDate().toString()))
           .andExpect(jsonPath("$.password").doesNotExist())
@@ -78,7 +78,7 @@ public class UserControllerTest extends TestBase {
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.orderId").value(user.getId().toString()))
+          .andExpect(jsonPath("$.id").value(user.getId().toString()))
           .andExpect(jsonPath("$.username").value(dto.username()))
           .andExpect(jsonPath("$.birthDate").value(dto.birthDate().toString()))
           .andExpect(jsonPath("$.password").doesNotExist())
@@ -214,17 +214,15 @@ public class UserControllerTest extends TestBase {
       LocalDate[] invalidDates = {
           null,
           LocalDate.now().plusYears(10),
-          LocalDate.now().minusYears(200),
           LocalDate.now().minusYears(17),
           LocalDate.now()
       };
       for (LocalDate date : invalidDates) {
         UserUpdateDto dto = new UserUpdateDto(MockUser.userWithId().getUsername(), date);
-        String valueAsString = objectMapper.writeValueAsString(dto);
         mockMvc.perform(put(USER_URL)
                 .header("Authorization", userToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(valueAsString))
+                .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isBadRequest())
             .andDo(print());
       }

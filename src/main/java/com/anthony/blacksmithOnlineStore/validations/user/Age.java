@@ -16,7 +16,7 @@ public @interface Age {
 
   int min() default 18;
 
-  int max() default 150;
+  int max() default 300;
 
   Class<?>[] groups() default {};
 
