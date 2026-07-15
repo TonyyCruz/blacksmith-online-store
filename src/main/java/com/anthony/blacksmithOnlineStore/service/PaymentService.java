@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
+import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import org.springframework.stereotype.Service;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
@@ -15,6 +16,7 @@ import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class PaymentService {
   private final OrderService orderService;
   private final PaymentRepository paymentRepository;
   private final PaymentProcessorFactory paymentFactory;
+  private final TransactionalEventPublisher eventPublisher;
 
   @Transactional
     public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
@@ -31,11 +34,10 @@ public class PaymentService {
     Payment payment = PaymentCreateDto.toEntity(dto);
     payment.setTransactionId(result.transactionId());
     payment.setOrder(order);
-    // =========> MODIFICAR PARA ENVIAR UM EVENTO NO LUGAR DE CHAMAR O ORDER SERVICE <========
     if (result.isApproved()) {
       order.setStatus(OrderStatus.PAYMENT_APPROVED);
       payment.setPaymentStatus(PaymentStatus.APPROVED);
-      orderService.orderConfirmed(orderId);
+      eventPublisher.publishEvent(new OrderPaidEvent(orderId, java.time.LocalDateTime.now()));
     } else {
       order.setStatus(OrderStatus.PAYMENT_REJECTED);
       payment.setPaymentStatus(PaymentStatus.REJECTED);

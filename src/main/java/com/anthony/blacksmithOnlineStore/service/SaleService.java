@@ -1,20 +1,45 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
+import com.anthony.blacksmithOnlineStore.entity.Order;
+import com.anthony.blacksmithOnlineStore.entity.OrderItem;
+import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.events.ItemsReturnedEvent;
+import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @RequiredArgsConstructor
 public class SaleService {
   private final ItemService itemService;
   private final ItemRepository itemRepository;
+  private final OrderService orderService;
 
-  @Transactional
-  public void performSale(long itemId, int qty) {
+  @TransactionalEventListener
+  public void orderSold(OrderPaidEvent paidEvent) {
+    Order order = orderService.getEntityById(paidEvent.orderId());
+    for (OrderItem orderItem : order.getOrderItems()) {
+      performSale(orderItem.getItemId(), orderItem.getQuantity());
+    }
+  }
+
+  @TransactionalEventListener
+  public void returnComplete(ItemsReturnedEvent returnedEvent) {
+    for (OrderItem orderItem : returnedEvent.orderItems()) {
+      cancelSale(orderItem.getItemId(), orderItem.getQuantity());
+    }
+  }
+
+
+  private void performSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
     if (itemRepository.isItemActive(itemId)) {
       throw new InvalidOrderException("Item %d is unactive".formatted(itemId));
@@ -25,7 +50,7 @@ public class SaleService {
     }
   }
 
-  public void cancelSale(long itemId, int qty) {
+  private void cancelSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
     int modifiedLines = itemRepository.incrementStockAndDecrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
