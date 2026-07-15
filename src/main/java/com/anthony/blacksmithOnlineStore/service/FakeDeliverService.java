@@ -6,6 +6,7 @@ import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.DeliverException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -15,6 +16,7 @@ public class FakeDeliverService {
 
   private final OrderRepository orderRepository;
 
+  @Async
   @TransactionalEventListener
   public void deliverRequest(OrderPaidEvent paidEvent) {
     Order order = orderRepository.findById(paidEvent.orderId())
@@ -39,6 +41,8 @@ public class FakeDeliverService {
     }
   }
 
+  @Async
+  @TransactionalEventListener
   public void returnRequest(OrderPaidEvent paidEvent) {
     Order order = orderRepository.findById(paidEvent.orderId())
         .orElseThrow(() -> new DeliverException("Order not found"));
