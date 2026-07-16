@@ -1,20 +1,19 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
-import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.ItemsReturnedEvent;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
+
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,8 @@ public class SaleService {
   private final ItemRepository itemRepository;
   private final OrderService orderService;
 
-  @TransactionalEventListener
+  @Transactional
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void orderSold(OrderPaidEvent paidEvent) {
     Order order = orderService.getEntityById(paidEvent.orderId());
     for (OrderItem orderItem : order.getOrderItems()) {
@@ -31,7 +31,8 @@ public class SaleService {
     }
   }
 
-  @TransactionalEventListener
+  @Transactional
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void returnComplete(ItemsReturnedEvent returnedEvent) {
     for (OrderItem orderItem : returnedEvent.orderItems()) {
       cancelSale(orderItem.getItemId(), orderItem.getQuantity());

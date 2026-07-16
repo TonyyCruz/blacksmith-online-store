@@ -22,7 +22,7 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
@@ -313,9 +313,9 @@ public class OrderServiceTest {
       ));
 
       when(userService.getUserReference()).thenReturn(user);
-      when(itemService.findEntityById(999L)).thenThrow(ItemNotFoundException.class);
+      when(itemService.findEntityById(999L)).thenThrow(PaymentNotFoundException.class);
 
-      assertThrows(ItemNotFoundException.class, () -> orderService.create(dto));
+      assertThrows(PaymentNotFoundException.class, () -> orderService.create(dto));
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(999L);
     }

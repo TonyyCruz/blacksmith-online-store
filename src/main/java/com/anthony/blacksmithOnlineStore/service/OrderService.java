@@ -1,5 +1,10 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.reactive.TransactionalEventPublisher;
+
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
@@ -9,7 +14,8 @@ import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.events.ItemsReturnedEvent;
+import com.anthony.blacksmithOnlineStore.events.RefoundRequestEvent;
+import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
@@ -17,12 +23,9 @@ import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
+
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,6 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final UserService userService;
   private final OrderItemFactory orderItemFactory;
-  private final SaleService saleService;
   private final ItemService itemService;
   private final AuthenticatedUserService authUser;
   private final TransactionalEventPublisher eventPublisher;
@@ -58,16 +60,6 @@ public class OrderService {
     return OrderPaymentDto.fromEntity(orderRepository.save(order));
   }
 
-//  @Transactional
-//  public void orderConfirmed(long orderId) {
-//    Order order = getEntityById(orderId);
-//    for (OrderItem orderItem : order.getOrderItems()) {
-//      saleService.performSale(orderItem.getItemId(), orderItem.getQuantity());
-//    }
-    // =========> MODIFICAR PARA ENVIAR UM EVENTO NO LUGAR DE CHAMAR O DELIVER SERVICE <========
-//    deliverService.deliverRequest(order);
-//  }
-
   @Transactional
   public OrderResponseDto cancel(long id) {
     Order order = getEntityById(id);
@@ -88,6 +80,7 @@ public class OrderService {
       throw new InvalidOrderStatusException("This order cannot be refunded");
     }
     order.setStatus(OrderStatus.REFUND_PENDING);
+    eventPublisher.publishEvent(new RefoundRequestEvent(id, order.getOrderItems()));
     return OrderResponseDto.fromEntity(order);
   }
 
@@ -98,6 +91,7 @@ public class OrderService {
       throw new InvalidOrderStatusException("Only delivered orders can be returned.");
     }
     order.setStatus(OrderStatus.RETURN_REQUESTED);
+    eventPublisher.publishEvent(new ReturnRequestEvent(id, order.getOrderItems()));
     return OrderResponseDto.fromEntity(order);
   }
 

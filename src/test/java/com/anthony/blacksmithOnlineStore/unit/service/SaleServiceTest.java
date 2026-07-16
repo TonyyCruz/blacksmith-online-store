@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
-import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
@@ -74,10 +74,10 @@ public class SaleServiceTest {
     @Test
     @DisplayName("PerformSale should throw an ItemNotFoundException when itemWithId not exists")
     void performSale_shouldShouldThrowAnException_whenItemNotExists() {
-      doThrow(new ItemNotFoundException(targetItem.getId()))
+      doThrow(new PaymentNotFoundException(targetItem.getId()))
           .when(itemService).itemExistesVerifier(any());
 
-      assertThrows(ItemNotFoundException.class,
+      assertThrows(PaymentNotFoundException.class,
           () -> saleService.performSale(targetItem.getId(), 2));
       verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
     }
@@ -97,10 +97,10 @@ public class SaleServiceTest {
     @Test
     @DisplayName("CancelSale should throw an ItemNotFoundException when itemWithId not exists")
     void cancelSale_shouldShouldThrowAnException_whenItemNotExists() {
-      doThrow(new ItemNotFoundException(targetItem.getId()))
+      doThrow(new PaymentNotFoundException(targetItem.getId()))
           .when(itemService).itemExistesVerifier(any());
 
-      assertThrows(ItemNotFoundException.class,
+      assertThrows(PaymentNotFoundException.class,
           () -> saleService.cancelSale(targetItem.getId(), 2));
       verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
     }
