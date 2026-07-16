@@ -37,4 +37,25 @@ public class OrderController {
   public ResponseEntity<List<OrderResponseDto>> getOrders() {
     return ResponseEntity.ok(orderService.getUserOrders());
   }
+
+  @PostMapping("/{id}/return")
+  public String returnRequest(@RequestBody String entity) {
+      //TODO: process POST request
+      
+      return entity;
+  }
+
+  @PostMapping("/{id}/refound")
+  public String refoundRequest(@RequestBody String entity) {
+      //TODO: process POST request
+      
+      return entity;
+  }
+
+  @PostMapping("/{id}/cancel")
+  public ResponseEntity<Void> returnRequest(@PathVariable long id) {
+      orderService.cancel(id);
+      return ResponseEntity.noContent().build();
+  }
+  
 }

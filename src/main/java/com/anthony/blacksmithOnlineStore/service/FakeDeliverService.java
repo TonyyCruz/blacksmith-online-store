@@ -5,6 +5,7 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.DeliverException;
+import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -15,12 +16,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Service
 @RequiredArgsConstructor
 public class FakeDeliverService {
-  private final OrderService orderService;
+  private final OrderRepository orderRepository;
 
   @Async
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void deliverRequest(OrderPaidEvent paidEvent) {
-    Order order = orderService.getEntityById(paidEvent.orderId());
+    Order order = orderRepository.findById(paidEvent.orderId())
+        .orElseThrow(() -> new OrderNotFoundException(paidEvent.orderId()));
     try {
         if (!order.getStatus().equals(OrderStatus.PAYMENT_APPROVED)) {
           throw new DeliverException("A not paid order cannot be delivered");
@@ -35,6 +37,7 @@ public class FakeDeliverService {
         order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
         order.setStatus(OrderStatus.DELIVERED);
         Thread.sleep(5000); // Simulate a delay in the delivery process
+        orderRepository.save(order);
     } catch(InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new DeliverException("Delivery process was interrupted");
@@ -44,7 +47,8 @@ public class FakeDeliverService {
   @Async
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void returnRequest(ReturnRequestEvent returnEvent) {
-    Order order = orderService.getEntityById(returnEvent.orderId());
+    Order order = orderRepository.findById(returnEvent.orderId())
+        .orElseThrow(() -> new OrderNotFoundException(returnEvent.orderId()));
     try {
       if (!order.getStatus().equals(OrderStatus.DELIVERED)) {
         throw new DeliverException("A not delivered order cannot be returned");
@@ -52,6 +56,7 @@ public class FakeDeliverService {
       order.setStatus(OrderStatus.RETURN_REQUESTED);
       order.setStatus(OrderStatus.RETURNED);
         Thread.sleep(5000); // Simulate a delay in the delivery process
+        orderRepository.save(order);
     } catch(InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new DeliverException("Delivery process was interrupted");
