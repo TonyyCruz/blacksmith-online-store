@@ -9,6 +9,7 @@ import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.events.ItemsReturnedEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
@@ -17,9 +18,11 @@ import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class OrderService {
   private final SaleService saleService;
   private final ItemService itemService;
   private final AuthenticatedUserService authUser;
-  private final DeliverService deliverService;
+  private final TransactionalEventPublisher eventPublisher;
 
   @Transactional
   public OrderPaymentDto create(OrderRequestDto dto) {
@@ -55,15 +58,15 @@ public class OrderService {
     return OrderPaymentDto.fromEntity(orderRepository.save(order));
   }
 
-  @Transactional
-  public void orderConfirmed(long orderId) {
-    Order order = getEntityById(orderId);
-    for (OrderItem orderItem : order.getOrderItems()) {
-      saleService.performSale(orderItem.getItemId(), orderItem.getQuantity());
-    }
+//  @Transactional
+//  public void orderConfirmed(long orderId) {
+//    Order order = getEntityById(orderId);
+//    for (OrderItem orderItem : order.getOrderItems()) {
+//      saleService.performSale(orderItem.getItemId(), orderItem.getQuantity());
+//    }
     // =========> MODIFICAR PARA ENVIAR UM EVENTO NO LUGAR DE CHAMAR O DELIVER SERVICE <========
 //    deliverService.deliverRequest(order);
-  }
+//  }
 
   @Transactional
   public OrderResponseDto cancel(long id) {
@@ -85,9 +88,6 @@ public class OrderService {
       throw new InvalidOrderStatusException("This order cannot be refunded");
     }
     order.setStatus(OrderStatus.REFUND_PENDING);
-    for (OrderItem orderItem : order.getOrderItems()) {
-      saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
-    }
     return OrderResponseDto.fromEntity(order);
   }
 
@@ -98,19 +98,6 @@ public class OrderService {
       throw new InvalidOrderStatusException("Only delivered orders can be returned.");
     }
     order.setStatus(OrderStatus.RETURN_REQUESTED);
-    return OrderResponseDto.fromEntity(order);
-  }
-
-  @Transactional
-  public OrderResponseDto returnComplete(long id) {
-    Order order = getEntityById(id);
-    if (order.getStatus() != OrderStatus.RETURN_REQUESTED) {
-      throw new InvalidOrderStatusException("Only return requested orders can be returned.");
-    }
-    order.setStatus(OrderStatus.RETURNED);
-    for (OrderItem orderItem : order.getOrderItems()) {
-      saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
-    }
     return OrderResponseDto.fromEntity(order);
   }
 
