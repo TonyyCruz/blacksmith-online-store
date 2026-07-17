@@ -1,5 +1,9 @@
 package com.anthony.blacksmithOnlineStore.controller.dto.payment;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.BankSlipDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.CreditDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.DebitDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.PixDTO;
 import com.anthony.blacksmithOnlineStore.entity.Payment;
 import java.math.BigDecimal;
 

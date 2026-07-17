@@ -38,21 +38,17 @@ public class OrderController {
     return ResponseEntity.ok(orderService.getUserOrders());
   }
 
-  @PostMapping("/{id}/return")
-  public String returnRequest(@RequestBody String entity) {
-      //TODO: process POST request
-      
-      return entity;
+  @PostMapping("/request/{id}/return")
+  public ResponseEntity<OrderResponseDto> returnRequest(@PathVariable Long id) {
+      return ResponseEntity.ok(orderService.returnRequest(id));
   }
 
-  @PostMapping("/{id}/refound")
-  public String refoundRequest(@RequestBody String entity) {
-      //TODO: process POST request
-      
-      return entity;
+  @PostMapping("/request/{id}/refound")
+  public ResponseEntity<OrderResponseDto> refoundRequest(@PathVariable Long id) {
+      return ResponseEntity.ok(orderService.refoundRequest(id));
   }
 
-  @PostMapping("/{id}/cancel")
+  @PostMapping("/request/{id}/cancel")
   public ResponseEntity<Void> returnRequest(@PathVariable long id) {
       orderService.cancel(id);
       return ResponseEntity.noContent().build();
