@@ -22,7 +22,7 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
@@ -60,7 +60,7 @@ public class PaymentServiceTest {
   private AuthenticatedUserService authUser;
   @InjectMocks
   OrderService orderService;
-  private final Item targetItem = MockItem.itemWithId();
+  private final Item targetItem = MockItem.item();
   private final User user = MockUser.userWithId();
 
   @Nested

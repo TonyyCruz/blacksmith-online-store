@@ -7,10 +7,12 @@ import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MockItem {
 
-  public static Item itemWithId(Long id) {
+  public static Item item(Long id) {
     return Item.builder()
         .id(id)
         .material(Material.ADAMANTIUM)
@@ -32,21 +34,21 @@ public class MockItem {
         .build();
   }
 
-  public static Item itemWithId() {
-    return itemWithId(999L);
+  public static Item item() {
+    return item(999L);
   }
 
-  public static Item item() {
+  public static Item newItem() {
     return Item.builder()
         .material(Material.ADAMANTIUM)
         .baseDamage(1000)
         .baseDefense(500)
-        .name("Avalon blade")
-        .basePrice(BigDecimal.valueOf(9999.99))
-        .finalPrice(BigDecimal.valueOf(9999.99))
+        .name("Avalon blade%f".formatted(Math.random()))
+        .basePrice(BigDecimal.valueOf(Math.random() * 1000 + 1))
+        .finalPrice(BigDecimal.valueOf(Math.random() * 1000 + 1))
         .hasDiscount(false)
-        .description("The sword of dreams")
-        .weight(35.0d)
+        .description("The sword of dreams%f".formatted(Math.random()))
+        .weight(Math.random() * 100 + 1)
         .stock(1)
         .type(Type.LONG_SWORD)
         .rarity(Rarity.LEGENDARY)
@@ -55,6 +57,35 @@ public class MockItem {
         .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
         .ratingCount(0)
         .build();
+  }
+
+  public static List<Item> newItems() {
+    Item item1 = newItem();
+    Item item2 = newItem().toBuilder()
+        .stock(3)
+        .type(Type.BATTLE_AXE)
+        .rarity(Rarity.DIVINE)
+        .baseDamage(322)
+        .baseDefense(100)
+        .build();
+        Item item3 = newItem().toBuilder()
+        .stock(102)
+        .type(Type.DAGGER)
+        .rarity(Rarity.COMMON)
+        .baseDamage(9)
+        .baseDefense(1)
+        .build();
+        return new ArrayList<Item>(List.of(item1, item2, item3));
+  }
+
+  public static List<Item> items() {
+    List<Item> items = newItems();
+    Long fakeId = 1L;
+    for (Item itm : items) {
+      itm.setId(fakeId);
+      fakeId++;
+    }
+    return items;
   }
 
   // ========== DTOs ==========

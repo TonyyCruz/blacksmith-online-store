@@ -1,10 +1,10 @@
 package com.anthony.blacksmithOnlineStore.helper.mocks;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.payment.BankSlipDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.payment.CreditDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.payment.DebitDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.payment.PixDTO;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.BankSlipDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.CreditDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.DebitDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.PixDTO;
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
 import java.math.BigDecimal;
 

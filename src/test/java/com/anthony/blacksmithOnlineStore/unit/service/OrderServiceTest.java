@@ -22,7 +22,7 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
@@ -66,7 +66,7 @@ public class OrderServiceTest {
   private AuthenticatedUserService authUser;
   @InjectMocks
   OrderService orderService;
-  private final Item targetItem = MockItem.itemWithId();
+  private final Item targetItem = MockItem.item();
   private final User user = MockUser.userWithId();
 
   @Nested
@@ -81,11 +81,11 @@ public class OrderServiceTest {
           new OrderItemRequestDto(2L, 2),
           new OrderItemRequestDto(3L, 1)
       ));
-      Item item1 = MockItem.itemWithId(1L).toBuilder()
+      Item item1 = MockItem.item(1L).toBuilder()
           .finalPrice(BigDecimal.valueOf(10)).stock(50).build();
-      Item item2 = MockItem.itemWithId(2L).toBuilder()
+      Item item2 = MockItem.item(2L).toBuilder()
           .finalPrice(BigDecimal.valueOf(20)).stock(50).build();
-      Item item3 = MockItem.itemWithId(3L).toBuilder()
+      Item item3 = MockItem.item(3L).toBuilder()
           .finalPrice(BigDecimal.valueOf(30)).stock(50).build();
 
       when(userService.getUserReference()).thenReturn(user);
@@ -313,9 +313,9 @@ public class OrderServiceTest {
       ));
 
       when(userService.getUserReference()).thenReturn(user);
-      when(itemService.findEntityById(999L)).thenThrow(ItemNotFoundException.class);
+      when(itemService.findEntityById(999L)).thenThrow(PaymentNotFoundException.class);
 
-      assertThrows(ItemNotFoundException.class, () -> orderService.create(dto));
+      assertThrows(PaymentNotFoundException.class, () -> orderService.create(dto));
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(999L);
     }

@@ -2,6 +2,10 @@ package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
+import com.anthony.blacksmithOnlineStore.events.RefoundRequestEvent;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentException;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
+
 import org.springframework.stereotype.Service;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
@@ -16,6 +20,9 @@ import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 @Service
@@ -43,5 +50,17 @@ public class PaymentService {
       payment.setPaymentStatus(PaymentStatus.REJECTED);
     }
     return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
+    }
+
+    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    private void refoundPayment(RefoundRequestEvent refoundEvent) {
+      // REFOUND PROCCESS
+      Order order = orderService.getEntityById(refoundEvent.orderId());
+      order.setStatus(OrderStatus.REFUNDED);
+      if (order.getPayment() == null) throw new PaymentException("This order have no payment");
+      Payment payment = paymentRepository.findById(order.getPayment().getId())
+      .orElseThrow(() -> new PaymentNotFoundException(order.getPayment().getId()));
+      payment.setPaymentStatus(PaymentStatus.REFOUNDED);
     }
 }

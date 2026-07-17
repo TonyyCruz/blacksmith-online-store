@@ -22,9 +22,7 @@ public class MockOrder {
   }
 
   public static Order deliveredOrder() {
-
     User user = MockUser.userWithId();
-
     return Order.builder()
         .id(2L)
         .user(user)
@@ -43,9 +41,15 @@ public class MockOrder {
         .priceApplied(new BigDecimal("90.00"))
         .quantity(1)
         .build();
-    item2.calculateTotal();
-    order.addOrderItem(item1);
-    order.addOrderItem(item2);
+    //item2.calculateTotal();
+    //order.addOrderItem(item1);
+    //order.addOrderItem(item2);
+    //order.recalculateTotal();
+    //return order;
+
+    for (OrderItem orderItem : MockOrderItem.newOrderItems(order)) {
+      order.addOrderItem(orderItem);
+    }
     order.recalculateTotal();
     return order;
   }
