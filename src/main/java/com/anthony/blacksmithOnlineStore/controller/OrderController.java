@@ -49,7 +49,7 @@ public class OrderController {
   }
 
   @PostMapping("/request/{id}/cancel")
-  public ResponseEntity<Void> returnRequest(@PathVariable long id) {
+  public ResponseEntity<Void> cancel(@PathVariable Long id) {
       orderService.cancel(id);
       return ResponseEntity.noContent().build();
   }

@@ -158,6 +158,15 @@ public class OrderControllerTest extends TestBase {
               .value(orders.get(1).getTotal().doubleValue()));
     }
 
+    @Test
+    @DisplayName("User can cancel own order successfully")
+    void user_canCancelOwnOrcrSuccessfully() throws Exception {
+      Order order = saveOrder(MockOrder.orderWithItems());
+      mockMvc.perform(post(ORDER_BASE_URL + "/request/{id}/cancel", order.getId())
+              .header("Authorization", userToken))
+          .andExpect(status().isNoContent());
+    }
+
   }
 
   @Nested
@@ -323,5 +332,12 @@ public class OrderControllerTest extends TestBase {
           .andExpect(status().isForbidden());
     }
 
+  }
+
+  private Order saveOrder(Order newOrder) {
+    newOrder.setUser(getUserById(newOrder.getUser().getId()));
+
+
+    return orderRepository.save(newOrder);
   }
 }

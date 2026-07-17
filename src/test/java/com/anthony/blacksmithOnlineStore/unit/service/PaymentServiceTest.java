@@ -60,7 +60,7 @@ public class PaymentServiceTest {
   private AuthenticatedUserService authUser;
   @InjectMocks
   OrderService orderService;
-  private final Item targetItem = MockItem.itemWithId();
+  private final Item targetItem = MockItem.item();
   private final User user = MockUser.userWithId();
 
   @Nested

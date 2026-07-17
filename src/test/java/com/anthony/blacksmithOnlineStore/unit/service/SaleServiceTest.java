@@ -31,7 +31,7 @@ public class SaleServiceTest {
   private ItemService itemService;
   @InjectMocks
   private SaleService saleService;
-  private final Item targetItem = MockItem.itemWithId();
+  private final Item targetItem = MockItem.item();
 
   @Nested
   @DisplayName("Happy Path")

@@ -322,7 +322,7 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Can delete an itens with admin acount")
     void deleteItem_canDeleteAnItem_WithAdminAccount() throws Exception {
-      Item savedItem = saveItem(MockItem.item());
+      Item savedItem = saveItem(MockItem.newItem());
       mockMvc.perform(delete(item_BASE_URL + "/" + savedItem.getId())
               .header("Authorization", adminToken))
           .andExpect(status().isNoContent());
@@ -672,7 +672,7 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Delete should return 403 when deleting sold itemWithId")
     void delete_shouldReturn403_whenItemWasSold() throws Exception {
-      Item soldItem = saveItem(MockItem.item());
+      Item soldItem = saveItem(MockItem.newItem());
       soldItem.addSoldQuantity(10);
       itemRepository.save(soldItem);
       mockMvc.perform(delete(item_BASE_URL + "/" + soldItem.getId())
