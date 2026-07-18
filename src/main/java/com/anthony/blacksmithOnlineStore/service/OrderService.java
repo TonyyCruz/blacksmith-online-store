@@ -1,10 +1,5 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.reactive.TransactionalEventPublisher;
-
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
@@ -14,7 +9,7 @@ import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.events.RefoundRequestEvent;
+import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
@@ -23,9 +18,11 @@ import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
-
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +32,7 @@ public class OrderService {
   private final OrderItemFactory orderItemFactory;
   private final ItemService itemService;
   private final AuthenticatedUserService authUser;
-  private final TransactionalEventPublisher eventPublisher;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   public OrderPaymentDto create(OrderRequestDto dto) {
@@ -71,7 +68,7 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto refoundRequest(long id) {
+  public OrderResponseDto refundRequest(long id) {
     Order order = getEntityById(id);
     if (!order.getStatus().canBeRefunded()) {
       if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
@@ -80,7 +77,7 @@ public class OrderService {
       throw new InvalidOrderStatusException("This order cannot be refunded");
     }
     order.setStatus(OrderStatus.REFUND_PENDING);
-    eventPublisher.publishEvent(new RefoundRequestEvent(id, order.getOrderItems()));
+    eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
     return OrderResponseDto.fromEntity(order);
   }
 

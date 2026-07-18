@@ -2,10 +2,7 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,7 +16,6 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
@@ -215,7 +211,7 @@ public class OrderServiceTest {
 //      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 //      doNothing().when(saleService).cancelSale(anyLong(), anyInt());
 //
-//      OrderResponseDto response = orderService.refoundRequest(order.getId());
+//      OrderResponseDto response = orderService.refundRequest(order.getId());
 //
 //      assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
 //      verify(orderRepository, times(1)).findById(order.getId());
@@ -388,7 +384,7 @@ public class OrderServiceTest {
     void refoundRequest_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.refoundRequest(999L),
+      assertThrows(OrderNotFoundException.class, () -> orderService.refundRequest(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).findById(999L);
     }
@@ -403,7 +399,7 @@ public class OrderServiceTest {
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
       assertThrows(InvalidOrderStatusException.class,
-          () -> orderService.refoundRequest(order.getId()));
+          () -> orderService.refundRequest(order.getId()));
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
     }
@@ -517,7 +513,7 @@ public class OrderServiceTest {
       when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
 
       assertThrows(ForbiddenOperationException.class,
-          () -> orderService.refoundRequest(order.getId()),
+          () -> orderService.refundRequest(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();

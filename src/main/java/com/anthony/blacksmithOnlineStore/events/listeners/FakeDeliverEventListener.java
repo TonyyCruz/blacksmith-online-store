@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.service;
+package com.anthony.blacksmithOnlineStore.events.listeners;
 
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
@@ -9,13 +9,13 @@ import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class FakeDeliverService {
+public class FakeDeliverEventListener {
   private final OrderRepository orderRepository;
 
   @Async
@@ -53,7 +53,6 @@ public class FakeDeliverService {
       if (!order.getStatus().equals(OrderStatus.DELIVERED)) {
         throw new DeliverException("A not delivered order cannot be returned");
       }
-      order.setStatus(OrderStatus.RETURN_REQUESTED);
       order.setStatus(OrderStatus.RETURNED);
         Thread.sleep(5000); // Simulate a delay in the delivery process
         orderRepository.save(order);

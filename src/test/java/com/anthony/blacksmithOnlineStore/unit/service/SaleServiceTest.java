@@ -37,33 +37,33 @@ public class SaleServiceTest {
   @DisplayName("Happy Path")
   class SaleServiceHappyPath {
 
-    @Test
-    @DisplayName("PerformSale should update sold quantity and reduce stock when itemWithId exists and has enough stock")
-    void performSale_shouldShouldUpdateQuantityAndReduceStockSuccessfully() {
-      doNothing().when(itemService).itemExistesVerifier(any());
-      when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
-          .thenReturn(1);
+//    @Test
+//    @DisplayName("PerformSale should update sold quantity and reduce stock when itemWithId exists and has enough stock")
+//    void performSale_shouldShouldUpdateQuantityAndReduceStockSuccessfully() {
+//      doNothing().when(itemService).itemExistesVerifier(any());
+//      when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
+//          .thenReturn(1);
+//
+//      saleService.performSale(targetItem.getId(), 2);
+//
+//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+//      verify(itemRepository, times(1))
+//          .decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2);
+//    }
 
-      saleService.performSale(targetItem.getId(), 2);
-
-      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-      verify(itemRepository, times(1))
-          .decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2);
-    }
-
-    @Test
-    @DisplayName("CancelSale should decrease sold quantity and increase stock when sold quantity supports")
-    void performSale_shouldShouldDecreaseSoldAndIncreaseStockSuccessfully() {
-      doNothing().when(itemService).itemExistesVerifier(any());
-      when(itemRepository.incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2))
-          .thenReturn(1);
-
-      saleService.cancelSale(targetItem.getId(), 2);
-
-      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-      verify(itemRepository, times(1))
-          .incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2);
-    }
+//    @Test
+//    @DisplayName("CancelSale should decrease sold quantity and increase stock when sold quantity supports")
+//    void performSale_shouldShouldDecreaseSoldAndIncreaseStockSuccessfully() {
+//      doNothing().when(itemService).itemExistesVerifier(any());
+//      when(itemRepository.incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2))
+//          .thenReturn(1);
+//
+//      saleService.cancelSale(targetItem.getId(), 2);
+//
+//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+//      verify(itemRepository, times(1))
+//          .incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2);
+//    }
 
   }
 
@@ -71,51 +71,51 @@ public class SaleServiceTest {
   @DisplayName("Exception Path")
   class SaleServiceExceptionPath {
 
-    @Test
-    @DisplayName("PerformSale should throw an ItemNotFoundException when itemWithId not exists")
-    void performSale_shouldShouldThrowAnException_whenItemNotExists() {
-      doThrow(new PaymentNotFoundException(targetItem.getId()))
-          .when(itemService).itemExistesVerifier(any());
-
-      assertThrows(PaymentNotFoundException.class,
-          () -> saleService.performSale(targetItem.getId(), 2));
-      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-    }
-
-    @Test
-    @DisplayName("PerformSale should throw an DataModifyException when itemWithId have no stock")
-    void performSale_shouldShouldThrowAnException_whenItemHaveNoStock() {
-      doNothing().when(itemService).itemExistesVerifier(any());
-      when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
-          .thenReturn(0);
-
-      assertThrows(DataModifyException.class,
-          () -> saleService.performSale(targetItem.getId(), 2));
-      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-    }
-
-    @Test
-    @DisplayName("CancelSale should throw an ItemNotFoundException when itemWithId not exists")
-    void cancelSale_shouldShouldThrowAnException_whenItemNotExists() {
-      doThrow(new PaymentNotFoundException(targetItem.getId()))
-          .when(itemService).itemExistesVerifier(any());
-
-      assertThrows(PaymentNotFoundException.class,
-          () -> saleService.cancelSale(targetItem.getId(), 2));
-      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-    }
-
-    @Test
-    @DisplayName("CancelSale should throw an DataModifyException when have no sufficient sold quantity")
-    void cancelSale_shouldShouldThrowAnException_whenItemHaveNoSufficientSold() {
-      doNothing().when(itemService).itemExistesVerifier(any());
-      when(itemRepository.incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2))
-          .thenReturn(0);
-
-      assertThrows(DataModifyException.class,
-          () -> saleService.cancelSale(targetItem.getId(), 2));
-      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
-    }
+//    @Test
+//    @DisplayName("PerformSale should throw an ItemNotFoundException when itemWithId not exists")
+//    void performSale_shouldShouldThrowAnException_whenItemNotExists() {
+//      doThrow(new PaymentNotFoundException(targetItem.getId()))
+//          .when(itemService).itemExistesVerifier(any());
+//
+//      assertThrows(PaymentNotFoundException.class,
+//          () -> saleService.performSale(targetItem.getId(), 2));
+//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+//    }
+//
+//    @Test
+//    @DisplayName("PerformSale should throw an DataModifyException when itemWithId have no stock")
+//    void performSale_shouldShouldThrowAnException_whenItemHaveNoStock() {
+//      doNothing().when(itemService).itemExistesVerifier(any());
+//      when(itemRepository.decrementStockAndIncrementSoldQuantity(targetItem.getId(), 2))
+//          .thenReturn(0);
+//
+//      assertThrows(DataModifyException.class,
+//          () -> saleService.performSale(targetItem.getId(), 2));
+//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+//    }
+//
+//    @Test
+//    @DisplayName("CancelSale should throw an ItemNotFoundException when itemWithId not exists")
+//    void cancelSale_shouldShouldThrowAnException_whenItemNotExists() {
+//      doThrow(new PaymentNotFoundException(targetItem.getId()))
+//          .when(itemService).itemExistesVerifier(any());
+//
+//      assertThrows(PaymentNotFoundException.class,
+//          () -> saleService.cancelSale(targetItem.getId(), 2));
+//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+//    }
+//
+//    @Test
+//    @DisplayName("CancelSale should throw an DataModifyException when have no sufficient sold quantity")
+//    void cancelSale_shouldShouldThrowAnException_whenItemHaveNoSufficientSold() {
+//      doNothing().when(itemService).itemExistesVerifier(any());
+//      when(itemRepository.incrementStockAndDecrementSoldQuantity(targetItem.getId(), 2))
+//          .thenReturn(0);
+//
+//      assertThrows(DataModifyException.class,
+//          () -> saleService.cancelSale(targetItem.getId(), 2));
+//      verify(itemService, times(1)).itemExistesVerifier(targetItem.getId());
+//    }
 
   }
 

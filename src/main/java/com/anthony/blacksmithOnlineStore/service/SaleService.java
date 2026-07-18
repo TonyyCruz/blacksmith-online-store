@@ -20,27 +20,8 @@ import lombok.RequiredArgsConstructor;
 public class SaleService {
   private final ItemService itemService;
   private final ItemRepository itemRepository;
-  private final OrderService orderService;
 
-  @Transactional
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  public void orderSold(OrderPaidEvent paidEvent) {
-    Order order = orderService.getEntityById(paidEvent.orderId());
-    for (OrderItem orderItem : order.getOrderItems()) {
-      performSale(orderItem.getItemId(), orderItem.getQuantity());
-    }
-  }
-
-  @Transactional
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  public void returnComplete(ItemsReturnedEvent returnedEvent) {
-    for (OrderItem orderItem : returnedEvent.orderItems()) {
-      cancelSale(orderItem.getItemId(), orderItem.getQuantity());
-    }
-  }
-
-
-  private void performSale(long itemId, int qty) {
+  public void performSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
     if (itemRepository.isItemActive(itemId)) {
       throw new InvalidOrderException("Item %d is unactive".formatted(itemId));
@@ -51,7 +32,7 @@ public class SaleService {
     }
   }
 
-  private void cancelSale(long itemId, int qty) {
+  public void cancelSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
     int modifiedLines = itemRepository.incrementStockAndDecrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
