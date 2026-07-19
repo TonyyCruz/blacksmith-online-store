@@ -3,6 +3,7 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,8 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
+import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
@@ -45,6 +48,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -60,6 +64,8 @@ public class OrderServiceTest {
   private ItemService itemService;
   @Mock
   private AuthenticatedUserService authUser;
+  @Mock
+  private ApplicationEventPublisher eventPublisher;
   @InjectMocks
   OrderService orderService;
   private final Item targetItem = MockItem.item();
@@ -133,7 +139,7 @@ public class OrderServiceTest {
 //      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 //      doNothing().when(saleService).performSale(anyLong(), anyInt());
 //
-//      orderService.orderConfirmed(1L);
+//      paymentService.orderConfirmed(1L);
 //
 //      assertEquals(OrderStatus.PAYMENT_APPROVED, order.getStatus(),
 //          "The status must be payment approved");
@@ -196,28 +202,27 @@ public class OrderServiceTest {
       verify(authUser).getAuthenticatedId();
     }
 
-//    @ParameterizedTest
-//    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#refundable")
-//    @DisplayName("Should request a refound of a paid order and set status refound pending")
-//    void refundRequest_shouldSetRefoundRequestAndSetStatusRefoundPending(OrderStatus status) {
-//      User user = MockUser.userWithId();
-//      Order order = MockOrder.orderWithItems()
-//          .toBuilder()
-//          .user(user)
-//          .status(status)
-//          .build();
-//
-//      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-//      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-//      doNothing().when(saleService).cancelSale(anyLong(), anyInt());
-//
-//      OrderResponseDto response = orderService.refundRequest(order.getId());
-//
-//      assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
-//      verify(orderRepository, times(1)).findById(order.getId());
-//      verify(authUser, times(1)).getAuthenticatedId();
-//      verify(saleService, times(order.getOrderItems().size())).cancelSale(anyLong(), anyInt());
-//    }
+    @ParameterizedTest
+    @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#refundable")
+    @DisplayName("Should request a refound of a paid order and set status refound pending")
+    void refundRequest_shouldSetRefoundRequestAndSetStatusRefoundPending(OrderStatus status) {
+      User user = MockUser.userWithId();
+      Order order = MockOrder.orderWithItems()
+          .toBuilder()
+          .user(user)
+          .status(status)
+          .build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+
+      OrderResponseDto response = orderService.refundRequest(order.getId());
+
+      assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
+      verify(eventPublisher).publishEvent(any(RefundRequestEvent.class));
+      verify(orderRepository, times(1)).findById(order.getId());
+      verify(authUser, times(1)).getAuthenticatedId();
+    }
 
     @Test
     @DisplayName("Should request a return of a delivered order")
@@ -235,6 +240,7 @@ public class OrderServiceTest {
       OrderResponseDto response = orderService.returnRequest(order.getId());
 
       assertEquals(OrderStatus.RETURN_REQUESTED, response.status(), "Status must be return request");
+      verify(eventPublisher).publishEvent(any(ReturnRequestEvent.class));
       verify(orderRepository, times(1)).findById(order.getId());
       verify(authUser, times(1)).getAuthenticatedId();
     }
@@ -253,7 +259,7 @@ public class OrderServiceTest {
 //      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 //      doNothing().when(saleService).cancelSale(anyLong(), anyInt());
 //
-//      OrderResponseDto response = orderService.returnComplete(order.getId());
+//      OrderResponseDto response = paymentService.returnComplete(order.getId());
 //
 //      assertEquals(OrderStatus.RETURNED, response.status(), "Status must be refound pending");
 //      verify(orderRepository, times(1)).findById(order.getId());
@@ -321,7 +327,7 @@ public class OrderServiceTest {
 //    void orderPaid_shouldThrownAnException_whenOrderWasNoFound() {
 //      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 //
-//      assertThrows(OrderNotFoundException.class, () -> orderService.orderConfirmed(999L));
+//      assertThrows(OrderNotFoundException.class, () -> paymentService.orderConfirmed(999L));
 //      verify(orderRepository, times(1)).findById(999L);
 //    }
 
@@ -334,7 +340,7 @@ public class OrderServiceTest {
 //      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 //      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 //
-//      assertThrows(InvalidOrderStatusException.class, () -> orderService.orderConfirmed(order.getId()));
+//      assertThrows(InvalidOrderStatusException.class, () -> paymentService.orderConfirmed(order.getId()));
 //      verify(orderRepository, times(1)).findById(order.getId());
 //      verify(authUser, times(1)).getAuthenticatedId();
 //    }
@@ -349,7 +355,7 @@ public class OrderServiceTest {
 //      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 //      doThrow(DataModifyException.class).when(saleService).performSale(anyLong(), anyInt());
 //
-//      assertThrows(DataModifyException.class, () -> orderService.orderConfirmed(order.getId())
+//      assertThrows(DataModifyException.class, () -> paymentService.orderConfirmed(order.getId())
 //          , "Must thrown an exception when itemWithId have no stock");
 //      verify(authUser, times(1)).getAuthenticatedId();
 //      verify(orderRepository, times(1)).findById(order.getId());
@@ -434,7 +440,7 @@ public class OrderServiceTest {
 //    void returnComplete_shouldThrownAnException_whenOrderWasNoFound() {
 //      when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 //
-//      assertThrows(OrderNotFoundException.class, () -> orderService.returnComplete(999L),
+//      assertThrows(OrderNotFoundException.class, () -> paymentService.returnComplete(999L),
 //          "Must thrown an exception with a non existing order");
 //      verify(orderRepository, times(1)).findById(999L);
 //    }
@@ -449,7 +455,7 @@ public class OrderServiceTest {
 //      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 //
 //      assertThrows(InvalidOrderStatusException.class,
-//          () -> orderService.returnComplete(order.getId()));
+//          () -> paymentService.returnComplete(order.getId()));
 //      verify(orderRepository, times(1)).findById(order.getId());
 //      verify(authUser, times(1)).getAuthenticatedId();
 //    }
@@ -473,21 +479,6 @@ public class OrderServiceTest {
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).findById(999L);
     }
-
-//    @Test
-//    @DisplayName("Should thrown an exception trying pay a not authorized order")
-//    void orderPaid_shouldThrownAnException_tryingPayANotAuthorizedOrder() {
-//      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
-//
-//      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-//      when(authUser.getAuthenticatedId()).thenReturn(UUID.randomUUID());
-//
-//      assertThrows(ForbiddenOperationException.class,
-//          () -> orderService.orderConfirmed(order.getId()),
-//          "Should thrown an exception trying cancel an unauthorized order");
-//      verify(orderRepository, times(1)).findById(order.getId());
-//      verify(authUser, times(1)).getAuthenticatedId();
-//    }
 
     @Test
     @DisplayName("Should thrown an exception trying cancel a not authorized order")

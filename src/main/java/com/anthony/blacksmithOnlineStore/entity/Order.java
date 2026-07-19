@@ -68,10 +68,11 @@ public class Order {
   public void setStatus(OrderStatus status) {
     if (!this.status.canChangeTo(status)) {
       throw new InvalidOrderStatusException(
-          "The current state "
+          "The current state \""
               .concat(this.status.getStatus())
-              .concat(" cannot be change to ")
+              .concat("\" cannot be change to \"")
               .concat(status.toString())
+              .concat("\"")
       );
     }
     this.status = status;
@@ -80,11 +81,6 @@ public class Order {
   public void addOrderItem(OrderItem item) {
     checkIfFinalized();
     orderItems.add(item);
-  }
-
-  public void removeOrderItem(OrderItem item) {
-    checkIfFinalized();
-    orderItems.remove(item);
   }
 
   public void recalculateTotal() {
