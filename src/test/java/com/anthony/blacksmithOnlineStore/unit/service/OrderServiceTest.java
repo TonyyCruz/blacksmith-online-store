@@ -3,8 +3,6 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,8 +19,8 @@ import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
@@ -31,7 +29,6 @@ import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
-import com.anthony.blacksmithOnlineStore.service.SaleService;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
 import java.math.BigDecimal;
@@ -58,8 +55,6 @@ public class OrderServiceTest {
   private UserService userService;
   @Mock
   private OrderItemFactory orderItemFactory;
-  @Mock
-  private SaleService saleService;
   @Mock
   private ItemService itemService;
   @Mock
