@@ -7,11 +7,13 @@ import com.anthony.blacksmithOnlineStore.entity.Payment;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentException;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessor;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessorFactory;
 import com.anthony.blacksmithOnlineStore.payment.PaymentResult;
 import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -24,23 +26,33 @@ public class PaymentService {
   private final PaymentProcessorFactory paymentFactory;
   private final ApplicationEventPublisher eventPublisher;
 
-  @Transactional
+    @Transactional
     public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
       Order order = orderService.getEntityById(orderId);
-      PaymentProcessor processor = paymentFactory.getProcessor(dto.method());
-      PaymentResult result = processor.process(dto);
-      Payment payment = PaymentCreateDto.toEntity(dto);
-      payment.setTransactionId(result.transactionId());
-      payment.setOrder(order);
-      if (result.isApproved()) {
-        order.setStatus(OrderStatus.PAYMENT_APPROVED);
-        payment.setPaymentStatus(PaymentStatus.APPROVED);
-        eventPublisher.publishEvent(new OrderPaidEvent(orderId, java.time.LocalDateTime.now()));
-      } else {
-        order.setStatus(OrderStatus.PAYMENT_REJECTED);
-        payment.setPaymentStatus(PaymentStatus.REJECTED);
+      if (order.getTotal().compareTo(dto.amount()) != 0) {
+        throw new PaymentException(
+            "The order total price is R$ %.2f but the amount receive is R$ %.2f"
+            .formatted(order.getTotal(), dto.amount()));
       }
+      Payment payment = processPayment(order, dto);
       return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
+    }
+
+    private Payment processPayment(Order order, PaymentCreateDto dto) {
+      PaymentProcessor processor = paymentFactory.getProcessor(dto.method());
+      PaymentResult paymentResult = processor.process(dto);
+      Payment payment = PaymentCreateDto.toEntity(dto);
+      payment.setTransactionId(paymentResult.transactionId());
+      payment.setOrder(order);
+      if (paymentResult.isApproved()) {
+        payment.setPaymentStatus(PaymentStatus.APPROVED);
+        order.setStatus(OrderStatus.PAYMENT_APPROVED);
+        eventPublisher.publishEvent(new OrderPaidEvent(order.getId(), LocalDateTime.now()));
+      } else {
+        payment.setPaymentStatus(PaymentStatus.REJECTED);
+        order.setStatus(OrderStatus.PAYMENT_REJECTED);
+      }
+      return payment;
     }
 
 }
