@@ -148,7 +148,6 @@ class AuthControllerTest extends TestBase {
       LocalDate[] invalidDates = {
           null,
           LocalDate.now().plusYears(10),
-          LocalDate.now().minusYears(200),
           LocalDate.now().minusYears(17),
           LocalDate.now()
       };

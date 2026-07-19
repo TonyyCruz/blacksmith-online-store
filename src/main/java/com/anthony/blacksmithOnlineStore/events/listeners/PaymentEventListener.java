@@ -23,7 +23,7 @@ public class PaymentEventListener {
 
   @Transactional
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  private void refundPayment(RefundRequestEvent refoundEvent) {
+  public void refundPayment(RefundRequestEvent refoundEvent) {
     // REFUND PROCESS
     Order order = orderService.getEntityById(refoundEvent.orderId());
     order.setStatus(OrderStatus.REFUNDED);
