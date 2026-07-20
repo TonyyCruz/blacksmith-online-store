@@ -1,5 +1,11 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
@@ -8,13 +14,9 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.RatingException;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
+
 import jakarta.transaction.Transactional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
