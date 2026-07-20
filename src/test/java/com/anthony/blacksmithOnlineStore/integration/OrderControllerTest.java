@@ -39,10 +39,12 @@ public class OrderControllerTest extends TestBase {
   @Autowired
   private ItemRepository itemRepository;
   private String userToken;
+  private Order order;
 
   @BeforeEach
   void setup() {
     userToken = performLogin(userLogin);
+    order = getTestOrder(1L);
   }
 
   @Nested
@@ -116,14 +118,11 @@ public class OrderControllerTest extends TestBase {
     @Test
     @DisplayName("User can get one of his existing order successfully")
     void getById_userCanGetOneOfHisOrderSuccessfully() throws Exception {
-      Order orderRef = orderRepository.getReferenceById(1L);
-      orderRef.setUser(getUserById(USER_ID));
-      Order order = orderRepository.save(orderRef);
       mockMvc.perform(get(ORDER_BASE_URL + "/{id}", order.getId())
               .header("Authorization", userToken))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.id").value(order.getId()))
-          .andExpect(jsonPath("$.status").value(OrderStatus.DELIVERED.name()))
+          .andExpect(jsonPath("$.status").value(order.getStatus().name()))
           .andExpect(jsonPath("$.items").isArray())
           .andExpect(jsonPath("$.items.size()").value(order.getOrderItems().size()))
           .andExpect(jsonPath("$.total").value(order.getTotal().doubleValue()));
@@ -160,8 +159,7 @@ public class OrderControllerTest extends TestBase {
 
     @Test
     @DisplayName("User can cancel own order successfully")
-    void user_canCancelOwnOrcrSuccessfully() throws Exception {
-      Order order = saveOrder(MockOrder.orderWithItems());
+    void user_canCancelOwnOrderSuccessfully() throws Exception {
       mockMvc.perform(post(ORDER_BASE_URL + "/request/{id}/cancel", order.getId())
               .header("Authorization", userToken))
           .andExpect(status().isNoContent());
@@ -334,10 +332,14 @@ public class OrderControllerTest extends TestBase {
 
   }
 
-  private Order saveOrder(Order newOrder) {
-    newOrder.setUser(getUserById(newOrder.getUser().getId()));
-
-
+  private Order getTestOrder(long id) {
+    Order newOrder = getOrderById(id).toBuilder().status(OrderStatus.PENDING).build();
+    newOrder.setUser(getUserById(USER_ID));
     return orderRepository.save(newOrder);
+  }
+
+  private Order getOrderById(long id) {
+    return orderRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("Order not found in test DB"));
   }
 }

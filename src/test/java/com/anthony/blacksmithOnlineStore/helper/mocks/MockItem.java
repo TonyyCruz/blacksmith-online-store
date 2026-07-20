@@ -39,16 +39,19 @@ public class MockItem {
   }
 
   public static Item newItem() {
+    BigDecimal basePrice = BigDecimal.valueOf(Math.floor(Math.random() * 1000 + 1));
+    BigDecimal dif = (Math.random() % 2 == 0) ? BigDecimal.valueOf(10) : BigDecimal.ZERO;
+    BigDecimal finalPrice = basePrice.min(dif);
     return Item.builder()
         .material(Material.ADAMANTIUM)
         .baseDamage(1000)
         .baseDefense(500)
         .name("Avalon blade%f".formatted(Math.random()))
-        .basePrice(BigDecimal.valueOf(Math.random() * 1000 + 1))
-        .finalPrice(BigDecimal.valueOf(Math.random() * 1000 + 1))
+        .basePrice(BigDecimal.valueOf(Math.floor(Math.random() * 1000 + 1)))
+        .finalPrice(finalPrice)
         .hasDiscount(false)
         .description("The sword of dreams%f".formatted(Math.random()))
-        .weight(Math.random() * 100 + 1)
+        .weight(Math.floor(Math.random() * 100 + 1))
         .stock(1)
         .type(Type.LONG_SWORD)
         .rarity(Rarity.LEGENDARY)
@@ -56,6 +59,7 @@ public class MockItem {
         .blacksmithIdSnapshot(MockBlacksmith.blacksmith().getId())
         .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
         .ratingCount(0)
+        .hasDiscount(dif.compareTo(BigDecimal.ZERO) > 0)
         .build();
   }
 
@@ -63,6 +67,7 @@ public class MockItem {
     Item item1 = newItem();
     Item item2 = newItem().toBuilder()
         .stock(3)
+        .material(Material.MITHRIL)
         .type(Type.BATTLE_AXE)
         .rarity(Rarity.DIVINE)
         .baseDamage(322)
@@ -70,6 +75,7 @@ public class MockItem {
         .build();
         Item item3 = newItem().toBuilder()
         .stock(102)
+        .material(Material.IRON)
         .type(Type.DAGGER)
         .rarity(Rarity.COMMON)
         .baseDamage(9)

@@ -43,9 +43,9 @@ public class OrderController {
       return ResponseEntity.ok(orderService.returnRequest(id));
   }
 
-  @PostMapping("/request/{id}/refound")
-  public ResponseEntity<OrderResponseDto> refoundRequest(@PathVariable Long id) {
-      return ResponseEntity.ok(orderService.refoundRequest(id));
+  @PostMapping("/request/{id}/refund")
+  public ResponseEntity<OrderResponseDto> refundRequest(@PathVariable Long id) {
+      return ResponseEntity.ok(orderService.refundRequest(id));
   }
 
   @PostMapping("/request/{id}/cancel")
