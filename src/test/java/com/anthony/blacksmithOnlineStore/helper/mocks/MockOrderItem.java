@@ -30,7 +30,6 @@ public class MockOrderItem {
 
   public static OrderItem fromItem(Item item, int quantity) {
     OrderItem orderItem = OrderItem.builder()
-        .id(null)
         .itemId(item.getId())
         .itemName(item.getName())
         .basePriceAtPurchase(item.getFinalPrice())

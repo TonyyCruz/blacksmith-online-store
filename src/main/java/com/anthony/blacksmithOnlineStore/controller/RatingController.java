@@ -30,7 +30,7 @@ public class RatingController {
     return ResponseEntity.ok().build();
   }
 
-  @GetMapping("/item/{itemId}")
+  @GetMapping("/item/{id}")
   public ResponseEntity<Page<RatingResponseDto>> getRatingsFromItemId(
       @PathVariable Long id,
       @PageableDefault(page = 0, size = 5, sort = "id", direction = Direction.DESC)

@@ -19,7 +19,7 @@ public class MockUser {
     return user;
   }
 
-  public static User userWithId(UUID id) {
+  public static User user(UUID id) {
     User user = new User();
     user.setId(id);
     user.setUsername("user_one");
@@ -30,7 +30,7 @@ public class MockUser {
   }
 
   public static User userWithId() {
-    return userWithId(UUID.randomUUID());
+    return user(UUID.randomUUID());
   }
 
   public static User admin() {

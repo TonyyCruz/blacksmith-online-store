@@ -7,17 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
-import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
-import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
-import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
-import com.anthony.blacksmithOnlineStore.enums.Role;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.jayway.jsonpath.JsonPath;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +16,16 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+
+import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
+import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.enums.Role;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
+import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.jayway.jsonpath.JsonPath;
 
 @Tag("integration")
 @DisplayName("Integration test for auth controller")
@@ -47,7 +48,7 @@ class AuthControllerTest extends TestBase {
     void register_createsNewUserSuccessfully() throws Exception {
       UserCreateDto dto = MockUser.userCreateDto();
       String valueAsString = objectMapper.writeValueAsString(dto);
-      MvcResult result = mockMvc.perform(post(AUTH_REGISTER_URL)
+      mockMvc.perform(post(AUTH_REGISTER_URL)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
           .andExpect(status().isCreated())
