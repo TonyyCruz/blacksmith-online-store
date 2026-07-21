@@ -54,9 +54,6 @@ public class OrderItem {
   private Long blacksmithId;
   @CreationTimestamp
   private LocalDateTime createdAt;
-  @Column(nullable = false)
-  @Builder.Default
-  private boolean reviewed = false;
 
   public void setId(Long id) {
     checkIfFinalized();
@@ -104,11 +101,10 @@ public class OrderItem {
       throw new IllegalStateException("Only finalized item can be rated");
     }
     this.rating = rating;
-    setReviewed();
   }
 
-  public void setReviewed() {
-    reviewed = true;
+  public boolean isReviewed() {
+    return rating != null;
   }
 
   public void setUserId(UUID userId) {

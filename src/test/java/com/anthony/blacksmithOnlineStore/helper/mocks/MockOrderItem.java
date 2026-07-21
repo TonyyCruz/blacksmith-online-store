@@ -22,7 +22,6 @@ public class MockOrderItem {
         .userId(order.getUser().getId())
         .blacksmithId(1L)
         .order(order)
-        .reviewed(false)
         .build();
     orderItem.calculateTotal();
     return orderItem;
@@ -38,7 +37,6 @@ public class MockOrderItem {
         .userId(UUID.randomUUID())
         .blacksmithId(item.getBlacksmithIdSnapshot())
         .order(new Order())
-        .reviewed(false)
         .build();
     orderItem.calculateTotal();
     return orderItem;
@@ -55,7 +53,6 @@ public class MockOrderItem {
         .userId(order.getUser().getId())
         .blacksmithId(item.getBlacksmithIdSnapshot())
         .order(order)
-        .reviewed(false)
         .build();
     orderItem.calculateTotal();
     return orderItem;
@@ -87,7 +84,6 @@ public class MockOrderItem {
         .userId(UUID.randomUUID())
         .blacksmithId(77L)
         .order(order)
-        .reviewed(false)
         .build();
     orderItem.calculateTotal();
     return orderItem;
