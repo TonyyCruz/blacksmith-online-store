@@ -89,6 +89,10 @@ public class Order {
         .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
+  public boolean wasDelivered() {
+    return deliveredAt != null;
+  }
+
   private void checkIfFinalized() {
     if (status.isFinalState()) {
       throw new IllegalStateException("Item não pode ser alterado após finalização.");
