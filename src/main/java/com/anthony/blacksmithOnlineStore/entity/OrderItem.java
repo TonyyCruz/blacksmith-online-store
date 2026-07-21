@@ -104,13 +104,11 @@ public class OrderItem {
       throw new IllegalStateException("Only finalized item can be rated");
     }
     this.rating = rating;
-    if (rating != null) {
-      ratingValue = rating.getRatingValue();
-      reviewed = true;
-    } else {
-      ratingValue = null;
-      reviewed = false;
-    }
+    setReviewed();
+  }
+
+  public void setReviewed() {
+    reviewed = true;
   }
 
   public void setUserId(UUID userId) {
