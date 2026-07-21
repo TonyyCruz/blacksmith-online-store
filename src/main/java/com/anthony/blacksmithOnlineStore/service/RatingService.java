@@ -30,11 +30,9 @@ public class RatingService {
   @Transactional
   public RatingResponseDto ratePurchase(RatingRequestDto dto) {
     OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
-    if (orderItem.getOrder().getDeliveredAt() == null) {
-      throw new RatingException("You cannot rate a item that has not been delivered.");
-    }
     User user = userService.getUserEntity();
     verifyUserCanRatePurchase(user.getId(), orderItem);
+    // MUDAR RATING DE BLACKSMITH E ITEM PARA EVENTO
     blacksmithService.addRating(orderItem.getBlacksmithId(), dto.rating());
     itemService.addRating(orderItem.getItemId(), dto.rating());
     Rating rating = RatingRequestDto.toEntity(dto);
@@ -55,10 +53,13 @@ public class RatingService {
   }
 
   private void verifyUserCanRatePurchase(UUID userId, OrderItem orderItem) {
+    if (!orderItem.getOrder().wasDelivered()) {
+      throw new RatingException("You cannot rate a item that Was not delivered.");
+    }
     if (!orderItem.getUserId().equals(userId)) {
       throw new ForbiddenOperationException("Only hwo purchased the item can rate it.");
     }
-    if (orderItem.getRating() != null) {
+    if (orderItem.isReviewed()) {
       throw new ForbiddenOperationException("This item has already been rated.");
     }
     if (!orderItem.getOrder().getStatus().isFinalState()) {
