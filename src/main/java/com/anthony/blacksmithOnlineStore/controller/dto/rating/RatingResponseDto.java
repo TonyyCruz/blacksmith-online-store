@@ -12,14 +12,14 @@ public record RatingResponseDto(
     LocalDateTime createdAt,
     LocalDateTime updatedAt) {
 
-    public static RatingResponseDto fromEntity(Rating dto) {
+    public static RatingResponseDto fromEntity(Rating rating) {
         return new RatingResponseDto(
-            dto.getId(),
-            dto.getReviewerUsername(),
-            dto.getRatingValue(),
-            dto.getReview(),
-            dto.getCreatedAt(),
-            dto.getUpdatedAt()
+            rating.getId(),
+            rating.getReviewerUsername(),
+            rating.getRatingValue(),
+            rating.getReview(),
+            rating.getCreatedAt(),
+            rating.getUpdatedAt()
         );
     }
 

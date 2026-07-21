@@ -28,7 +28,7 @@ public class RatingService {
   private final UserService userService;
 
   @Transactional
-  public void ratePurchase(RatingRequestDto dto) {
+  public RatingResponseDto ratePurchase(RatingRequestDto dto) {
     OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
     if (orderItem.getOrder().getDeliveredAt() == null) {
       throw new RatingException("You cannot rate a item that has not been delivered.");
@@ -44,7 +44,8 @@ public class RatingService {
     rating.setReviewedItemId(orderItem.getItemId());
     rating.setReviewedBlacksmithId(orderItem.getBlacksmithId());
     rating.setReview(rating.getReview());
-    ratingRepository.save(rating);
+    orderItem.setRating(rating);
+    return RatingResponseDto.fromEntity(ratingRepository.save(rating));
   }
 
   public Page<RatingResponseDto> getRatingsFromItemId(Long itemId, Pageable pageable) {
@@ -57,7 +58,7 @@ public class RatingService {
     if (!orderItem.getUserId().equals(userId)) {
       throw new ForbiddenOperationException("Only hwo purchased the item can rate it.");
     }
-    if (orderItem.isReviewed()) {
+    if (orderItem.getRating() != null) {
       throw new ForbiddenOperationException("This item has already been rated.");
     }
     if (!orderItem.getOrder().getStatus().isFinalState()) {
