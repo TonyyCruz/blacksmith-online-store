@@ -41,8 +41,6 @@ public class RatingService {
     rating.setReviewerUsername(user.getUsername());
     rating.setReviewedItemId(orderItem.getItemId());
     rating.setReviewedBlacksmithId(orderItem.getBlacksmithId());
-    rating.setReview(rating.getReview());
-    orderItem.setRating(rating);
     return RatingResponseDto.fromEntity(ratingRepository.save(rating));
   }
 
