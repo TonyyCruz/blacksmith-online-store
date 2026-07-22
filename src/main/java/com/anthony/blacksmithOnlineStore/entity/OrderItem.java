@@ -44,8 +44,7 @@ public class OrderItem {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id", nullable = false)
   private Order order;
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "rating_id", unique = true)
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "orderItem")
   private Rating rating;
   private Integer ratingValue;
   @Column(nullable = false, updatable = false)

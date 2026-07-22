@@ -128,21 +128,21 @@ VALUES
      'DELIVERED', 440.00);
 
 INSERT INTO ORDER_ITEMS (item_id, item_name, base_price_at_purchase, price_applied, quantity,
-                         total_price, order_id, rating_id, rating_value, user_id, blacksmith_id,
+                         total_price, order_id, rating_value, user_id, blacksmith_id,
                          created_at)
 VALUES
     (1, 'Sword of Valor', 100.00, 90.00, 2,
-     180.00, 1, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     180.00, 1, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
      1, '2025-11-15'),
     (2, 'Dagger of Night', 80.00, 80.00, 1,
-     80.00, 1, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     80.00, 1, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
      2, '2025-11-15'),
     (3, 'Axe of Light', 150.00, 135.00, 1,
-     135.00, 2, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     135.00, 2, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
      2, '2025-11-15'),
     (4, 'Sword of Valor', 100.00, 90.00, 2,
-     180.00, 3, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd4',
+     180.00, 3, NULL, '7b87f809-d142-4dfa-8802-87644d774dd4',
      1, '2025-11-20'),
     (5, 'Dagger of Night', 80.00, 80.00, 1,
-     80.00, 3, NULL, NULL, '7b87f809-d142-4dfa-8802-87644d774dd4',
+     80.00, 3, NULL, '7b87f809-d142-4dfa-8802-87644d774dd4',
      2, '2025-11-20');
