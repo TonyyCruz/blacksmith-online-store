@@ -47,7 +47,7 @@ public class MockItem {
         .baseDamage(1000)
         .baseDefense(500)
         .name("Avalon blade%f".formatted(Math.random()))
-        .basePrice(BigDecimal.valueOf(Math.floor(Math.random() * 1000 + 1)))
+        .basePrice(basePrice)
         .finalPrice(finalPrice)
         .hasDiscount(false)
         .description("The sword of dreams%f".formatted(Math.random()))
