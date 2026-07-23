@@ -50,7 +50,7 @@ public class RatingControllerTest extends TestBase{
 
   @BeforeEach void setup() {
     userToken = performLogin(userLogin);
-    orderItem = newOrderItem();
+    orderItem = getTestOrderItem();
     user = getUserById(USER_ID);
   }
 
@@ -119,7 +119,7 @@ public class RatingControllerTest extends TestBase{
     }
   }
 
-  private OrderItem newOrderItem() {
+  private OrderItem getTestOrderItem() {
     Item itm = getItem();
     OrderItem oi = MockOrderItem.fromItem(itm, 1);
     oi.setUserId(USER_ID);
