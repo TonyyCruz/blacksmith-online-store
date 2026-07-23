@@ -45,7 +45,7 @@ public class RatingService {
     rating.setReviewedBlacksmithId(orderItem.getBlacksmithId());
     return RatingResponseDto.fromEntity(ratingRepository.save(rating));
     // rating = ratingRepository.save(rating);
-    // eventPublisher(new RatingCreatedEvent(orderItem.getItemId(), orderItem.getBlacksmithId(), dto.rating(), rating.getId()));
+    // eventPublisher(new RatingCreatedEvent(orderItem.getItemId(), dto.rating(), rating.getId()));
   }
 
   public Page<RatingResponseDto> getRatingsFromItemId(Long itemId, Pageable pageable) {
