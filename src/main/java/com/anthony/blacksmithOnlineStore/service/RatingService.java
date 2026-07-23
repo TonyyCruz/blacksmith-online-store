@@ -57,7 +57,7 @@ public class RatingService {
     if (!orderItem.getUserId().equals(userId)) {
       throw new ForbiddenOperationException("Only hwo purchased the item can rate it.");
     }
-    if (orderItem.isReviewed()) {
+    if (ratingRepository.existsByOrderItemId(orderItem.getId())) {
       throw new ForbiddenOperationException("This item has already been rated.");
     }
     if (!orderItem.getOrder().getStatus().isFinalState()) {

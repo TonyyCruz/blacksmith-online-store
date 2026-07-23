@@ -44,7 +44,7 @@ public class OrderItem {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id", nullable = false)
   private Order order;
-  @OneToOne(fetch = FetchType.LAZY, mappedBy = "orderItem")
+  @OneToOne(mappedBy = "orderItem")
   private Rating rating;
   private Integer ratingValue;
   @Column(nullable = false, updatable = false)
@@ -100,10 +100,6 @@ public class OrderItem {
       throw new IllegalStateException("Only finalized item can be rated");
     }
     this.rating = rating;
-  }
-
-  public boolean isReviewed() {
-    return rating != null;
   }
 
   public void setUserId(UUID userId) {

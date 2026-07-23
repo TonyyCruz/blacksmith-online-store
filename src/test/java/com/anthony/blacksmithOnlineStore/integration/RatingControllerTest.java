@@ -108,10 +108,7 @@ public class RatingControllerTest extends TestBase{
     @Test
     @DisplayName("Cannot rate a bought item that is already rated")
     void user_cannotRateABoughtThatIsAlreadyRated() throws Exception {
-      Rating rtg = rate(orderItem.getId(), MockRating.rating());
-      OrderItem orderItm = getOrderItem(orderItem.getId());
-      //orderItem.setRating(rtg);
-      //orderItemRepository.save(orderItem);
+      ratingRepository.save(MockRating.rating(orderItem));
       RatingRequestDto rating = new RatingRequestDto(orderItem.getId(), 4, "my review");
       String valueAsString = objectMapper.writeValueAsString(rating);
       mockMvc.perform(post(RATING_BASE_URL)
@@ -150,16 +147,14 @@ public class RatingControllerTest extends TestBase{
         "Order not found in test DB"));
   }
 
-  private OrderItem getOrderItem(Long id) {
-    return orderItemRepository.findById(id).orElseThrow(()-> new IllegalArgumentException(
-        "Order Item not found in test DB"));
-  }
-
-  private Rating rate(Long orderItemId, Rating rating) {
-    OrderItem oi = getOrderItem(orderItemId);
-    rating.setOrderItem(orderItem);
-    return ratingRepository.save(rating);
-    //oi.setRating(rating);
-    //orderItemRepository.save(oi);
-  }
+//  private OrderItem getOrderItem(Long id) {
+//    return orderItemRepository.findById(id).orElseThrow(()-> new IllegalArgumentException(
+//        "Order Item not found in test DB"));
+//  }
+//
+//  private Rating rate(Long orderItemId, Rating rating) {
+//    rating.setOrderItem(orderItem);
+//    orderItem.setRating(rating);
+//    return ratingRepository.save(rating);
+//  }
 }
