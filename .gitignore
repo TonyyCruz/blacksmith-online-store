@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+hs_**.log
+replay_**.log
