@@ -60,8 +60,5 @@ public class RatingService {
     if (ratingRepository.existsByOrderItemId(orderItem.getId())) {
       throw new ForbiddenOperationException("This item has already been rated.");
     }
-    if (!orderItem.getOrder().getStatus().isFinalState()) {
-      throw new ForbiddenOperationException("Cannot rate an item from a not finalized order.");
-    }
   }
 }
