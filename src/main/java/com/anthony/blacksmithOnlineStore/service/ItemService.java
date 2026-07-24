@@ -30,9 +30,6 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto create(ItemRequestDto dto) {
-    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
-      throw new InvalidItemDataException("Final price cannot be greater than base price");
-    }
     Item item = ItemRequestDto.toEntity(dto);
     Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     item.setCraftedBy(blacksmith);
@@ -43,9 +40,6 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto update(Long id, ItemRequestDto dto) {
-    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
-      throw new InvalidItemDataException("Final price cannot be greater than base price");
-    }
     Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());

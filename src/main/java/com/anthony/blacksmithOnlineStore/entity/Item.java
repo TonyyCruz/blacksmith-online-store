@@ -46,8 +46,10 @@ public class Item {
   private Integer baseDamage;
   private Integer baseDefense;
   @Column(nullable = false, scale = 2)
+  @Setter(AccessLevel.NONE)
   private BigDecimal basePrice;
   @Column(nullable = false, scale = 2)
+  @Setter(AccessLevel.NONE)
   private BigDecimal finalPrice;
   @Column(nullable = false)
   @Builder.Default
@@ -110,6 +112,26 @@ public class Item {
 
   public void addSoldQuantity(int quantity) {
     this.sold += quantity;
+  }
+
+  public void setBasePrice(BigDecimal basePrice) {
+    if (isInvalidPrice(basePrice, this.finalPrice)) {
+      throw new InvalidItemDataException("Final price cannot be greater than base price");
+    }
+    this.basePrice = basePrice;
+  }
+
+  public void setFinalPrice(BigDecimal finalPrice) {
+    if (isInvalidPrice(this.basePrice, finalPrice)) {
+      throw new InvalidItemDataException("Final price cannot be greater than base price");
+    }
+    this.finalPrice = finalPrice;
+  }
+
+  private boolean isInvalidPrice(BigDecimal basePrice, BigDecimal finalPrice) {
+    return basePrice != null 
+      && finalPrice != null
+      && finalPrice.compareTo(basePrice) > 0;
   }
 
   @Override
