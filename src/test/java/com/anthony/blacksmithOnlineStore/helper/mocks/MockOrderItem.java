@@ -47,7 +47,7 @@ public class MockOrderItem {
         .id(null)
         .itemId(item.getId())
         .itemName(item.getName())
-        .basePriceAtPurchase(item.getFinalPrice())
+        .basePriceAtPurchase(item.getBasePrice())
         .priceApplied(item.getFinalPrice())
         .quantity(quantity)
         .userId(order.getUser().getId())

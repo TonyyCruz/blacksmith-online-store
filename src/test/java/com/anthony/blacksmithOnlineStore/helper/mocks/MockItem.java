@@ -39,15 +39,15 @@ public class MockItem {
   }
 
   public static Item newItem() {
-    BigDecimal basePrice = BigDecimal.valueOf(Math.floor(Math.random() * 1000 + 1));
-    BigDecimal dif = (Math.random() % 2 == 0) ? BigDecimal.valueOf(10) : BigDecimal.ZERO;
-    BigDecimal finalPrice = basePrice.min(dif);
+    BigDecimal basePrice = BigDecimal.valueOf(Math.floor(Math.random() * 1000 + 11));
+    BigDecimal dif = ((Math.random() > 0.5) ? BigDecimal.valueOf(10) : BigDecimal.ZERO);
+    BigDecimal finalPrice = basePrice.subtract(dif);
     return Item.builder()
         .material(Material.ADAMANTIUM)
         .baseDamage(1000)
         .baseDefense(500)
         .name("Avalon blade%f".formatted(Math.random()))
-        .basePrice(BigDecimal.valueOf(Math.floor(Math.random() * 1000 + 1)))
+        .basePrice(basePrice)
         .finalPrice(finalPrice)
         .hasDiscount(false)
         .description("The sword of dreams%f".formatted(Math.random()))
