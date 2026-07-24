@@ -108,10 +108,4 @@ public class ItemService {
   public void itemExistesVerifier(Long id) {
     if (!itemRepository.existsById(id)) throw new PaymentNotFoundException(id);
   }
-
-  public void addRating(Long itemId, int rating) {
-    Item item = findEntityById(itemId);
-    item.addRating(rating);
-    itemRepository.save(item);
-  }
 }

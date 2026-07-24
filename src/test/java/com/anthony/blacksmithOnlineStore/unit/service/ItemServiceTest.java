@@ -155,18 +155,6 @@ public class ItemServiceTest {
 
       verify(itemRepository, times(1)).deleteById(targetItem.getId());
     }
-
-    @Test
-    @DisplayName("AddRating should update rating count and average when itemWithId exists")
-    void addRating_shouldAddRatingSuccessfully() {
-      when(itemRepository.findById(targetItem.getId()))
-          .thenReturn(Optional.of(targetItem));
-
-      itemService.addRating(targetItem.getId(), 5);
-
-      assertEquals(1, targetItem.getRatingCount(), "Item must have the correct rating");
-      verify(itemRepository, times(1)).save(targetItem);
-    }
   }
 
   @Nested

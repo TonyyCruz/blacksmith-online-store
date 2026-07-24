@@ -59,10 +59,4 @@ public class BlacksmithService {
       throw new BlacksmithNotFoundException(id);
     }
   }
-
-  public void addRating(Long blacksmithId, int rating) {
-    Blacksmith blacksmith = findEntityById(blacksmithId);
-    blacksmith.addRating(rating);
-    blacksmithRepository.save(blacksmith);
-  }
 }

@@ -21,7 +21,6 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
-import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockRating;
@@ -46,12 +45,10 @@ public class RatingControllerTest extends TestBase{
   private RatingRepository ratingRepository;
   private OrderItem orderItem;
   private String userToken;
-  private User user;
 
   @BeforeEach void setup() {
     userToken = performLogin(userLogin);
     orderItem = getTestOrderItem();
-    user = getUserById(USER_ID);
   }
 
   @Nested
@@ -59,24 +56,20 @@ public class RatingControllerTest extends TestBase{
   class RatingControllerHappyPath {
       
     @Test
-    @DisplayName("Can rate a bought item successfully with correct data")
-    void user_canRateAnItemBoughtSuccessfully_withCorrectData() throws Exception {
+    @DisplayName("Can rate an order item delivered successfully with correct data")
+    void user_canRateAnOrderItemDeliveredSuccessfully_withCorrectData() throws Exception {
       RatingRequestDto rating = new RatingRequestDto(orderItem.getId(), 4, "my review");
       String valueAsString = objectMapper.writeValueAsString(rating);
       mockMvc.perform(post(RATING_BASE_URL)
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.id").exists())
-          .andExpect(jsonPath("$.purchaseUsername").value(user.getUsername()))
-          .andExpect(jsonPath("$.rating").value(rating.rating()))
-          .andExpect(jsonPath("$.review").value(rating.review()));
+          .andExpect(status().isCreated());
     }
 
     @Test
-    @DisplayName("Users get rates of an existing item successfully")
-    void user_canGetRatesOfAnExistingItemSuccessfully() throws Exception {
+    @DisplayName("Users get rates of an existing order item successfully")
+    void user_canGetRatesOfAnExistingOrderItemSuccessfully() throws Exception {
       Rating rating = MockRating.rating(orderItem);
       ratingRepository.save(rating);
       mockMvc.perform(get(RATING_BASE_URL + "/item/{id}", orderItem.getItemId())

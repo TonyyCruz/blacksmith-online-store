@@ -2,6 +2,7 @@ package com.anthony.blacksmithOnlineStore.service;
 
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,12 +12,12 @@ import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingResponseDto
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
 import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.events.RatingCreatedEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.RatingException;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
 
 import jakarta.transaction.Transactional;
-import org.springframework.context.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,28 +25,23 @@ import lombok.RequiredArgsConstructor;
 public class RatingService {
   private final RatingRepository ratingRepository;
   private final OrderItemService orderItemService;
-  private final BlacksmithService blacksmithService;
   private final ItemService itemService;
   private final UserService userService;
   private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
-  public RatingResponseDto ratePurchase(RatingRequestDto dto) {
+  public void ratePurchase(RatingRequestDto dto) {
     OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
     User user = userService.getUserEntity();
     verifyUserCanRatePurchase(user.getId(), orderItem);
-    // MUDAR RATING DE BLACKSMITH E ITEM PARA EVENTO, TROCAR RETORNO PARA VOID
-    blacksmithService.addRating(orderItem.getBlacksmithId(), dto.rating());
-    itemService.addRating(orderItem.getItemId(), dto.rating());
     Rating rating = RatingRequestDto.toEntity(dto);
     rating.setOrderItem(orderItem);
     rating.setReviewerUserId(user.getId());
     rating.setReviewerUsername(user.getUsername());
     rating.setReviewedItemId(orderItem.getItemId());
     rating.setReviewedBlacksmithId(orderItem.getBlacksmithId());
-    return RatingResponseDto.fromEntity(ratingRepository.save(rating));
-    // rating = ratingRepository.save(rating);
-    // eventPublisher(new RatingCreatedEvent(orderItem.getItemId(), dto.rating(), rating.getId()));
+    rating = ratingRepository.save(rating);
+    eventPublisher.publishEvent(new RatingCreatedEvent(orderItem.getItemId(), dto.rating(), rating.getId()));
   }
 
   public Page<RatingResponseDto> getRatingsFromItemId(Long itemId, Pageable pageable) {

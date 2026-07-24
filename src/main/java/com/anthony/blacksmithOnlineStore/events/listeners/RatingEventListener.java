@@ -1,5 +1,7 @@
 package com.anthony.blacksmithOnlineStore.events.listeners;
 
+import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
+import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.events.RatingCreatedEvent;
 import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
@@ -17,8 +19,11 @@ public class RatingEventListener {
 
   @Transactional
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  public void eventHandle(RatingCreatedEvent createEvent) {
-
+  public void eventHandle(RatingCreatedEvent createdEvent) {
+    Item item = itemService.findEntityById(createdEvent.itemId());
+    item.addRating(createdEvent.rate());
+    Blacksmith blacksmith = blacksmithService.findEntityById(item.getBlacksmithIdSnapshot());
+    blacksmith.addRating(createdEvent.rate());
   }
 
 }

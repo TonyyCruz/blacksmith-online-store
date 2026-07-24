@@ -692,11 +692,6 @@ public class ItemControllerTest extends TestBase {
   }
 
   private Item saveItem(Item newItem) {
-    if (newItem.getFinalPrice().compareTo(newItem.getBasePrice()) > 0) {
-      throw new InvalidItemDataException(
-          "Final price \"%s\" cannot be greater than base \"%s\" price"
-              .formatted(newItem.getFinalPrice(), newItem.getBasePrice()));
-    }
     Blacksmith blacksmith = findBlacksmithById(newItem.getBlacksmithIdSnapshot());
     newItem.setCraftedBy(blacksmith);
     newItem.setBlacksmithIdSnapshot(blacksmith.getId());

@@ -116,14 +116,18 @@ public class Item {
 
   public void setBasePrice(BigDecimal basePrice) {
     if (isInvalidPrice(basePrice, this.finalPrice)) {
-      throw new InvalidItemDataException("Final price cannot be greater than base price");
+      throw new InvalidItemDataException(
+          "Final price \"%s\" cannot be greater than base price \"%s\""
+              .formatted(this.finalPrice, basePrice));
     }
     this.basePrice = basePrice;
   }
 
   public void setFinalPrice(BigDecimal finalPrice) {
     if (isInvalidPrice(this.basePrice, finalPrice)) {
-      throw new InvalidItemDataException("Final price cannot be greater than base price");
+      throw new InvalidItemDataException(
+          "Final price \"%s\" cannot be greater than base price \"%s\""
+              .formatted(finalPrice, this.basePrice));
     }
     this.finalPrice = finalPrice;
   }
