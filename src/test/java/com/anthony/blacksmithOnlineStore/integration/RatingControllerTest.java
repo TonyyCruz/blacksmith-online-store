@@ -87,14 +87,31 @@ public class RatingControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Users get rates of an existing order item successfully")
-    void user_canGetRatesOfAnExistingOrderItemSuccessfully() throws Exception {
+    @DisplayName("Users can get all rates of an existing item successfully")
+    void user_canGetAllRatesOfAnExistingItemSuccessfully() throws Exception {
       Rating rating = MockRating.rating(orderItem);
       ratingRepository.save(rating);
       mockMvc.perform(get(RATING_BASE_URL + "/item/{id}", orderItem.getItemId())
               .header("Authorization", userToken))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content[0].id").value(rating.getId().toString()));
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content").isNotEmpty())
+          .andExpect(jsonPath("$.content[0].reviewerUsername").value(userLogin.username()))
+          .andExpect(jsonPath("$.content[0].ratingValue").value(rating.getRatingValue()))
+          .andExpect(jsonPath("$.content[0].review").value(rating.getReview()));
+    }
+
+    @Test
+    @DisplayName("Users get rates of an existing order item successfully")
+    void user_canGetRatesOfAnExistingOrderItemSuccessfully() throws Exception {
+      Rating rating = MockRating.rating(orderItem);
+      ratingRepository.save(rating);
+      mockMvc.perform(get(RATING_BASE_URL + "/orderItem/{id}", orderItem.getItemId())
+              .header("Authorization", userToken))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.reviewerUsername").value(userLogin.username()))
+          .andExpect(jsonPath("$.ratingValue").value(rating.getRatingValue()))
+          .andExpect(jsonPath("$.review").value(rating.getReview()));
     }
 
   }
