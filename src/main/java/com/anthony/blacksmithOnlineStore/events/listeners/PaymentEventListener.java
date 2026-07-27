@@ -6,7 +6,7 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.PaymentException;
-import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 import jakarta.transaction.Transactional;
@@ -29,7 +29,7 @@ public class PaymentEventListener {
     order.setStatus(OrderStatus.REFUNDED);
     if (order.getPayment() == null) throw new PaymentException("This order have no payment");
     Payment payment = paymentRepository.findById(order.getPayment().getId())
-        .orElseThrow(() -> new PaymentNotFoundException(order.getPayment().getId()));
+        .orElseThrow(() -> new RatingNotFoundException(order.getPayment().getId()));
     payment.setPaymentStatus(PaymentStatus.REFOUNDED);
   }
 }

@@ -30,6 +30,11 @@ public class RatingController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
+  @GetMapping("/orderItem/{id}")
+  public ResponseEntity<RatingResponseDto> getRatingsFromItemId(@PathVariable Long id) {
+    return ResponseEntity.ok(ratingService.getByOrderItemId(id));
+  }
+
   @GetMapping("/item/{id}")
   public ResponseEntity<Page<RatingResponseDto>> getRatingsFromItemId(
       @PathVariable Long id,

@@ -15,6 +15,7 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.events.RatingCreatedEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.RatingException;
+import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
 
 import jakarta.transaction.Transactional;
@@ -48,6 +49,11 @@ public class RatingService {
     itemService.itemExistesVerifier(itemId);
     Page<Rating> ratings = ratingRepository.findAllByReviewedItemId(itemId, pageable);
     return ratings.map(RatingResponseDto::fromEntity);
+  }
+
+  public RatingResponseDto getByOrderItemId(Long id) {
+    Rating rating = ratingRepository.findByOrderItemId(id).orElseThrow(() -> new RatingNotFoundException(id));
+    return RatingResponseDto.fromEntity(rating);
   }
 
   private void verifyUserCanRatePurchase(UUID userId, OrderItem orderItem) {
