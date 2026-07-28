@@ -16,16 +16,20 @@ import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.service.AdminService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/admin")
+@Tag(name = "Admins", description = "Users management")
 public class AdminController {
   private final AdminService adminService;
 
   @PatchMapping("/users/{id}/role")
+  @Operation(summary = "Update user role")
   public ResponseEntity<Void> updateUserRole(@PathVariable UUID id,
       @RequestBody @Valid RoleUpdateDto roleUpdateDto) {
     adminService.updateRole(id, roleUpdateDto);
@@ -33,6 +37,7 @@ public class AdminController {
   }
 
   @GetMapping("/users")
+  @Operation(summary = "Find user by id")
   public ResponseEntity<UserDto> findByUsername(@RequestParam String username) {
     return ResponseEntity.ok(adminService.findByUsername(username));
   }
