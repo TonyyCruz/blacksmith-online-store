@@ -20,7 +20,7 @@ import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
@@ -269,9 +269,9 @@ public class OrderServiceTest {
       ));
 
       when(userService.getUserReference()).thenReturn(user);
-      when(itemService.findEntityById(999L)).thenThrow(PaymentNotFoundException.class);
+      when(itemService.findEntityById(999L)).thenThrow(RatingNotFoundException.class);
 
-      assertThrows(PaymentNotFoundException.class, () -> orderService.create(dto));
+      assertThrows(RatingNotFoundException.class, () -> orderService.create(dto));
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(999L);
     }

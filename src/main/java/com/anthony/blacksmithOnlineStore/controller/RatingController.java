@@ -25,8 +25,14 @@ public class RatingController {
   private final RatingService ratingService;
 
   @PostMapping
-  public ResponseEntity<RatingResponseDto> rate(@Valid @RequestBody RatingRequestDto dto) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(ratingService.ratePurchase(dto));
+  public ResponseEntity<Void> rate(@Valid @RequestBody RatingRequestDto dto) {
+    ratingService.ratePurchase(dto);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  @GetMapping("/orderItem/{id}")
+  public ResponseEntity<RatingResponseDto> getRatingsFromItemId(@PathVariable Long id) {
+    return ResponseEntity.ok(ratingService.getByOrderItemId(id));
   }
 
   @GetMapping("/item/{id}")

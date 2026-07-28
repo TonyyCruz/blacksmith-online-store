@@ -8,7 +8,7 @@ import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
@@ -30,9 +30,6 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto create(ItemRequestDto dto) {
-    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
-      throw new InvalidItemDataException("Final price cannot be greater than base price");
-    }
     Item item = ItemRequestDto.toEntity(dto);
     Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     item.setCraftedBy(blacksmith);
@@ -43,9 +40,6 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto update(Long id, ItemRequestDto dto) {
-    if (dto.finalPrice().compareTo(dto.basePrice()) > 0) {
-      throw new InvalidItemDataException("Final price cannot be greater than base price");
-    }
     Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());
@@ -87,7 +81,7 @@ public class ItemService {
   }
 
   public Item findEntityById(Long id) {
-    return itemRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(id));
+    return itemRepository.findById(id).orElseThrow(() -> new RatingNotFoundException(id));
   }
 
   public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
@@ -112,12 +106,6 @@ public class ItemService {
   }
 
   public void itemExistesVerifier(Long id) {
-    if (!itemRepository.existsById(id)) throw new PaymentNotFoundException(id);
-  }
-
-  public void addRating(Long itemId, int rating) {
-    Item item = findEntityById(itemId);
-    item.addRating(rating);
-    itemRepository.save(item);
+    if (!itemRepository.existsById(id)) throw new RatingNotFoundException(id);
   }
 }

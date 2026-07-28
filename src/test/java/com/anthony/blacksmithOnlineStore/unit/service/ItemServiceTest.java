@@ -19,7 +19,7 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.PaymentNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
@@ -155,18 +155,6 @@ public class ItemServiceTest {
 
       verify(itemRepository, times(1)).deleteById(targetItem.getId());
     }
-
-    @Test
-    @DisplayName("AddRating should update rating count and average when itemWithId exists")
-    void addRating_shouldAddRatingSuccessfully() {
-      when(itemRepository.findById(targetItem.getId()))
-          .thenReturn(Optional.of(targetItem));
-
-      itemService.addRating(targetItem.getId(), 5);
-
-      assertEquals(1, targetItem.getRatingCount(), "Item must have the correct rating");
-      verify(itemRepository, times(1)).save(targetItem);
-    }
   }
 
   @Nested
@@ -258,7 +246,7 @@ public class ItemServiceTest {
     @DisplayName("Update should throw ItemNotFoundException when itemWithId does not exist")
     void updateItem_shouldThrowItemNotFoundException_whenItemNotFound() {
       when(itemRepository.existsById(any())).thenReturn(false);
-      assertThrows(PaymentNotFoundException.class,
+      assertThrows(RatingNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemRequestDto()),
           "Update itemWithId must throw an exception when itemWithId to update was not found");
       verify(itemRepository, times(1)).existsById(any());
@@ -268,7 +256,7 @@ public class ItemServiceTest {
     @DisplayName("Patch update should throw ItemNotFoundException when itemWithId does not exist")
     void patchUpdate_shouldThrowItemNotFoundException_whenItemNotFound() {
       when(itemRepository.findById(any())).thenReturn(Optional.empty());
-      assertThrows(PaymentNotFoundException.class,
+      assertThrows(RatingNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemPatchUpdateDto()),
           "Patch update must throw an exception when itemWithId to patch update was not found");
       verify(itemRepository, times(1)).findById(any());
@@ -292,7 +280,7 @@ public class ItemServiceTest {
     @DisplayName("Delete should throw ItemNotFoundException when itemWithId does not exist")
     void delete_shouldThrowItemNotFoundException_whenItemNotFound() {
       when(itemRepository.findById(any())).thenReturn(Optional.empty());
-      assertThrows(PaymentNotFoundException.class, () -> itemService.deleteItem(1L),
+      assertThrows(RatingNotFoundException.class, () -> itemService.deleteItem(1L),
           "Create itemWithId must throw an exception when trying to delete an itemWithId that was not found");
       verify(itemRepository, times(1)).findById(any());
     }

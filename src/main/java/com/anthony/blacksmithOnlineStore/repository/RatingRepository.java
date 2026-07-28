@@ -1,6 +1,9 @@
 package com.anthony.blacksmithOnlineStore.repository;
 
 import com.anthony.blacksmithOnlineStore.entity.Rating;
+
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +13,6 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
   Page<Rating> findAllByReviewedItemId(long reviewedItemId, Pageable pageable);
 
   boolean existsByOrderItemId(Long id);
+
+  Optional<Rating> findByOrderItemId(Long id);
 }
