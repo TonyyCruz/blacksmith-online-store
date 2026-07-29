@@ -14,6 +14,7 @@ import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto create(ItemRequestDto dto) {
+    itemPriceValidate(dto.basePrice(), dto.finalPrice());
     Item item = ItemRequestDto.toEntity(dto);
     Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     item.setCraftedBy(blacksmith);
@@ -40,6 +42,7 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto update(Long id, ItemRequestDto dto) {
+    itemPriceValidate(dto.basePrice(), dto.finalPrice());
     Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());
@@ -62,6 +65,7 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto update(Long id, ItemPatchUpdateDto dto) {
+    itemPriceValidate(dto.basePrice(), dto.finalPrice());
     Item item = findEntityById(id);
     if (dto.blacksmithId() != null) {
       Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
@@ -107,5 +111,16 @@ public class ItemService {
 
   public void itemExistesVerifier(Long id) {
     if (!itemRepository.existsById(id)) throw new RatingNotFoundException(id);
+  }
+
+  private void itemPriceValidate(BigDecimal basePrice, BigDecimal finalPrice) {
+    boolean isInvalidPrice = basePrice != null
+        && finalPrice != null
+        && finalPrice.compareTo(basePrice) > 0;
+    if (isInvalidPrice) {
+      throw new InvalidItemDataException(
+          "Final price \"%s\" cannot be greater than base price \"%s\""
+              .formatted(finalPrice, basePrice));
+    }
   }
 }

@@ -1,5 +1,6 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -52,7 +53,9 @@ public class RatingService {
   }
 
   public RatingResponseDto getByOrderItemId(Long id) {
-    Rating rating = ratingRepository.findByOrderItemId(id).orElseThrow(() -> new RatingNotFoundException(id));
+    List<Rating> ratings = ratingRepository.findAll();
+    Rating rating = ratingRepository.findByOrderItemId(id)
+        .orElseThrow(() -> new RatingNotFoundException(id));
     return RatingResponseDto.fromEntity(rating);
   }
 
