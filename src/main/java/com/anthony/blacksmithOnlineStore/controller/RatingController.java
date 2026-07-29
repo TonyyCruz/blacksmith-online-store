@@ -3,6 +3,9 @@ package com.anthony.blacksmithOnlineStore.controller;
 import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingResponseDto;
 import com.anthony.blacksmithOnlineStore.service.RatingService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,21 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/ratings")
+@Tag(name = "Rating", description = "Rating management")
 public class RatingController {
   private final RatingService ratingService;
 
   @PostMapping
+  @Operation(summary = "Rate your recived item")
   public ResponseEntity<Void> rate(@Valid @RequestBody RatingRequestDto dto) {
     ratingService.ratePurchase(dto);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @GetMapping("/orderItem/{id}")
+  @Operation(summary = "Find the rate by order item id")
   public ResponseEntity<RatingResponseDto> getRatingsFromItemId(@PathVariable Long id) {
     return ResponseEntity.ok(ratingService.getByOrderItemId(id));
   }
 
   @GetMapping("/item/{id}")
+  @Operation(summary = "Find all items rate by item id")
   public ResponseEntity<Page<RatingResponseDto>> getRatingsFromItemId(
       @PathVariable Long id,
       @PageableDefault(page = 0, size = 5, sort = "id", direction = Direction.DESC)
