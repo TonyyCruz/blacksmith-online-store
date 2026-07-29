@@ -6,9 +6,11 @@ import com.anthony.blacksmithOnlineStore.validations.user.Age;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import org.hibernate.validator.constraints.Length;
 
 public record UserCreateDto(
     @NotBlank(message = "Username is required.")
+    @Length(min = 2, max = 100, message = "Username must be between 2 and 100 characters.")
     String username,
     @Password
     String password,
