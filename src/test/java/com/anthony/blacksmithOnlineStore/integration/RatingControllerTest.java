@@ -97,20 +97,20 @@ public class RatingControllerTest extends TestBase {
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content").isNotEmpty())
           .andExpect(jsonPath("$.content[0].reviewerUsername").value(userLogin.username()))
-          .andExpect(jsonPath("$.content[0].ratingValue").value(rating.getRatingValue()))
+          .andExpect(jsonPath("$.content[0].rating").value(rating.getRatingValue()))
           .andExpect(jsonPath("$.content[0].review").value(rating.getReview()));
     }
 
     @Test
-    @DisplayName("Users get rates of an existing order item successfully")
-    void user_canGetRatesOfAnExistingOrderItemSuccessfully() throws Exception {
+    @DisplayName("Users can get rate of an existing order item successfully")
+    void user_canGetRateOfAnExistingOrderItemSuccessfully() throws Exception {
       Rating rating = MockRating.rating(orderItem);
       ratingRepository.save(rating);
-      mockMvc.perform(get(RATING_BASE_URL + "/orderItem/{id}", orderItem.getItemId())
+      mockMvc.perform(get(RATING_BASE_URL + "/orderItem/{id}", orderItem.getId())
               .header("Authorization", userToken))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.reviewerUsername").value(userLogin.username()))
-          .andExpect(jsonPath("$.ratingValue").value(rating.getRatingValue()))
+          .andExpect(jsonPath("$.rating").value(rating.getRatingValue()))
           .andExpect(jsonPath("$.review").value(rating.getReview()));
     }
 

@@ -86,7 +86,7 @@ public class ItemServiceTest {
 
 
     @Test
-    @DisplayName("Update should modify itemWithId and return response when data is valid")
+    @DisplayName("Update should modify the item and return response when data is valid")
     void updateItem_shouldUpdateItemSuccessfully_withValidData() {
       Long id = targetItem.getId();
       ItemRequestDto dto = MockItem.itemRequestDto();
@@ -230,13 +230,6 @@ public class ItemServiceTest {
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100)).finalPrice(BigDecimal.valueOf(200))
           .blacksmithId(null).build();
-
-      when(itemRepository.findById(any())).thenReturn(Optional.of(targetItem));
-      doAnswer(invocation -> {
-        targetItem.setBasePrice(dto.basePrice());
-        targetItem.setFinalPrice(dto.finalPrice());
-        return null;
-      }).when(itemUpdate).updateItemFromDto(dto, targetItem);
 
       assertThrows(InvalidItemDataException.class, () -> itemService.update(1L, dto),
           "Patch update must throw an exception when final price is greater than base price");

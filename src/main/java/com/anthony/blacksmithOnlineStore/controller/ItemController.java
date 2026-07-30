@@ -5,6 +5,9 @@ import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,17 +30,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/items")
+@Tag(name = "Items", description = "Item management")
 public class ItemController {
   private final ItemService itemService;
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Create item")
   public ResponseEntity<ItemResponseDto> createItem(@RequestBody @Valid ItemRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(dto));
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Update all item data by id")
   public ResponseEntity<ItemResponseDto> updateItem(
       @PathVariable Long id,
       @RequestBody @Valid ItemRequestDto dto) {
@@ -46,6 +52,7 @@ public class ItemController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Update item partially by id")
   public ResponseEntity<ItemResponseDto> patchItemUpdate(
       @PathVariable Long id,
       @RequestBody @Valid ItemPatchUpdateDto dto) {
@@ -53,11 +60,13 @@ public class ItemController {
   }
 
   @GetMapping("/{id}")
+  @Operation(summary = "Find item by id")
   public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long id) {
     return ResponseEntity.ok(itemService.findById(id));
   }
 
   @GetMapping
+  @Operation(summary = "Find items by filter")
   public ResponseEntity<Page<ItemResponseDto>> getAllFilteredItems(
       ItemFilterDto filter,
       @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
@@ -67,6 +76,7 @@ public class ItemController {
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Delete item by id")
   public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
     itemService.deleteItem(id);
     return ResponseEntity.noContent().build();

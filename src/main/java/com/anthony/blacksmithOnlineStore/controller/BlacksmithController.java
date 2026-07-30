@@ -3,6 +3,9 @@ package com.anthony.blacksmithOnlineStore.controller;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
 import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,12 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Blacksmith", description = "Blacksmith management")
 @RequestMapping("/blacksmiths")
 public class BlacksmithController {
   private final BlacksmithService blacksmithService;
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Create a blacksmith")
   public ResponseEntity<BlacksmithResponseDto> createBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(blacksmithService.create(dto));
@@ -36,12 +41,14 @@ public class BlacksmithController {
 
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Update all blacksmith data")
   public ResponseEntity<BlacksmithResponseDto> updateBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto, @PathVariable Long id) {
     return ResponseEntity.ok(blacksmithService.update(id, dto));
   }
 
   @GetMapping
+  @Operation(summary = "Find all blacksmiths")
   public ResponseEntity<Page<BlacksmithResponseDto>> findAll(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
       Pageable pageable
@@ -50,11 +57,13 @@ public class BlacksmithController {
   }
 
   @GetMapping("/{id}")
+  @Operation(summary = "Find blacksmith by id")
   public ResponseEntity<BlacksmithResponseDto> findById(@PathVariable Long id) {
     return ResponseEntity.ok(blacksmithService.findById(id));
   }
 
   @GetMapping("/search")
+  @Operation(summary = "Find blacksmith by name")
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
       Pageable pageable,

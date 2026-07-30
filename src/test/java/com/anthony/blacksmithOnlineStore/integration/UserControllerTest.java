@@ -196,7 +196,7 @@ public class UserControllerTest extends TestBase {
     @Test
     @DisplayName("Update Current User returns 400 when username is invalid")
     void updateCurrentUser_returns400_whenUsernameIsInvalid() throws Exception {
-      String[] wrongUsername = {"", "   ", null};
+      String[] wrongUsername = {"", "   ", "a", null};
       for (String usrName : wrongUsername) {
         UserUpdateDto dto = new UserUpdateDto(usrName, MockUser.userWithId().getBirthDate());
         String valueAsString = objectMapper.writeValueAsString(dto);
