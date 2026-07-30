@@ -1,5 +1,12 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import java.math.BigDecimal;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
@@ -8,18 +15,14 @@ import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
+
 import jakarta.transaction.Transactional;
-import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
@@ -85,7 +88,7 @@ public class ItemService {
   }
 
   public Item findEntityById(Long id) {
-    return itemRepository.findById(id).orElseThrow(() -> new RatingNotFoundException(id));
+    return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
   }
 
   public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
@@ -110,7 +113,7 @@ public class ItemService {
   }
 
   public void itemExistesVerifier(Long id) {
-    if (!itemRepository.existsById(id)) throw new RatingNotFoundException(id);
+    if (!itemRepository.existsById(id)) throw new ItemNotFoundException(id);
   }
 
   private void itemPriceValidate(BigDecimal basePrice, BigDecimal finalPrice) {

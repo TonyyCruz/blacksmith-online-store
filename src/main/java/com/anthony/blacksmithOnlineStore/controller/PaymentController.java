@@ -5,6 +5,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentResponseD
 import com.anthony.blacksmithOnlineStore.service.PaymentService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/payments")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Payment", description = "Payment management")
 public class PaymentController {
   private final PaymentService paymentService;

@@ -7,6 +7,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,20 +31,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/items")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Items", description = "Item management")
 public class ItemController {
   private final ItemService itemService;
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Create item")
+  @Operation(summary = "Create item, ADMIN only")
   public ResponseEntity<ItemResponseDto> createItem(@RequestBody @Valid ItemRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(dto));
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Update all item data by id")
+  @Operation(summary = "Update all item data by id, ADMIN only")
   public ResponseEntity<ItemResponseDto> updateItem(
       @PathVariable Long id,
       @RequestBody @Valid ItemRequestDto dto) {
@@ -52,7 +54,7 @@ public class ItemController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Update item partially by id")
+  @Operation(summary = "Update item partially by id, ADMIN only")
   public ResponseEntity<ItemResponseDto> patchItemUpdate(
       @PathVariable Long id,
       @RequestBody @Valid ItemPatchUpdateDto dto) {

@@ -3,13 +3,24 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
@@ -19,23 +30,13 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
-import java.math.BigDecimal;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
@@ -239,7 +240,7 @@ public class ItemServiceTest {
     @DisplayName("Update should throw ItemNotFoundException when itemWithId does not exist")
     void updateItem_shouldThrowItemNotFoundException_whenItemNotFound() {
       when(itemRepository.existsById(any())).thenReturn(false);
-      assertThrows(RatingNotFoundException.class,
+      assertThrows(ItemNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemRequestDto()),
           "Update itemWithId must throw an exception when itemWithId to update was not found");
       verify(itemRepository, times(1)).existsById(any());
@@ -249,7 +250,7 @@ public class ItemServiceTest {
     @DisplayName("Patch update should throw ItemNotFoundException when itemWithId does not exist")
     void patchUpdate_shouldThrowItemNotFoundException_whenItemNotFound() {
       when(itemRepository.findById(any())).thenReturn(Optional.empty());
-      assertThrows(RatingNotFoundException.class,
+      assertThrows(ItemNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemPatchUpdateDto()),
           "Patch update must throw an exception when itemWithId to patch update was not found");
       verify(itemRepository, times(1)).findById(any());
@@ -273,7 +274,7 @@ public class ItemServiceTest {
     @DisplayName("Delete should throw ItemNotFoundException when itemWithId does not exist")
     void delete_shouldThrowItemNotFoundException_whenItemNotFound() {
       when(itemRepository.findById(any())).thenReturn(Optional.empty());
-      assertThrows(RatingNotFoundException.class, () -> itemService.deleteItem(1L),
+      assertThrows(ItemNotFoundException.class, () -> itemService.deleteItem(1L),
           "Create itemWithId must throw an exception when trying to delete an itemWithId that was not found");
       verify(itemRepository, times(1)).findById(any());
     }
