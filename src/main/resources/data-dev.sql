@@ -105,9 +105,7 @@ VALUES
     ('7b87f809-d142-4dfa-8802-87644d774dd5', '2025-11-15', '2025-11-15',
      'DELIVERED', 260.00),
     ('7b87f809-d142-4dfa-8802-87644d774dd5', '2025-11-20', '2025-11-20',
-     'PENDING', 135.00),
-    ('7b87f809-d142-4dfa-8802-87644d774dd4', '2025-11-15', '2025-11-15',
-     'DELIVERED', 440.00);
+     'PENDING', 135.00);
 
 INSERT INTO ORDER_ITEMS (item_id, item_name, base_price_at_purchase, price_applied, quantity,
                          total_price, order_id, rating_value, user_id, blacksmith_id,
@@ -121,10 +119,4 @@ VALUES
      2, '2025-11-15'),
     (3, 'Axe of Light', 150.00, 135.00, 1,
      135.00, 2, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
-     2, '2025-11-15'),
-    (4, 'Sword of Valor', 100.00, 90.00, 2,
-     180.00, 3, NULL, '7b87f809-d142-4dfa-8802-87644d774dd4',
-     1, '2025-11-20'),
-    (5, 'Dagger of Night', 80.00, 80.00, 1,
-     80.00, 3, NULL, '7b87f809-d142-4dfa-8802-87644d774dd4',
-     2, '2025-11-20');
+     2, '2025-11-15');
