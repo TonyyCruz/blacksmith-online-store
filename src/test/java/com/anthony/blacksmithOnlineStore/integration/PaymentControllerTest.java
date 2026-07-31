@@ -71,14 +71,14 @@ public class PaymentControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Cannot pay an order that does not belong to you and return status 403")
+    @DisplayName("Cannot pay an order that does not belong to you and return status 404")
     void approve_throws403TryingPayAnOrderThatIsNotYours() throws Exception {
         User anotherUser = userRepository.save(MockUser.user());
         order.setUser(anotherUser);
       mockMvc.perform(post("/payments/order/{id}", order.getId())
               .header("Authorization", userToken).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(MockPayment.creditCard())))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isNotFound());
     }
   }
 
