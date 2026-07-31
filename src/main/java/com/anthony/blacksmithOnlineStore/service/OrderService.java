@@ -104,10 +104,9 @@ public class OrderService {
   }
 
   public Order getEntityById(long id) {
-    if (authUser.isAdmin()) {
-      return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
-    }
+    if (!orderRepository.existsById(id)) throw new OrderNotFoundException(id);
+    if (authUser.isAdmin()) return orderRepository.findById(id).get();
     return orderRepository.findByIdAndUserId(id, authUser.getAuthenticatedId())
-        .orElseThrow(() -> new OrderNotFoundException(id));
+        .orElseThrow(() -> new ForbiddenOperationException("You cannot access this order."));
   }
 }

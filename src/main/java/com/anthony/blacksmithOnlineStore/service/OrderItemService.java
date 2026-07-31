@@ -15,15 +15,10 @@ public class OrderItemService {
   private final AuthenticatedUserService authUser;
 
   public OrderItem findEntityById(Long id) {
-    OrderItem orderItem = orderItemRepository.findById(id)
-        .orElseThrow(() -> new OrderItemNotFoundException(id));
-    if (authUser.isAdmin()) return orderItem;
-    if (!authUser.getAuthenticatedId().equals(orderItem.getUserId())) {
-      throw new ForbiddenOperationException(
-          "You cannot cannot access this order item."
-      );
-    }
-    return orderItem;
+    if (!orderItemRepository.existsById(id)) throw new OrderItemNotFoundException(id);
+    if (authUser.isAdmin()) return orderItemRepository.findById(id).get();
+    return orderItemRepository.findByIdAndUserId(id, authUser.getAuthenticatedId())
+        .orElseThrow(() -> new ForbiddenOperationException("You cannot access this order item."));
   }
 
 }

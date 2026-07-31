@@ -2,6 +2,7 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,6 +45,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -129,6 +131,7 @@ public class OrderServiceTest {
     void findEntityById_shouldFindAnOrderByIdSuccessfully_andReturnAEntity() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
@@ -138,6 +141,8 @@ public class OrderServiceTest {
 
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1))
+          .existsById(anyLong());
       assertEquals(order.getId(), response.getId(), "The id must be the same");
       assertEquals(order.getUser().getId(), response.getUser().getId(),
           "The userWithId id must be the same");
@@ -150,6 +155,7 @@ public class OrderServiceTest {
     void findById_shouldFindAnOrderByIdSuccessfully_andReturnADto() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
@@ -159,6 +165,8 @@ public class OrderServiceTest {
 
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1))
+          .existsById(anyLong());
       assertEquals(order.getId(), response.id(), "The id must be the same");
       assertEquals(order.getUser().getId(), response.userId(), "The userWithId id must be the same");
       assertEquals(order.getStatus(), response.status(), "The status must be the same");
@@ -175,6 +183,7 @@ public class OrderServiceTest {
           .status(status)
           .build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
@@ -184,6 +193,7 @@ public class OrderServiceTest {
 
       assertEquals(OrderStatus.CANCELLED, response.status());
       verify(orderRepository).findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository).existsById(anyLong());
       verify(authUser).getAuthenticatedId();
     }
 
@@ -198,6 +208,8 @@ public class OrderServiceTest {
           .status(status)
           .build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
+      when(authUser.isAdmin()).thenReturn(false);
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
@@ -207,6 +219,7 @@ public class OrderServiceTest {
       assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
       verify(eventPublisher).publishEvent(any(RefundRequestEvent.class));
       verify(orderRepository, times(1)).findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
@@ -220,6 +233,7 @@ public class OrderServiceTest {
           .status(OrderStatus.DELIVERED)
           .build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
@@ -230,6 +244,7 @@ public class OrderServiceTest {
       assertEquals(OrderStatus.RETURN_REQUESTED, response.status(), "Status must be return request");
       verify(eventPublisher).publishEvent(any(ReturnRequestEvent.class));
       verify(orderRepository, times(1)).findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
@@ -291,14 +306,10 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Cancel should throw an exception when order was no found")
     void cancel_shouldThrownAnException_whenOrderWasNoFound() {
-      when(authUser.isAdmin()).thenReturn(false);
-      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-      when(orderRepository.findByIdAndUserId(999L, user.getId()))
-          .thenReturn(Optional.empty());
+      when(orderRepository.existsById(anyLong())).thenReturn(false);
 
       assertThrows(OrderNotFoundException.class, () -> orderService.cancel(999L));
-      verify(orderRepository, times(1))
-          .findByIdAndUserId(999L, user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
     }
 
     @ParameterizedTest
@@ -307,29 +318,27 @@ public class OrderServiceTest {
     void cancel_shouldThrownAnException_whenOrderMustNotBeCancelled(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.cancel(order.getId()));
+      assertThrows(ForbiddenOperationException.class, () -> orderService.cancel(order.getId()));
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
     @Test
     @DisplayName("Refound request should thrown an exception when order was no found")
     void refoundRequest_shouldThrownAnException_whenOrderWasNoFound() {
-      when(authUser.isAdmin()).thenReturn(false);
-      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-      when(orderRepository.findByIdAndUserId(999L, user.getId()))
-          .thenReturn(Optional.empty());
+      when(orderRepository.existsById(anyLong())).thenReturn(false);
 
       assertThrows(OrderNotFoundException.class, () -> orderService.refundRequest(999L),
           "Must thrown an exception with a non existing order");
-      verify(orderRepository, times(1))
-          .findByIdAndUserId(999L, user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
     }
 
     @ParameterizedTest
@@ -338,6 +347,7 @@ public class OrderServiceTest {
     void refoundRequest_shouldThrownAnException_whenOrderStatusAreIncorrect(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
@@ -347,21 +357,18 @@ public class OrderServiceTest {
           () -> orderService.refundRequest(order.getId()));
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
     @Test
     @DisplayName("Return request should thrown an exception when order was no found")
     void returnRequest_shouldThrownAnException_whenOrderWasNoFound() {
-      when(authUser.isAdmin()).thenReturn(false);
-      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-      when(orderRepository.findByIdAndUserId(999L, user.getId()))
-          .thenReturn(Optional.empty());
+      when(orderRepository.existsById(anyLong())).thenReturn(false);
 
       assertThrows(OrderNotFoundException.class, () -> orderService.returnRequest(999L),
           "Must thrown an exception with a non existing order");
-      verify(orderRepository, times(1))
-          .findByIdAndUserId(999L, user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
     }
 
     @ParameterizedTest
@@ -370,6 +377,7 @@ public class OrderServiceTest {
     void returnRequest_shouldThrownAnException_whenOrderMustNotBeReturned(OrderStatus status) {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
@@ -380,35 +388,28 @@ public class OrderServiceTest {
           () -> orderService.returnRequest(order.getId()));
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
     @Test
     @DisplayName("Get by id should thrown an exception when order was no found")
     void getById_shouldThrownAnException_whenOrderWasNoFound() {
-      when(authUser.isAdmin()).thenReturn(false);
-      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-      when(orderRepository.findByIdAndUserId(999L, user.getId()))
-          .thenReturn(Optional.empty());
+      when(orderRepository.existsById(999L)).thenReturn(false);
 
       assertThrows(OrderNotFoundException.class, () -> orderService.getById(999L),
           "Must thrown an exception with a non existing order");
-      verify(orderRepository, times(1))
-          .findByIdAndUserId(999L, user.getId());
+      verify(orderRepository, times(1)).existsById(999L);
     }
 
     @Test
     @DisplayName("Get entity by id should thrown an exception when order was no found")
     void getEntityById_shouldThrownAnException_whenOrderWasNoFound() {
-      when(authUser.isAdmin()).thenReturn(false);
-      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
-      when(orderRepository.findByIdAndUserId(999L, user.getId()))
-          .thenReturn(Optional.empty());
+      when(orderRepository.existsById(anyLong())).thenReturn(false);
 
       assertThrows(OrderNotFoundException.class, () -> orderService.getEntityById(999L),
           "Must thrown an exception with a non existing order");
-      verify(orderRepository, times(1))
-          .findByIdAndUserId(999L, user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
     }
 
     @Test
@@ -416,16 +417,18 @@ public class OrderServiceTest {
     void cancel_shouldThrownAnException_tryingCancelANotAuthorizedOrder() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class,
+      assertThrows(ForbiddenOperationException.class,
           () -> orderService.cancel(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
@@ -434,15 +437,18 @@ public class OrderServiceTest {
     void refoundRequest_shouldThrownAnException_tryingRefoundRequestANotAuthorizedOrder() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class,
+      assertThrows(ForbiddenOperationException.class,
           () -> orderService.refundRequest(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
-      verify(orderRepository, times(1)).findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1))
+          .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
@@ -451,16 +457,18 @@ public class OrderServiceTest {
     void returnRequest_shouldThrownAnException_tryingReturnRequestANotAuthorizedOrder() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class,
+      assertThrows(ForbiddenOperationException.class,
           () -> orderService.returnRequest(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
@@ -469,16 +477,18 @@ public class OrderServiceTest {
     void getById_shouldThrownAnException_tryingGetANotAuthorizedOrder() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class,
+      assertThrows(ForbiddenOperationException.class,
           () -> orderService.getById(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
 
@@ -487,12 +497,13 @@ public class OrderServiceTest {
     void getEntityById_shouldThrownAnException_tryingGetEntityOfANotAuthorizedOrder() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
       when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
 
-      assertThrows(OrderNotFoundException.class,
+      assertThrows(ForbiddenOperationException.class,
           () -> orderService.getById(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1))
