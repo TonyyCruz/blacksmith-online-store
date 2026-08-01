@@ -50,11 +50,12 @@ public class FakeDeliverEventListener {
     Order order = orderRepository.findById(returnEvent.orderId())
         .orElseThrow(() -> new OrderNotFoundException(returnEvent.orderId()));
     try {
-      if (!order.getStatus().equals(OrderStatus.DELIVERED)) {
+      if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
         throw new DeliverException("A not delivered order cannot be returned");
       }
-      order.setStatus(OrderStatus.RETURNED);
+      order.setStatus(OrderStatus.RETURN_REQUESTED);
         Thread.sleep(5000); // Simulate a delay in the delivery process
+      order.setStatus(OrderStatus.RETURNED);
         orderRepository.save(order);
     } catch(InterruptedException e) {
       Thread.currentThread().interrupt();

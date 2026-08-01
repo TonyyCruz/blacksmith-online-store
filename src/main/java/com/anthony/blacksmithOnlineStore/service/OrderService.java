@@ -41,9 +41,6 @@ public class OrderService {
     order.setUser(user);
     for (OrderItemRequestDto orderItemDto : dto.items()) {
       Item item = itemService.findEntityById(orderItemDto.itemId());
-//      if (!item.isActive()) {
-//        throw new InvalidOrderException("Item %d is unactive".formatted(item.getId()));
-//      }
       if (orderItemDto.quantity() > item.getStock()) {
         throw new InvalidOrderException(
             "Item %d does not have enough stock".formatted(item.getId()));
@@ -61,7 +58,7 @@ public class OrderService {
   public OrderResponseDto cancel(long id) {
     Order order = findEntityById(id);
     if (!order.getStatus().canBeCanceled()) {
-      throw new InvalidOrderStatusException("Only pending orders can be cancelled.");
+      throw new InvalidOrderStatusException("Only pending orders can be cancelled");
     }
     order.setStatus(OrderStatus.CANCELLED);
     return OrderResponseDto.fromEntity(order);
@@ -85,9 +82,8 @@ public class OrderService {
   public OrderResponseDto returnRequest(long id) {
     Order order = findEntityById(id);
     if (!order.getStatus().canBeReturned()) {
-      throw new InvalidOrderStatusException("Only delivered orders can be returned.");
+      throw new InvalidOrderStatusException("Only delivered orders can be returned");
     }
-    order.setStatus(OrderStatus.RETURN_REQUESTED);
     eventPublisher.publishEvent(new ReturnRequestEvent(id, order.getOrderItems()));
     return OrderResponseDto.fromEntity(order);
   }

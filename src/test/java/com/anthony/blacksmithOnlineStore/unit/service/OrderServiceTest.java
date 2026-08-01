@@ -239,9 +239,10 @@ public class OrderServiceTest {
 
       OrderResponseDto response = orderService.returnRequest(order.getId());
 
-      assertEquals(OrderStatus.RETURN_REQUESTED, response.status(), "Status must be return request");
+      assertEquals(OrderStatus.DELIVERED, response.status(), "Status must be return request");
       verify(eventPublisher).publishEvent(any(ReturnRequestEvent.class));
-      verify(orderRepository, times(1)).findByIdAndUserId(order.getId(), user.getId());
+      verify(orderRepository, times(1))
+          .findByIdAndUserId(order.getId(), user.getId());
       verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
     }
