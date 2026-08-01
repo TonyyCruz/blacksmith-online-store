@@ -65,7 +65,7 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderResponseDto refundRequest(long id) {
+  public void refundRequest(long id) {
     Order order = findEntityById(id);
     if (!order.getStatus().canBeRefunded()) {
       if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
@@ -75,17 +75,15 @@ public class OrderService {
     }
     order.setStatus(OrderStatus.REFUND_PENDING);
     eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
-    return OrderResponseDto.fromEntity(order);
   }
 
   @Transactional
-  public OrderResponseDto returnRequest(long id) {
+  public void returnRequest(long id) {
     Order order = findEntityById(id);
     if (!order.getStatus().canBeReturned()) {
       throw new InvalidOrderStatusException("Only delivered orders can be returned");
     }
     eventPublisher.publishEvent(new ReturnRequestEvent(id, order.getOrderItems()));
-    return OrderResponseDto.fromEntity(order);
   }
 
   public OrderResponseDto findById(long id) {

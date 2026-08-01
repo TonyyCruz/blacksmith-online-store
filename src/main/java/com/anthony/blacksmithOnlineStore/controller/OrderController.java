@@ -49,14 +49,16 @@ public class OrderController {
 
   @PostMapping("/request/{id}/return")
   @Operation(summary = "Request a return of your own order by id")
-  public ResponseEntity<OrderResponseDto> returnRequest(@PathVariable Long id) {
-      return ResponseEntity.ok(orderService.returnRequest(id));
+  public ResponseEntity<Void> returnRequest(@PathVariable Long id) {
+    orderService.returnRequest(id);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/request/{id}/refund")
   @Operation(summary = "Request a refound of your own payd order by id")
-  public ResponseEntity<OrderResponseDto> refundRequest(@PathVariable Long id) {
-      return ResponseEntity.ok(orderService.refundRequest(id));
+  public ResponseEntity<Void> refundRequest(@PathVariable Long id) {
+      orderService.refundRequest(id);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/request/{id}/cancel")

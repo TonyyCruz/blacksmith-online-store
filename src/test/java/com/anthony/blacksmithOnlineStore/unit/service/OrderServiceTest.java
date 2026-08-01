@@ -212,9 +212,8 @@ public class OrderServiceTest {
           .thenReturn(Optional.of(order));
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
-      OrderResponseDto response = orderService.refundRequest(order.getId());
+      orderService.refundRequest(order.getId());
 
-      assertEquals(OrderStatus.REFUND_PENDING, response.status(), "Status must be refound pending");
       verify(eventPublisher).publishEvent(any(RefundRequestEvent.class));
       verify(orderRepository, times(1)).findByIdAndUserId(order.getId(), user.getId());
       verify(orderRepository, times(1)).existsById(anyLong());
@@ -237,9 +236,8 @@ public class OrderServiceTest {
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
 
-      OrderResponseDto response = orderService.returnRequest(order.getId());
+      orderService.returnRequest(order.getId());
 
-      assertEquals(OrderStatus.DELIVERED, response.status(), "Status must be return request");
       verify(eventPublisher).publishEvent(any(ReturnRequestEvent.class));
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
