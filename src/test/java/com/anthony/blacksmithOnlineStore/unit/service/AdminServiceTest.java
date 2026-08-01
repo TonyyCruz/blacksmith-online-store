@@ -49,7 +49,7 @@ class AdminServiceTest {
     @DisplayName("GetById should return userWithId when exists")
     void getById_ShouldReturnUser_WhenExists() {
       when(userRepository.findById(targetUser.getId())).thenReturn(Optional.of(targetUser));
-      User found = adminService.getEntityById(targetUser.getId());
+      User found = adminService.findEntityById(targetUser.getId());
       assertEquals(targetUser, found, "The found userWithId should match the target userWithId");
       verify(userRepository, times(1)).findById(targetUser.getId());
     }
@@ -103,7 +103,7 @@ class AdminServiceTest {
     void getById_ShouldThrowUserNotFoundException_WhenNotFound() {
       UUID fakeId = UUID.randomUUID();
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
-      assertThrows(UserNotFoundException.class, () -> adminService.getEntityById(fakeId));
+      assertThrows(UserNotFoundException.class, () -> adminService.findEntityById(fakeId));
     }
   }
 }

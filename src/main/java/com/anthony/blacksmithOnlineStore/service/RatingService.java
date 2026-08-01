@@ -34,7 +34,7 @@ public class RatingService {
   @Transactional
   public void ratePurchase(RatingRequestDto dto) {
     OrderItem orderItem = orderItemService.findEntityById(dto.orderItemId());
-    User user = userService.getUserEntity();
+    User user = userService.findUserEntity();
     verifyUserCanRatePurchase(user.getId(), orderItem);
     Rating rating = RatingRequestDto.toEntity(dto);
     rating.setOrderItem(orderItem);
@@ -52,7 +52,7 @@ public class RatingService {
     return ratings.map(RatingResponseDto::fromEntity);
   }
 
-  public RatingResponseDto getByOrderItemId(Long id) {
+  public RatingResponseDto findByOrderItemId(Long id) {
     List<Rating> ratings = ratingRepository.findAll();
     Rating rating = ratingRepository.findByOrderItemId(id)
         .orElseThrow(() -> new RatingNotFoundException(id));

@@ -28,7 +28,7 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
-      Order order = orderService.getEntityById(orderId);
+      Order order = orderService.findEntityById(orderId);
       if (order.getTotal().compareTo(dto.amount()) != 0) {
         throw new PaymentException(
             "The order total price is R$ %.2f but the amount receive is R$ %.2f"

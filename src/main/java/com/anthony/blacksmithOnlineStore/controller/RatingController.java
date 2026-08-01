@@ -41,7 +41,7 @@ public class RatingController {
   @GetMapping("/orderItem/{id}")
   @Operation(summary = "Find the rate by order item id")
   public ResponseEntity<RatingResponseDto> getRatingsFromItemId(@PathVariable Long id) {
-    return ResponseEntity.ok(ratingService.getByOrderItemId(id));
+    return ResponseEntity.ok(ratingService.findByOrderItemId(id));
   }
 
   @GetMapping("/item/{id}")

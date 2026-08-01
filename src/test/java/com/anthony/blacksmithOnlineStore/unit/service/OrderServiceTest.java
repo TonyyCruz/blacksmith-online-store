@@ -36,7 +36,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -137,7 +135,7 @@ public class OrderServiceTest {
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
 
-      Order response = orderService.getEntityById(order.getId());
+      Order response = orderService.findEntityById(order.getId());
 
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
@@ -161,7 +159,7 @@ public class OrderServiceTest {
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
 
-      OrderResponseDto response = orderService.getById(order.getId());
+      OrderResponseDto response = orderService.findById(order.getId());
 
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
@@ -397,7 +395,7 @@ public class OrderServiceTest {
     void getById_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(999L)).thenReturn(false);
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.getById(999L),
+      assertThrows(OrderNotFoundException.class, () -> orderService.findById(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(999L);
     }
@@ -407,7 +405,7 @@ public class OrderServiceTest {
     void getEntityById_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(anyLong())).thenReturn(false);
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.getEntityById(999L),
+      assertThrows(OrderNotFoundException.class, () -> orderService.findEntityById(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(anyLong());
     }
@@ -484,7 +482,7 @@ public class OrderServiceTest {
           .thenReturn(Optional.empty());
 
       assertThrows(ForbiddenOperationException.class,
-          () -> orderService.getById(order.getId()),
+          () -> orderService.findById(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
@@ -504,7 +502,7 @@ public class OrderServiceTest {
           .thenReturn(Optional.empty());
 
       assertThrows(ForbiddenOperationException.class,
-          () -> orderService.getById(order.getId()),
+          () -> orderService.findById(order.getId()),
           "Should thrown an exception trying cancel an unauthorized order");
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());

@@ -21,7 +21,7 @@ public class SaleEventListener {
   @Transactional
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void orderSold(OrderPaidEvent paidEvent) {
-    Order order = orderService.getEntityById(paidEvent.orderId());
+    Order order = orderService.findEntityById(paidEvent.orderId());
     for (OrderItem orderItem : order.getOrderItems()) {
       saleService.performSale(orderItem.getItemId(), orderItem.getQuantity());
     }

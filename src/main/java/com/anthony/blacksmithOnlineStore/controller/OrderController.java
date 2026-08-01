@@ -38,7 +38,7 @@ public class OrderController {
   @GetMapping("/{id}")
   @Operation(summary = "Find your own order by id")
   public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id) {
-    return ResponseEntity.ok(orderService.getById(id));
+    return ResponseEntity.ok(orderService.findById(id));
   }
 
   @GetMapping

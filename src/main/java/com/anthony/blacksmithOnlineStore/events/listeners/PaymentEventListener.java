@@ -25,7 +25,7 @@ public class PaymentEventListener {
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void refundPayment(RefundRequestEvent refoundEvent) {
     // REFUND PROCESS
-    Order order = orderService.getEntityById(refoundEvent.orderId());
+    Order order = orderService.findEntityById(refoundEvent.orderId());
     order.setStatus(OrderStatus.REFUNDED);
     if (order.getPayment() == null) throw new PaymentException("This order have no payment");
     Payment payment = paymentRepository.findById(order.getPayment().getId())
