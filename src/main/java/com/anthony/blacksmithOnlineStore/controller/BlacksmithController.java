@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -53,6 +54,7 @@ public class BlacksmithController {
   @Operation(summary = "Find all blacksmiths")
   public ResponseEntity<Page<BlacksmithResponseDto>> findAll(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
+      @ParameterObject
       Pageable pageable
   ) {
     return ResponseEntity.ok(blacksmithService.findAll(pageable));
@@ -68,6 +70,7 @@ public class BlacksmithController {
   @Operation(summary = "Find blacksmith by name")
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
+      @ParameterObject
       Pageable pageable,
       @RequestParam(value = "name") String name) {
     return ResponseEntity.ok(blacksmithService.findByName(name, pageable));

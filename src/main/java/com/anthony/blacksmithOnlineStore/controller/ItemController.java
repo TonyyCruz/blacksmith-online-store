@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -70,9 +71,9 @@ public class ItemController {
   @GetMapping
   @Operation(summary = "Find items by filter")
   public ResponseEntity<Page<ItemResponseDto>> getAllFilteredItems(
-      ItemFilterDto filter,
+      @ParameterObject ItemFilterDto filter,
       @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
-      Pageable pageable) {
+      @ParameterObject Pageable pageable) {
     return ResponseEntity.ok(itemService.findFilteredItems(filter, pageable));
   }
 

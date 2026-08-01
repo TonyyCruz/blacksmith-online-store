@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -48,7 +49,7 @@ public class RatingController {
   public ResponseEntity<Page<RatingResponseDto>> getRatingsFromItemId(
       @PathVariable Long id,
       @PageableDefault(page = 0, size = 5, sort = "id", direction = Direction.DESC)
-      Pageable pageable) {
+      @ParameterObject Pageable pageable) {
     return ResponseEntity.ok(ratingService.getRatingsFromItemId(id, pageable));
   }
 }
