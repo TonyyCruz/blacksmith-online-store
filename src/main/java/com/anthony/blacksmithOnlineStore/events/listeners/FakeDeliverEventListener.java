@@ -8,10 +8,9 @@ import com.anthony.blacksmithOnlineStore.exceptions.DeliverException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class FakeDeliverEventListener {
   private final OrderRepository orderRepository;
 
   @Async
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @EventListener
   public void deliverRequest(OrderPaidEvent paidEvent) {
     Order order = orderRepository.findById(paidEvent.orderId())
         .orElseThrow(() -> new OrderNotFoundException(paidEvent.orderId()));
@@ -45,7 +44,7 @@ public class FakeDeliverEventListener {
   }
 
   @Async
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @EventListener
   public void returnRequest(ReturnRequestEvent returnEvent) {
     Order order = orderRepository.findById(returnEvent.orderId())
         .orElseThrow(() -> new OrderNotFoundException(returnEvent.orderId()));
@@ -54,9 +53,9 @@ public class FakeDeliverEventListener {
         throw new DeliverException("A not delivered order cannot be returned");
       }
       order.setStatus(OrderStatus.RETURN_REQUESTED);
-        Thread.sleep(5000); // Simulate a delay in the delivery process
+      Thread.sleep(5000); // Simulate a delay in the delivery process
       order.setStatus(OrderStatus.RETURNED);
-        orderRepository.save(order);
+      orderRepository.save(order);
     } catch(InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new DeliverException("Delivery process was interrupted");

@@ -53,7 +53,6 @@ public class RatingService {
   }
 
   public RatingResponseDto findByOrderItemId(Long id) {
-    List<Rating> ratings = ratingRepository.findAll();
     Rating rating = ratingRepository.findByOrderItemId(id)
         .orElseThrow(() -> new RatingNotFoundException(id));
     return RatingResponseDto.fromEntity(rating);

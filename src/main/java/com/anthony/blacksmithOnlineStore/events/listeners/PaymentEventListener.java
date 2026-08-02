@@ -11,6 +11,7 @@ import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -21,8 +22,7 @@ public class PaymentEventListener {
   private final OrderService orderService;
   private final PaymentRepository paymentRepository;
 
-  @Transactional
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @EventListener
   public void refundPayment(RefundRequestEvent refoundEvent) {
     // REFUND PROCESS
     Order order = orderService.findEntityById(refoundEvent.orderId());
