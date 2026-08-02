@@ -9,16 +9,13 @@ import com.anthony.blacksmithOnlineStore.exceptions.PaymentException;
 import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentEventListener {
+public class PaymentRefoundEventListener {
   private final OrderService orderService;
   private final PaymentRepository paymentRepository;
 
