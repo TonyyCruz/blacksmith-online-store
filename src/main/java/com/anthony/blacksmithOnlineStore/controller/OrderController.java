@@ -29,7 +29,7 @@ public class OrderController {
   private final OrderService orderService;
 
   @PostMapping
-  @Operation(summary = "Create a order")
+  @Operation(summary = "Create a new order")
   public ResponseEntity<OrderPaymentDto> create(
       @Valid @RequestBody OrderRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(dto));

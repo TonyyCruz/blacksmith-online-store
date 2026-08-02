@@ -5,6 +5,8 @@ import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.CreditDt
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.DebitDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.PixDTO;
 import com.anthony.blacksmithOnlineStore.entity.Payment;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
@@ -12,7 +14,10 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record PaymentCreateDto(
+        @NotNull
         PaymentMethod method,
+        @NotNull
+        @Min(value = 0, message = "Amount must be greater than or equal to zero")
         BigDecimal amount,
         DebitDto debit,
         CreditDto credit,
