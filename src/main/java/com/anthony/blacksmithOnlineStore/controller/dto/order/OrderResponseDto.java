@@ -12,6 +12,7 @@ public record OrderResponseDto(
     Long id,
     UUID userId,
     LocalDateTime createdAt,
+    LocalDateTime deliveredAt,
     OrderStatus status,
     List<OrderItemResponseDto> items,
     BigDecimal total) {
@@ -26,6 +27,7 @@ public record OrderResponseDto(
         order.getId(),
         order.getUser().getId(),
         order.getCreatedAt(),
+        order.getDeliveredAt(),
         order.getStatus(),
         orderItemsDto,
         order.getTotal()

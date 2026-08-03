@@ -99,3 +99,24 @@ VALUES
         4.25, '2025-11-15', '2026-02-25', 2, false,
      'Tyrion o Perdido', 2, 0
     );
+
+INSERT INTO ORDERS (user_id, created_at, updated_at, status, total, delivered_at)
+VALUES
+    ('7b87f809-d142-4dfa-8802-87644d774dd5', '2025-11-15', '2025-11-20',
+     'DELIVERED', 240.00, '2025-11-20'),
+    ('7b87f809-d142-4dfa-8802-87644d774dd5', '2025-11-20', '2025-11-20',
+     'PENDING', 135.00, null);
+
+INSERT INTO ORDER_ITEMS (item_id, item_name, base_price_at_purchase, price_applied, quantity,
+                         total_price, order_id, rating_value, user_id, blacksmith_id,
+                         created_at)
+VALUES
+    (1, 'Sword of Valor', 100.00, 90.00, 2,
+     180.00, 1, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     1, '2025-11-15'),
+    (4, 'Axe of Fury', 60.00, 60.00, 1,
+     80.00, 1, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     2, '2025-11-15'),
+    (3, 'Axe of Light', 150.00, 135.00, 1,
+     135.00, 2, NULL, '7b87f809-d142-4dfa-8802-87644d774dd5',
+     2, '2025-11-15');

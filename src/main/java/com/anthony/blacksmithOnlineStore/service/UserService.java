@@ -43,7 +43,7 @@ public class UserService {
   }
 
   public void updatePassword(PasswordUpdateDto passwordUpdateDto) {
-    User user = getUserEntity();
+    User user = findUserEntity();
     if (!passwordEncoder.matches(passwordUpdateDto.currentPassword(), user.getPassword())) {
       throw new InvalidCredentialsException();
     }
@@ -51,13 +51,13 @@ public class UserService {
     userRepository.save(user);
   }
 
-  public User getUserEntity() {
+  public User findUserEntity() {
     UUID id = authUser.getAuthenticatedId();
     return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
   }
   
   public UserDto getUser() {
-    return UserDto.fromEntity(getUserEntity());
+    return UserDto.fromEntity(findUserEntity());
   }
 
   public User getUserReference() {

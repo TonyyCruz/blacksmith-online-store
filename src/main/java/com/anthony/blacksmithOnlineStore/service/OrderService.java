@@ -41,9 +41,6 @@ public class OrderService {
     order.setUser(user);
     for (OrderItemRequestDto orderItemDto : dto.items()) {
       Item item = itemService.findEntityById(orderItemDto.itemId());
-      if (!item.isActive()) {
-        throw new InvalidOrderException("Item %d is unactive".formatted(item.getId()));
-      }
       if (orderItemDto.quantity() > item.getStock()) {
         throw new InvalidOrderException(
             "Item %d does not have enough stock".formatted(item.getId()));
@@ -59,17 +56,17 @@ public class OrderService {
 
   @Transactional
   public OrderResponseDto cancel(long id) {
-    Order order = getEntityById(id);
+    Order order = findEntityById(id);
     if (!order.getStatus().canBeCanceled()) {
-      throw new InvalidOrderStatusException("Only pending orders can be cancelled.");
+      throw new InvalidOrderStatusException("Only pending orders can be cancelled");
     }
     order.setStatus(OrderStatus.CANCELLED);
     return OrderResponseDto.fromEntity(order);
   }
 
   @Transactional
-  public OrderResponseDto refundRequest(long id) {
-    Order order = getEntityById(id);
+  public void refundRequest(long id) {
+    Order order = findEntityById(id);
     if (!order.getStatus().canBeRefunded()) {
       if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
         throw new InvalidOrderStatusException("This order is already pending for refund.");
@@ -78,22 +75,19 @@ public class OrderService {
     }
     order.setStatus(OrderStatus.REFUND_PENDING);
     eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
-    return OrderResponseDto.fromEntity(order);
   }
 
   @Transactional
-  public OrderResponseDto returnRequest(long id) {
-    Order order = getEntityById(id);
+  public void returnRequest(long id) {
+    Order order = findEntityById(id);
     if (!order.getStatus().canBeReturned()) {
-      throw new InvalidOrderStatusException("Only delivered orders can be returned.");
+      throw new InvalidOrderStatusException("Only delivered orders can be returned");
     }
-    order.setStatus(OrderStatus.RETURN_REQUESTED);
     eventPublisher.publishEvent(new ReturnRequestEvent(id, order.getOrderItems()));
-    return OrderResponseDto.fromEntity(order);
   }
 
-  public OrderResponseDto getById(long id) {
-    return OrderResponseDto.fromEntity(getEntityById(id));
+  public OrderResponseDto findById(long id) {
+    return OrderResponseDto.fromEntity(findEntityById(id));
   }
 
   public List<OrderResponseDto> getUserOrders() {
@@ -103,14 +97,10 @@ public class OrderService {
         .toList();
   }
 
-  public Order getEntityById(long id) {
-    Order order = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
-    if (authUser.isAdmin()) return order;
-    if (!order.getUser().getId().equals(authUser.getAuthenticatedId())) {
-      throw new ForbiddenOperationException(
-          "You cannot cannot access this order."
-      );
-    }
-    return order;
+  public Order findEntityById(long id) {
+    if (!orderRepository.existsById(id)) throw new OrderNotFoundException(id);
+    if (authUser.isAdmin()) return orderRepository.findById(id).get();
+    return orderRepository.findByIdAndUserId(id, authUser.getAuthenticatedId())
+        .orElseThrow(() -> new ForbiddenOperationException("You cannot access this order."));
   }
 }

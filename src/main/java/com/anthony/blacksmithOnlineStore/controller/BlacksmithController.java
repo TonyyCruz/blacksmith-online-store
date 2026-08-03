@@ -5,9 +5,11 @@ import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRes
 import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Blacksmith", description = "Blacksmith management")
 @RequestMapping("/blacksmiths")
 public class BlacksmithController {
@@ -33,7 +36,7 @@ public class BlacksmithController {
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Create a blacksmith")
+  @Operation(summary = "Create a blacksmith, ADMIN only")
   public ResponseEntity<BlacksmithResponseDto> createBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(blacksmithService.create(dto));
@@ -41,7 +44,7 @@ public class BlacksmithController {
 
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Update all blacksmith data")
+  @Operation(summary = "Update all blacksmith data, ADMIN only")
   public ResponseEntity<BlacksmithResponseDto> updateBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto, @PathVariable Long id) {
     return ResponseEntity.ok(blacksmithService.update(id, dto));
@@ -51,6 +54,7 @@ public class BlacksmithController {
   @Operation(summary = "Find all blacksmiths")
   public ResponseEntity<Page<BlacksmithResponseDto>> findAll(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
+      @ParameterObject
       Pageable pageable
   ) {
     return ResponseEntity.ok(blacksmithService.findAll(pageable));
@@ -66,6 +70,7 @@ public class BlacksmithController {
   @Operation(summary = "Find blacksmith by name")
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
+      @ParameterObject
       Pageable pageable,
       @RequestParam(value = "name") String name) {
     return ResponseEntity.ok(blacksmithService.findByName(name, pageable));

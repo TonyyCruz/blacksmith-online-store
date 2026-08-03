@@ -14,6 +14,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Users", description = "User management")
 public class UserController {
   private final UserService userService;

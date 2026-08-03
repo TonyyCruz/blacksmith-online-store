@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.repository;
 
 import com.anthony.blacksmithOnlineStore.entity.Item;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -34,4 +35,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
         SELECT i.active FROM Item i WHERE i.id = :id
     """)
   boolean isItemActive(long id);
+
+  Optional<Item> findByIdAndActiveTrue(Long id);
 }

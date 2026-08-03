@@ -6,6 +6,7 @@ import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundExcep
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
+import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,8 @@ public class RestExceptionHandler {
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
-  @ExceptionHandler({BadRequestException.class, DataAccessException.class})
+  @ExceptionHandler({BadRequestException.class, DataAccessException.class,
+      NestedRuntimeException.class})
   public ResponseEntity<ExceptionDetails> handleBadRequestException(Exception e,
       HttpServletRequest request) {
     ExceptionDetails exceptionDetails = new ExceptionDetails();
@@ -100,16 +102,17 @@ public class RestExceptionHandler {
     return ResponseEntity.status(validationDetails.getStatus()).body(validationDetails);
   }
 
-//  @ExceptionHandler(Exception.class)
-//  public ResponseEntity<ExceptionDetails> defaultException(Exception e,
-//      HttpServletRequest request) {
-//    ExceptionDetails exceptionDetails = new ExceptionDetails();
-//    exceptionDetails.setTitle("Server Error");
-//    exceptionDetails.setTimestamp(Instant.now());
-//    exceptionDetails.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-//    exceptionDetails.setException(e.getClass().toString());
-//    exceptionDetails.setPath(request.getRequestURI());
-//    exceptionDetails.addError("error", "Ops, algo deu errado. 😵");
-//    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
-//  }
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ExceptionDetails> defaultException(Exception e,
+      HttpServletRequest request) {
+    ExceptionDetails exceptionDetails = new ExceptionDetails();
+    exceptionDetails.setTitle("Server Error");
+    exceptionDetails.setTimestamp(Instant.now());
+    exceptionDetails.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    exceptionDetails.setException(e.getClass().toString());
+    exceptionDetails.setPath(request.getRequestURI());
+    exceptionDetails.addError("error", "Ops, algo deu errado. 😵");
+//    exceptionDetails.addError("error", e.getMessage());
+    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
+  }
 }

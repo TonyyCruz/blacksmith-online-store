@@ -3,31 +3,17 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
-import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
-import com.anthony.blacksmithOnlineStore.entity.Item;
-import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
-import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
-import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
-import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
-import com.anthony.blacksmithOnlineStore.service.ItemService;
+import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import java.math.BigDecimal;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,6 +23,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
+import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
+import com.anthony.blacksmithOnlineStore.entity.Item;
+import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
+import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
+import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
+import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
+import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
+import com.anthony.blacksmithOnlineStore.service.ItemService;
+
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
   @Mock
@@ -45,6 +47,8 @@ public class ItemServiceTest {
   private BlacksmithService blacksmithService;
   @Mock
   private ItemUpdate itemUpdate;
+  @Mock
+  private AuthenticatedUserService authUser;
   @InjectMocks
   private ItemService itemService;
   private Item targetItem;
@@ -59,7 +63,7 @@ public class ItemServiceTest {
   class ItemServiceHappyPath {
 
     @Test
-    @DisplayName("Create should save itemWithId and return response when data is valid")
+    @DisplayName("Create should save item and return response when data is valid")
     void createItem_shouldCreateItemSuccessfully_withValidData() {
       ItemRequestDto dto = MockItem.itemRequestDto();
       Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
@@ -99,13 +103,20 @@ public class ItemServiceTest {
       ItemResponseDto response = itemService.update(id, dto);
 
       assertEquals(dto.name(), response.name(), "Name must be equal to receive in dto");
-      assertEquals(dto.blacksmithId(), response.blacksmithId(), "Blacksmith Id must be equal to receive in dto");
-      assertEquals(dto.baseDefense(), response.baseDefense(), "BaseDefense must be equal to receive in dto");
-      assertEquals(dto.baseDamage(), response.baseDamage(), "BaseDamage must be equal to receive in dto");
-      assertEquals(dto.basePrice(), response.basePrice(), "BasePrice must be equal to receive in dto");
-      assertEquals(dto.finalPrice(), response.finalPrice(), "FinalPrice must be equal to receive in dto");
-      assertEquals(dto.description(), response.description(), "Description must be equal to receive in dto");
-      assertEquals(dto.material(), response.material(), "Material must be equal to receive in dto");
+      assertEquals(dto.blacksmithId(), response.blacksmithId(),
+          "Blacksmith Id must be equal to receive in dto");
+      assertEquals(dto.baseDefense(), response.baseDefense(),
+          "BaseDefense must be equal to receive in dto");
+      assertEquals(dto.baseDamage(), response.baseDamage(),
+          "BaseDamage must be equal to receive in dto");
+      assertEquals(dto.basePrice(), response.basePrice(),
+          "BasePrice must be equal to receive in dto");
+      assertEquals(dto.finalPrice(), response.finalPrice(),
+          "FinalPrice must be equal to receive in dto");
+      assertEquals(dto.description(), response.description(),
+          "Description must be equal to receive in dto");
+      assertEquals(dto.material(), response.material(),
+          "Material must be equal to receive in dto");
       assertEquals(dto.rarity(), response.rarity(), "Rarity must be equal to receive);");
       assertEquals(dto.stock(), response.stock(), "Stock must be equal to receive in dto");
       assertEquals(dto.type(), response.type(), "Type must be equal to receive in dto");
@@ -115,13 +126,15 @@ public class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("Patch update should modify itemWithId and return response when data is valid")
+    @DisplayName("Patch update should modify item and return response when data is valid")
     void patchUpdate_shouldPatchItemSuccessfully_withValidData() {
       Long id = targetItem.getId();
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto();
       Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
 
-      when(itemRepository.findById(id)).thenReturn(Optional.of(targetItem));
+      when(authUser.isAdmin()).thenReturn(false);
+      when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
+          .thenReturn(Optional.of(targetItem));
       when(blacksmithService.findEntityById(blacksmith.getId())).thenReturn(blacksmith);
       doNothing().when(itemUpdate).updateItemFromDto(dto, targetItem);
 
@@ -129,26 +142,32 @@ public class ItemServiceTest {
 
       assertNotNull(response, "Response mut not be null");
       verify(itemUpdate, times(1)).updateItemFromDto(dto, targetItem);
-      verify(itemRepository, times(1)).findById(targetItem.getId());
-      verify(blacksmithService, times(1)).findEntityById(dto.blacksmithId());
+      verify(itemRepository, times(1))
+          .findByIdAndActiveTrue(targetItem.getId());
+      verify(blacksmithService, times(1))
+          .findEntityById(dto.blacksmithId());
     }
 
     @Test
-    @DisplayName("FindById should return itemWithId response when itemWithId exists")
+    @DisplayName("FindById should return item response when item exists")
     void findById_shouldFindItemByIdSuccessfully_whenItemExists() {
-      when(itemRepository.findById(targetItem.getId()))
+      when(authUser.isAdmin()).thenReturn(false);
+      when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
 
       ItemResponseDto response = itemService.findById(targetItem.getId());
 
-      assertEquals(targetItem.getId(), response.id(), "Found itemWithId must have the correct ID");
-      verify(itemRepository, times(1)).findById(targetItem.getId());
+      assertEquals(targetItem.getId(), response.id(),
+          "Found item must have the correct ID");
+      verify(itemRepository, times(1))
+          .findByIdAndActiveTrue(targetItem.getId());
     }
 
     @Test
-    @DisplayName("Delete should remove itemWithId when it exists and has no sales")
+    @DisplayName("Delete should remove item when it exists and has no sales")
     void deleteItem_shouldDeleteItemSuccessfully_whenItemExists() {
-      when(itemRepository.findById(targetItem.getId()))
+      when(authUser.isAdmin()).thenReturn(false);
+      when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
 
       itemService.deleteItem(targetItem.getId());
@@ -182,8 +201,9 @@ public class ItemServiceTest {
           .thenThrow(new BlacksmithNotFoundException(dto.blacksmithId()));
 
       assertThrows(BlacksmithNotFoundException.class, () -> itemService.create(dto),
-          "Create itemWithId must throw an exception when blacksmith was not found");
-      verify(blacksmithService, times(1)).findEntityById(dto.blacksmithId());
+          "Create item must throw an exception when blacksmith was not found");
+      verify(blacksmithService, times(1))
+          .findEntityById(dto.blacksmithId());
     }
 
     @Test
@@ -195,7 +215,7 @@ public class ItemServiceTest {
           .thenThrow(new BlacksmithNotFoundException(dto.blacksmithId()));
 
       assertThrows(BlacksmithNotFoundException.class, () -> itemService.update(1L, dto),
-          "Update itemWithId must throw an exception when blacksmith was not found");
+          "Update item must throw an exception when blacksmith was not found");
       verify(blacksmithService, times(1)).findEntityById(dto.blacksmithId());
     }
 
@@ -204,15 +224,20 @@ public class ItemServiceTest {
     void pathUpdate_shouldThrowException_whenBlacksmithNotFound() {
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto();
 
-      when(itemRepository.findById(targetItem.getId())).thenReturn(Optional.of(targetItem));
+      when(authUser.isAdmin()).thenReturn(false);
+      when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
+          .thenReturn(Optional.of(targetItem));
       doThrow(new BlacksmithNotFoundException(dto.blacksmithId()))
           .when(blacksmithService)
           .findEntityById(dto.blacksmithId());
 
-      assertThrows(BlacksmithNotFoundException.class, () -> itemService.update(targetItem.getId(), dto),
+      assertThrows(BlacksmithNotFoundException.class,
+          () -> itemService.update(targetItem.getId(), dto),
           "Patch update must throw an exception when blacksmith was not found");
-      verify(itemRepository, times(1)).findById(targetItem.getId());
-      verify(blacksmithService, times(1)).findEntityById(dto.blacksmithId());
+      verify(itemRepository, times(1))
+          .findByIdAndActiveTrue(targetItem.getId());
+      verify(blacksmithService, times(1))
+          .findEntityById(dto.blacksmithId());
     }
 
     @Test
@@ -221,7 +246,7 @@ public class ItemServiceTest {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100)).finalPrice(BigDecimal.valueOf(200)).build();
       assertThrows(InvalidItemDataException.class,() -> itemService.update(1L, dto),
-          "Update itemWithId must throw an exception when final price is greater than base price");
+          "Update item must throw an exception when final price is greater than base price");
     }
 
     @Test
@@ -236,46 +261,47 @@ public class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("Update should throw ItemNotFoundException when itemWithId does not exist")
+    @DisplayName("Update should throw ItemNotFoundException when item does not exist")
     void updateItem_shouldThrowItemNotFoundException_whenItemNotFound() {
       when(itemRepository.existsById(any())).thenReturn(false);
-      assertThrows(RatingNotFoundException.class,
+      assertThrows(ItemNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemRequestDto()),
-          "Update itemWithId must throw an exception when itemWithId to update was not found");
+          "Update item must throw an exception when item to update was not found");
       verify(itemRepository, times(1)).existsById(any());
     }
 
     @Test
-    @DisplayName("Patch update should throw ItemNotFoundException when itemWithId does not exist")
+    @DisplayName("Patch update should throw ItemNotFoundException when item does not exist")
     void patchUpdate_shouldThrowItemNotFoundException_whenItemNotFound() {
-      when(itemRepository.findById(any())).thenReturn(Optional.empty());
-      assertThrows(RatingNotFoundException.class,
+      when(itemRepository.findByIdAndActiveTrue(any())).thenReturn(Optional.empty());
+      assertThrows(ItemNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemPatchUpdateDto()),
-          "Patch update must throw an exception when itemWithId to patch update was not found");
-      verify(itemRepository, times(1)).findById(any());
+          "Patch update must throw an exception when item to patch update was not found");
+      verify(itemRepository, times(1)).findByIdAndActiveTrue(any());
     }
 
     @Test
-    @DisplayName("Delete should throw ForbiddenOperationException when itemWithId has sales")
+    @DisplayName("Delete should throw ForbiddenOperationException when item has sales")
     void deleteItem_shouldThrowForbiddenOperationException_whenDeletingSoldItem() {
       targetItem.addSoldQuantity(5);
 
-      when(itemRepository.findById(targetItem.getId()))
+      when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
 
       assertThrows(ForbiddenOperationException.class,
           () -> itemService.deleteItem(targetItem.getId()),
-          "Delete itemWithId must throw an exception when trying to delete an itemWithId that has sales");
-      verify(itemRepository, times(1)).findById(targetItem.getId());
+          "Delete item must throw an exception when trying to delete an item that has sales");
+      verify(itemRepository, times(1))
+          .findByIdAndActiveTrue(targetItem.getId());
     }
 
     @Test
-    @DisplayName("Delete should throw ItemNotFoundException when itemWithId does not exist")
+    @DisplayName("Delete should throw ItemNotFoundException when item does not exist")
     void delete_shouldThrowItemNotFoundException_whenItemNotFound() {
-      when(itemRepository.findById(any())).thenReturn(Optional.empty());
-      assertThrows(RatingNotFoundException.class, () -> itemService.deleteItem(1L),
-          "Create itemWithId must throw an exception when trying to delete an itemWithId that was not found");
-      verify(itemRepository, times(1)).findById(any());
+      when(itemRepository.findByIdAndActiveTrue(any())).thenReturn(Optional.empty());
+      assertThrows(ItemNotFoundException.class, () -> itemService.deleteItem(1L),
+          "Delete item must throw an exception when trying to delete an item that was not found");
+      verify(itemRepository, times(1)).findByIdAndActiveTrue(any());
     }
   }
 

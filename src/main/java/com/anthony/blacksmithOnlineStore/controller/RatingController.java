@@ -5,9 +5,11 @@ import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingResponseDto
 import com.anthony.blacksmithOnlineStore.service.RatingService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/ratings")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Rating", description = "Rating management")
 public class RatingController {
   private final RatingService ratingService;
@@ -38,7 +41,7 @@ public class RatingController {
   @GetMapping("/orderItem/{id}")
   @Operation(summary = "Find the rate by order item id")
   public ResponseEntity<RatingResponseDto> getRatingsFromItemId(@PathVariable Long id) {
-    return ResponseEntity.ok(ratingService.getByOrderItemId(id));
+    return ResponseEntity.ok(ratingService.findByOrderItemId(id));
   }
 
   @GetMapping("/item/{id}")
@@ -46,7 +49,7 @@ public class RatingController {
   public ResponseEntity<Page<RatingResponseDto>> getRatingsFromItemId(
       @PathVariable Long id,
       @PageableDefault(page = 0, size = 5, sort = "id", direction = Direction.DESC)
-      Pageable pageable) {
+      @ParameterObject Pageable pageable) {
     return ResponseEntity.ok(ratingService.getRatingsFromItemId(id, pageable));
   }
 }

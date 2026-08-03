@@ -118,6 +118,12 @@ spring.jpa.hibernate.ddl-auto=update
 ```mvn spring-boot:run``` <br>
 Ou diretamente na sua IDE favorita.
 
+### Swagger
+Acesse `http://localhost:8080/swagger-ui/index.html`
+Faça o cadastro ha rota auth/register.
+Faça o log in ha rota auth/login.
+Copie o token para o botão de authorization na parte superior direita.
+
 ---
 
 ## 🧠 Decisões Técnicas

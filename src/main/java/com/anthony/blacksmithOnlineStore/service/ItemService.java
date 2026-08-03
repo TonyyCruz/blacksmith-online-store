@@ -8,7 +8,7 @@ import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
@@ -85,7 +85,11 @@ public class ItemService {
   }
 
   public Item findEntityById(Long id) {
-    return itemRepository.findById(id).orElseThrow(() -> new RatingNotFoundException(id));
+    if (authUser.isAdmin()) {
+      return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
+    }
+    return itemRepository.findByIdAndActiveTrue(id)
+        .orElseThrow(() -> new ItemNotFoundException(id));
   }
 
   public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
@@ -110,7 +114,7 @@ public class ItemService {
   }
 
   public void itemExistesVerifier(Long id) {
-    if (!itemRepository.existsById(id)) throw new RatingNotFoundException(id);
+    if (!itemRepository.existsById(id)) throw new ItemNotFoundException(id);
   }
 
   private void itemPriceValidate(BigDecimal basePrice, BigDecimal finalPrice) {

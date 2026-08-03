@@ -32,16 +32,15 @@ public class BlacksmithService {
 
   @Transactional
   public BlacksmithResponseDto create(BlacksmithRequestDto dto) {
-    Blacksmith blacksmith = blacksmithRepository.save(BlacksmithRequestDto.toEntity(dto));
-    return BlacksmithResponseDto.fromEntity(blacksmith);
+    return BlacksmithResponseDto.fromEntity(
+        blacksmithRepository.save(BlacksmithRequestDto.toEntity(dto)));
   }
 
   public BlacksmithResponseDto update(Long id, BlacksmithRequestDto dto) {
     Blacksmith blacksmith = getReferenceById(id);
     blacksmith.setName(dto.name());
     blacksmith.setDescription(dto.description());
-    Blacksmith updatedBlacksmith = blacksmithRepository.save(blacksmith);
-    return BlacksmithResponseDto.fromEntity(updatedBlacksmith);
+    return BlacksmithResponseDto.fromEntity(blacksmithRepository.save(blacksmith));
   }
 
   public Page<BlacksmithResponseDto> findAll(Pageable pageable) {

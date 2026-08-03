@@ -6,6 +6,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,12 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/orders")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Orders", description = "Order management")
 public class OrderController {
   private final OrderService orderService;
 
   @PostMapping
-  @Operation(summary = "Create a order")
+  @Operation(summary = "Create a new order")
   public ResponseEntity<OrderPaymentDto> create(
       @Valid @RequestBody OrderRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(dto));
@@ -36,7 +38,7 @@ public class OrderController {
   @GetMapping("/{id}")
   @Operation(summary = "Find your own order by id")
   public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id) {
-    return ResponseEntity.ok(orderService.getById(id));
+    return ResponseEntity.ok(orderService.findById(id));
   }
 
   @GetMapping
@@ -47,14 +49,16 @@ public class OrderController {
 
   @PostMapping("/request/{id}/return")
   @Operation(summary = "Request a return of your own order by id")
-  public ResponseEntity<OrderResponseDto> returnRequest(@PathVariable Long id) {
-      return ResponseEntity.ok(orderService.returnRequest(id));
+  public ResponseEntity<Void> returnRequest(@PathVariable Long id) {
+    orderService.returnRequest(id);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/request/{id}/refund")
   @Operation(summary = "Request a refound of your own payd order by id")
-  public ResponseEntity<OrderResponseDto> refundRequest(@PathVariable Long id) {
-      return ResponseEntity.ok(orderService.refundRequest(id));
+  public ResponseEntity<Void> refundRequest(@PathVariable Long id) {
+      orderService.refundRequest(id);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/request/{id}/cancel")

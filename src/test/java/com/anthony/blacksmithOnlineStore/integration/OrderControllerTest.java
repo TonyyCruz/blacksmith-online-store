@@ -231,7 +231,7 @@ public class OrderControllerTest extends TestBase {
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isBadRequest());
+          .andExpect(status().isNotFound());
     }
 
     @Test

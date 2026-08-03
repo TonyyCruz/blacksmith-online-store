@@ -9,7 +9,6 @@ import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +17,7 @@ public class AdminService {
   private final UserRepository userRepository;
   private final AuthenticatedUserService authUser;
 
-  public User getEntityById(UUID id) {
+  public User findEntityById(UUID id) {
     return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
   }
 
@@ -26,7 +25,7 @@ public class AdminService {
     if (authUser.getAuthenticatedId().equals(id)) {
       throw new ForbiddenOperationException("You cannot change your own role.");
     }
-    User user = getEntityById(id);
+    User user = findEntityById(id);
     user.setRole(roleUpdateDto.role());
     userRepository.save(user);
   }
