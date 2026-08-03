@@ -10,19 +10,27 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record PaymentCreateDto(
-        @NotNull
-        PaymentMethod method,
-        @NotNull
-        @Min(value = 0, message = "Amount must be greater than or equal to zero")
-        BigDecimal amount,
-        DebitDto debit,
-        CreditDto credit,
-        PixDTO pix,
-        BankSlipDto bankSlip
+  @Schema(description = "The payment method", example = "CREDIT_CARD")
+  @NotNull
+  PaymentMethod method,
+  @Schema(description = "The payment amount", example = "380.00")
+  @NotNull
+  @Min(value = 0, message = "Amount must be greater than or equal to zero")
+  BigDecimal amount,
+  @Schema(description = "The debit payment method, only the payment method used must be inserted")
+  DebitDto debit,
+  @Schema(description = "The credit payment method, only the payment method used must be inserted")
+  CreditDto credit,
+  @Schema(description = "The pix payment method, only the payment method used must be inserted")
+  PixDTO pix,
+  @Schema(description = "The bank slip payment method, only the payment method used must be inserted")
+  BankSlipDto bankSlip
 ) {
 
   public static Payment toEntity(PaymentCreateDto dto) {
