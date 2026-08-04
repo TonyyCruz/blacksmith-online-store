@@ -63,13 +63,13 @@ public class ItemController {
   }
 
   @GetMapping("/{id}")
-  @Operation(summary = "Find item by id")
+  @Operation(summary = "Find an active item by id")
   public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long id) {
     return ResponseEntity.ok(itemService.findById(id));
   }
 
   @GetMapping
-  @Operation(summary = "Find items by filter")
+  @Operation(summary = "Find all items by filter, only admin can get inactive items")
   public ResponseEntity<Page<ItemResponseDto>> getAllFilteredItems(
       @ParameterObject ItemFilterDto filter,
       @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
@@ -79,7 +79,7 @@ public class ItemController {
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Delete item by id")
+  @Operation(summary = "Delete item by id, ADMIN only")
   public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
     itemService.deleteItem(id);
     return ResponseEntity.noContent().build();

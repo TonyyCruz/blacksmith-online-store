@@ -31,13 +31,13 @@ public class AuthController {
   private final UserService userService;
 
   @PostMapping("/register")
-  @Operation(summary = "Register a user")
+  @Operation(summary = "Register a new user")
   public ResponseEntity<UserDto> register(@RequestBody @Valid UserCreateDto userCreateDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userCreateDto));
   }
 
   @PostMapping("/login")
-  @Operation(summary = "Log in")
+  @Operation(summary = "Authentication")
   public ResponseEntity<TokenDto> login(@RequestBody LoginRequest loginRequest) {
     Authentication authentication = authManager.authenticate(loginRequest.toAuthentication());
     User user = (User) authentication.getPrincipal();

@@ -1,5 +1,10 @@
 package com.anthony.blacksmithOnlineStore.events.listeners;
 
+import java.time.LocalDateTime;
+
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
@@ -7,10 +12,9 @@ import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.DeliverException;
 import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +32,7 @@ public class FakeDeliverEventListener {
       if (order.getDeliveredAt() != null) {
         throw new DeliverException("This order has already been delivered");
       }
-      order.setDeliveredAt(java.time.LocalDateTime.now());
+      order.setDeliveredAt(LocalDateTime.now());
       order.setStatus(OrderStatus.SEPARATING);
       order.setStatus(OrderStatus.DISPATCHED);
       order.setStatus(OrderStatus.IN_TRANSIT);
@@ -42,17 +46,11 @@ public class FakeDeliverEventListener {
   public void returnRequest(ReturnRequestEvent returnEvent) {
     Order order = orderRepository.findById(returnEvent.orderId())
         .orElseThrow(() -> new OrderNotFoundException(returnEvent.orderId()));
-    try {
-      if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-        throw new DeliverException("A not delivered order cannot be returned");
+    if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
+    throw new DeliverException("A not delivered order cannot be returned");
       }
-      order.setStatus(OrderStatus.RETURN_REQUESTED);
-      Thread.sleep(5000); // Simulate a delay in the delivery process
-      order.setStatus(OrderStatus.RETURNED);
-      orderRepository.save(order);
-    } catch(InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new DeliverException("Delivery process was interrupted");
-    }
+    order.setStatus(OrderStatus.RETURN_REQUESTED);
+    order.setStatus(OrderStatus.RETURNED);
+    orderRepository.save(order);
   }
 }

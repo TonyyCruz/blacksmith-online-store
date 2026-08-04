@@ -2,6 +2,9 @@ package com.anthony.blacksmithOnlineStore.controller.dto.user;
 
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.validations.user.Password;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import com.anthony.blacksmithOnlineStore.validations.user.Age;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,14 +12,17 @@ import java.time.LocalDate;
 import org.hibernate.validator.constraints.Length;
 
 public record UserCreateDto(
-    @NotBlank(message = "Username is required.")
-    @Length(min = 2, max = 100, message = "Username must be between 2 and 100 characters.")
-    String username,
-    @Password
-    String password,
-    @NotNull(message = "Birth date is required.")
-    @Age(min = 18, message = "User must be at least 18 years old.")
-    LocalDate birthDate) {
+  @Schema(description = "The username", example = "Avalon")
+  @NotBlank(message = "Username is required.")
+  @Length(min = 2, max = 100, message = "Username must be between 2 and 100 characters.")
+  String username,
+  @Schema(description = "The password", example = "Av4l0nGoat3")
+  @Password
+  String password,
+  @Schema(description = "The birthdate", example = "2000-04-06")
+  @NotNull(message = "Birth date is required.")
+  @Age(min = 18, message = "User must be at least 18 years old.")
+  LocalDate birthDate) {
 
   public static User toEntity(UserCreateDto dto) {
     User user = new User();
