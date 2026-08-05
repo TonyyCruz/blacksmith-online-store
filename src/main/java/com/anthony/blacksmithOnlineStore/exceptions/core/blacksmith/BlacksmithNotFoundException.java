@@ -1,6 +1,6 @@
-package com.anthony.blacksmithOnlineStore.exceptions.blacksmith;
+package com.anthony.blacksmithOnlineStore.exceptions.core.blacksmith;
 
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.NotFoundException;
 
 public class BlacksmithNotFoundException extends NotFoundException {
   public BlacksmithNotFoundException(Long id) {

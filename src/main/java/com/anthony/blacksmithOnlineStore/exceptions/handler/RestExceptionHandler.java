@@ -1,9 +1,9 @@
 package com.anthony.blacksmithOnlineStore.exceptions.handler;
 
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ForbiddenException;
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.BadRequestException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.ForbiddenException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import org.springframework.core.NestedRuntimeException;
@@ -111,7 +111,7 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", "Ops, algo deu errado. 😵");
+    exceptionDetails.addError("error", "Ops, something went wrong. 😵");
 //    exceptionDetails.addError("error", e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }

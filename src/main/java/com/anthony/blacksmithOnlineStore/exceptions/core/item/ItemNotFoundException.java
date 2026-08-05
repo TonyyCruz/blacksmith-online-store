@@ -1,6 +1,6 @@
-package com.anthony.blacksmithOnlineStore.exceptions.item;
+package com.anthony.blacksmithOnlineStore.exceptions.core.item;
 
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.NotFoundException;
 
 public class ItemNotFoundException extends NotFoundException {
 

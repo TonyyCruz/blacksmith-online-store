@@ -1,6 +1,6 @@
-package com.anthony.blacksmithOnlineStore.exceptions;
+package com.anthony.blacksmithOnlineStore.exceptions.core;
 
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.BadRequestException;
 
 public class DeliverException extends BadRequestException {
   public DeliverException() {

@@ -1,6 +1,6 @@
-package com.anthony.blacksmithOnlineStore.exceptions.rating;
+package com.anthony.blacksmithOnlineStore.exceptions.core.rating;
 
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.NotFoundException;
 
 public class RatingNotFoundException extends NotFoundException {
 
