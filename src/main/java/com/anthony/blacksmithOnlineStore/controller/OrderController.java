@@ -1,10 +1,8 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +28,7 @@ public class OrderController {
 
   @PostMapping
   @Operation(summary = "Create a new order")
-  public ResponseEntity<OrderPaymentDto> create(
+  public ResponseEntity<OrderResponseDto> create(
       @Valid @RequestBody OrderRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(dto));
   }

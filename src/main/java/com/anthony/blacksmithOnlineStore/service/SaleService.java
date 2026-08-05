@@ -1,18 +1,11 @@
 package com.anthony.blacksmithOnlineStore.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.anthony.blacksmithOnlineStore.entity.Order;
-import com.anthony.blacksmithOnlineStore.entity.OrderItem;
-import com.anthony.blacksmithOnlineStore.events.ItemsReturnedEvent;
-import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.DataModifyException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.DataModifyException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderException;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service

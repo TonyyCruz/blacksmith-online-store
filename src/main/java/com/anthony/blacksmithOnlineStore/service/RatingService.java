@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -14,9 +13,9 @@ import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.events.RatingCreatedEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.user.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.rating.RatingException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.rating.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
 
 import jakarta.transaction.Transactional;

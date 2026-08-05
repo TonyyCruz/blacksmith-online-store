@@ -7,7 +7,7 @@ import com.anthony.blacksmithOnlineStore.entity.Payment;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.PaymentException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.payment.PaymentException;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessor;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessorFactory;
 import com.anthony.blacksmithOnlineStore.payment.PaymentResult;

@@ -1,8 +1,8 @@
 package com.anthony.blacksmithOnlineStore.service;
 
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
-import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.OrderItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.user.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.OrderItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderItemRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import lombok.RequiredArgsConstructor;

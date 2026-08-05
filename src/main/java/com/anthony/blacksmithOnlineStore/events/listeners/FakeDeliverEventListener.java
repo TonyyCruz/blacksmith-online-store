@@ -9,8 +9,8 @@ import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.DeliverException;
-import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.DeliverException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;

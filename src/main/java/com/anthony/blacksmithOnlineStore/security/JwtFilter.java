@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.security;
 
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidTokenException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.InvalidTokenException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -11,10 +10,10 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderStatusException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.OrderNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.user.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
@@ -35,7 +34,7 @@ public class OrderService {
   private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
-  public OrderPaymentDto create(OrderRequestDto dto) {
+  public OrderResponseDto create(OrderRequestDto dto) {
     Order order = new Order();
     User user = userService.getUserReference();
     order.setUser(user);
@@ -51,7 +50,7 @@ public class OrderService {
       order.addOrderItem(orderItem);
     }
     order.recalculateTotal();
-    return OrderPaymentDto.fromEntity(orderRepository.save(order));
+    return OrderResponseDto.fromEntity(orderRepository.save(order));
   }
 
   @Transactional

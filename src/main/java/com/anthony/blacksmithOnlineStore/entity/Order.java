@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.entity;
 
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderStatusException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

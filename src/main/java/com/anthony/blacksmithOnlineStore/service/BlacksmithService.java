@@ -3,7 +3,7 @@ package com.anthony.blacksmithOnlineStore.service;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
-import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.blacksmith.BlacksmithNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
