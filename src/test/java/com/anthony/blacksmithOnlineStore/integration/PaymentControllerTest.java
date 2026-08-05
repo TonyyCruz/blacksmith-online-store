@@ -42,8 +42,8 @@ public class PaymentControllerTest extends TestBase {
   class PaymentHappyPath {
 
     @Test
-    @DisplayName("Can approve a valid order successfuly")
-    void approve_canConfirmAPaymentSuccessfully() throws Exception {
+    @DisplayName("Can paid a valid order successfuly")
+    void approve_canPayAValidOrderSuccessfully() throws Exception {
       String valueAsString = objectMapper.writeValueAsString(
           MockPayment.creditCard().toBuilder().amount(order.getTotal()).build());
       mockMvc.perform(post("/payments/order/{id}", order.getId())
@@ -52,7 +52,7 @@ public class PaymentControllerTest extends TestBase {
               .content(valueAsString))
           .andExpect(status().isOk());
        Order updatedOrder = getOrderById(order.getId());
-       assertEquals(OrderStatus.PAYMENT_APPROVED, updatedOrder.getStatus(),
+       assertEquals(OrderStatus.DELIVERED, updatedOrder.getStatus(),
            "The order status must be approved");
     }
   }

@@ -98,7 +98,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(
               jsonPath("$.finalPrice").value(dto.finalPrice().doubleValue()))
           .andExpect(jsonPath("$.description").value(dto.description()))
-          .andExpect(jsonPath("$.weight").value(dto.weight().doubleValue()))
+          .andExpect(jsonPath("$.weight").value(dto.weight()))
           .andExpect(jsonPath("$.stock").value(dto.stock()))
           .andExpect(jsonPath("$.type").value(dto.type().toString()))
           .andExpect(jsonPath("$.rarity").value(dto.rarity().toString()))
@@ -125,7 +125,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.basePrice").value(dto.basePrice().doubleValue()))
           .andExpect(jsonPath("$.finalPrice").value(dto.finalPrice().doubleValue()))
           .andExpect(jsonPath("$.description").value(dto.description()))
-          .andExpect(jsonPath("$.weight").value(dto.weight().doubleValue()))
+          .andExpect(jsonPath("$.weight").value(dto.weight()))
           .andExpect(jsonPath("$.stock").value(dto.stock()))
           .andExpect(jsonPath("$.type").value(dto.type().toString()))
           .andExpect(jsonPath("$.rarity").value(dto.rarity().toString()))
@@ -152,7 +152,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.basePrice").value(itemUpdate.basePrice().doubleValue()))
           .andExpect(jsonPath("$.finalPrice").value(itemUpdate.finalPrice().doubleValue()))
           .andExpect(jsonPath("$.description").value(itemUpdate.description()))
-          .andExpect(jsonPath("$.weight").value(itemUpdate.weight().doubleValue()))
+          .andExpect(jsonPath("$.weight").value(itemUpdate.weight()))
           .andExpect(jsonPath("$.stock").value(itemUpdate.stock()))
           .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
           .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
@@ -188,7 +188,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.basePrice").value(item.getBasePrice().doubleValue()))
           .andExpect(jsonPath("$.finalPrice").value(item.getFinalPrice().doubleValue()))
           .andExpect(jsonPath("$.description").value(itemUpdate.description()))
-          .andExpect(jsonPath("$.weight").value(item.getWeight().doubleValue()))
+          .andExpect(jsonPath("$.weight").value(item.getWeight()))
           .andExpect(jsonPath("$.stock").value(item.getStock()))
           .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
           .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
@@ -211,7 +211,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.basePrice").value(item.getBasePrice().doubleValue()))
           .andExpect(jsonPath("$.finalPrice").value(item.getFinalPrice().doubleValue()))
           .andExpect(jsonPath("$.description").value(item.getDescription()))
-          .andExpect(jsonPath("$.weight").value(item.getWeight().doubleValue()))
+          .andExpect(jsonPath("$.weight").value(item.getWeight()))
           .andExpect(jsonPath("$.stock").value(item.getStock()))
           .andExpect(jsonPath("$.type").value(item.getType().toString()))
           .andExpect(jsonPath("$.rarity").value(item.getRarity().toString()))
@@ -241,7 +241,7 @@ public class ItemControllerTest extends TestBase {
               .value(item.getFinalPrice().doubleValue()))
           .andExpect(jsonPath("$.content[0].description").value(item.getDescription()))
           .andExpect(jsonPath("$.content[0].weight")
-              .value(item.getWeight().doubleValue()))
+              .value(item.getWeight()))
           .andExpect(jsonPath("$.content[0].stock").value(item.getStock()))
           .andExpect(jsonPath("$.content[0].type").value(item.getType().toString()))
           .andExpect(jsonPath("$.content[0].rarity").value(item.getRarity().toString()))
@@ -279,7 +279,7 @@ public class ItemControllerTest extends TestBase {
     void getAllActiveItems_canGetAllFilteredMatchedItemsSuccessfully() throws Exception {
       ItemFilterDto filter = new ItemFilterDto("Sword of Valor", Material.STEEL, 50,
           51, 20, 21, BigDecimal.valueOf(89.0),
-          BigDecimal.valueOf(99.0), 2.2f, 5.1f, Type.SHORT_SWORD, Rarity.RARE,
+          BigDecimal.valueOf(99.0), 2.2d, 5.1d, Type.SHORT_SWORD, Rarity.RARE,
           1L, null);
       String query = QueryHelper.buildQueryString(filter);
       mockMvc.perform(get(item_BASE_URL + query)
@@ -327,6 +327,17 @@ public class ItemControllerTest extends TestBase {
               .header("Authorization", adminToken))
           .andExpect(status().isNoContent());
       assertFalse(itemRepository.existsById(savedItem.getId()));
+    }
+
+    @Test
+    @DisplayName("Get filtered item with invalid Blacksmith id return a empty list")
+    void getItemByBlacksmithId_shouldReturnAEmptyList_whenBlacksmithNotExists() throws Exception {
+      mockMvc.perform(get(item_BASE_URL)
+              .header("Authorization", userToken)
+              .queryParam("blacksmithId", "999999"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content").isEmpty());
     }
   }
 
@@ -639,14 +650,6 @@ public class ItemControllerTest extends TestBase {
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(dto)))
           .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Get itemWithId By Blacksmith orderId Should return 404 when blacksmith not exists")
-    void getItemByBlacksmithId_shouldReturn404_whenBlacksmithNotExists() throws Exception {
-      mockMvc.perform(get(item_BASE_URL + "/blacksmith/999999")
-              .header("Authorization", userToken))
-          .andExpect(status().isNotFound());
     }
 
     @Test

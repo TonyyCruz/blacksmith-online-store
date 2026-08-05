@@ -6,8 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Item;
@@ -76,7 +76,7 @@ public class OrderControllerTest extends TestBase {
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
           .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.orderId").isNotEmpty())
+          .andExpect(jsonPath("$.id").isNotEmpty())
           .andExpect(jsonPath("$.status").value(OrderStatus.PENDING.name()))
           .andExpect(jsonPath("$.items").isArray())
           .andExpect(jsonPath("$.items.size()").value(2))
@@ -84,12 +84,12 @@ public class OrderControllerTest extends TestBase {
           .andReturn();
 
       String stringResult = result.getResponse().getContentAsString();
-      OrderPaymentDto orderResult = objectMapper.readValue(stringResult, OrderPaymentDto.class);
+      OrderResponseDto orderResult = objectMapper.readValue(stringResult, OrderResponseDto.class);
       orderResult.items().forEach(item -> {
         assertThat(item.productId()).isNotNull();
         assertThat(item.quantity()).isGreaterThan(0);
         assertThat(item.UserId()).isEqualTo(USER_ID);
-        assertThat(item.orderId()).isEqualTo(orderResult.orderId());
+        assertThat(item.orderId()).isEqualTo(orderResult.id());
       });
 
       OrderItemResponseDto orderItemResponseDtoOne = orderResult.items().get(0);
@@ -310,7 +310,7 @@ public class OrderControllerTest extends TestBase {
     @Test
     @DisplayName("Get order by id returns 400 with a invalid id")
     void getById_returns403_withAInvalidId() throws Exception {
-      mockMvc.perform(get(ORDER_BASE_URL + "{id}", 99999999)
+      mockMvc.perform(get(ORDER_BASE_URL + "/{id}", 99999999)
               .header("Authorization", userToken))
           .andExpect(status().isNotFound());
     }

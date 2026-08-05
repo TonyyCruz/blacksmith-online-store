@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -18,10 +17,10 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderStatusException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.order.OrderNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.rating.RatingNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.user.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
@@ -63,7 +62,6 @@ public class OrderServiceTest {
   private ApplicationEventPublisher eventPublisher;
   @InjectMocks
   OrderService orderService;
-  private final Item targetItem = MockItem.item();
   private final User user = MockUser.userWithId();
 
   @Nested
@@ -98,7 +96,7 @@ public class OrderServiceTest {
       when(orderRepository.save(any()))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
-      OrderPaymentDto response = orderService.create(dto);
+      OrderResponseDto response = orderService.create(dto);
 
       assertEquals(BigDecimal.valueOf(90), response.total(),
           "The total must have the correct price");

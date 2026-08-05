@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.exceptions;
+package com.anthony.blacksmithOnlineStore.exceptions.item;
 
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
 

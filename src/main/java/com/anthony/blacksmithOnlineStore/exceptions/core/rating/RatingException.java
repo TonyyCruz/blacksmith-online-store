@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.exceptions;
+package com.anthony.blacksmithOnlineStore.exceptions.rating;
 
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
 
