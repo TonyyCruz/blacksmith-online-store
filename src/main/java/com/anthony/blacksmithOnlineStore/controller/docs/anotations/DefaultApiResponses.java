@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.controller.docs;
+package com.anthony.blacksmithOnlineStore.controller.docs.anotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses({
   @ApiResponse(responseCode = "400", description = "Invalid request"),
