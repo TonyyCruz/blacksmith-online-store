@@ -28,7 +28,7 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.NOT_FOUND.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
@@ -42,7 +42,7 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.BAD_REQUEST.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
@@ -55,7 +55,7 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.FORBIDDEN.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
@@ -69,7 +69,7 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.UNAUTHORIZED.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
@@ -82,7 +82,7 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.FORBIDDEN.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
@@ -95,7 +95,7 @@ public class RestExceptionHandler {
     validationDetails.setStatus(HttpStatus.BAD_REQUEST.value());
     validationDetails.setException(e.getClass().toString());
     validationDetails.setPath(request.getRequestURI());
-    validationDetails.addError("InvalidFieldData", e.getMessage());
+    validationDetails.setMessage(e.getMessage());
     e.getBindingResult().getFieldErrors().forEach(objectError -> {
       validationDetails.addFieldError(objectError.getField(), objectError.getDefaultMessage());
     });
@@ -111,8 +111,8 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", "Ops, something went wrong. 😵");
-//    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage("Ops, something went wrong. 😵");
+//    exceptionDetails.addError(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 }

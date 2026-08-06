@@ -1,15 +1,13 @@
 package com.anthony.blacksmithOnlineStore.exceptions.handler;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import lombok.AccessLevel;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @NoArgsConstructor
@@ -24,10 +22,5 @@ public class ExceptionDetails implements Serializable {
   private int status;
   private String exception;
   private String path;
-  @Setter(AccessLevel.NONE)
-  private final Map<String, String> errors = new HashMap<>();
-
-  public void addError(String error, String details) {
-    errors.put(error, details);
-  }
+  private String message;
 }
