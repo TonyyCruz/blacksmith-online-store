@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.core.payment;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.BadRequestException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
 
 public class InvalidPaymentException extends BadRequestException {
   public InvalidPaymentException() {

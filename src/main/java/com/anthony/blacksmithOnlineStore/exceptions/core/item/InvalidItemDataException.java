@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.core.item;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.BadRequestException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
 
 public class InvalidItemDataException extends BadRequestException {
   public InvalidItemDataException() {

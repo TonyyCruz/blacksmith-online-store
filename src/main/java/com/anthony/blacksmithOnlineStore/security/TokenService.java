@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.security;
 
 import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.exceptions.core.InvalidTokenException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidTokenException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;

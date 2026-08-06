@@ -3,23 +3,21 @@ package com.anthony.blacksmithOnlineStore.integration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
-import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.enums.Role;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
-import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+
+import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
+import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.enums.Role;
+import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 
 @Tag("integration")
 @DisplayName("Integration test for admin controller")

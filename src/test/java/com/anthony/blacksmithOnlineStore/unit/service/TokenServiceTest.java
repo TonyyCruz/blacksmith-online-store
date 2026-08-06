@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.exceptions.core.InvalidTokenException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidTokenException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.security.TokenService;
 import com.auth0.jwt.JWT;

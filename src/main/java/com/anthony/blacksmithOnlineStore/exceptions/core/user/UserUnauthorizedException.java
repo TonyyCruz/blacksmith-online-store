@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.core.user;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.UnauthorizedException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
 
 public class UserUnauthorizedException extends UnauthorizedException {
   public UserUnauthorizedException() {

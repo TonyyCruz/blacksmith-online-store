@@ -1,9 +1,5 @@
 package com.anthony.blacksmithOnlineStore.exceptions.handler;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.BadRequestException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.ForbiddenException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.NotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import org.springframework.core.NestedRuntimeException;
@@ -15,6 +11,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ForbiddenException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
 
 @RestControllerAdvice
 public class RestExceptionHandler {

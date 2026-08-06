@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions;
+package com.anthony.blacksmithOnlineStore.exceptions.baseExceptions;
 
 public class UnauthorizedException extends RuntimeException {
   protected UnauthorizedException(String msg, Throwable cause) {

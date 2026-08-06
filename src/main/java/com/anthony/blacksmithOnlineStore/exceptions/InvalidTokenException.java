@@ -1,6 +1,6 @@
-package com.anthony.blacksmithOnlineStore.exceptions.core;
+package com.anthony.blacksmithOnlineStore.exceptions;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.UnauthorizedException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
 
 public class InvalidTokenException extends UnauthorizedException {
   public InvalidTokenException() {

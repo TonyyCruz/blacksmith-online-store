@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.core.payment;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
 
 public class PaymentNotFoundException extends NotFoundException {
 

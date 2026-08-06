@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions;
+package com.anthony.blacksmithOnlineStore.exceptions.baseExceptions;
 
 public class ForbiddenException extends RuntimeException{
   protected ForbiddenException(String message) {

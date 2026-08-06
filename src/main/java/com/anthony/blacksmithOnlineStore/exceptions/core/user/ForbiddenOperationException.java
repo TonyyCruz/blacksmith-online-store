@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.core.user;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.ForbiddenException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ForbiddenException;
 
 public class ForbiddenOperationException extends ForbiddenException {
 

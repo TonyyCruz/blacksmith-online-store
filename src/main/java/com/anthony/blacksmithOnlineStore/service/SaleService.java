@@ -2,7 +2,7 @@ package com.anthony.blacksmithOnlineStore.service;
 
 import org.springframework.stereotype.Service;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.DataModifyException;
+import com.anthony.blacksmithOnlineStore.exceptions.InsufficientStockException;
 import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderException;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 
@@ -21,7 +21,7 @@ public class SaleService {
     }
     int modifiedLines = itemRepository.decrementStockAndIncrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
-      throw new DataModifyException("Item have no stock for this operation: " + itemId);
+      throw new InsufficientStockException("Item have no stock for this operation: " + itemId);
     }
   }
 
@@ -29,7 +29,7 @@ public class SaleService {
     itemService.itemExistesVerifier(itemId);
     int modifiedLines = itemRepository.incrementStockAndDecrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
-      throw new DataModifyException("Item have no sufficient sold for this operation: " + itemId);
+      throw new InsufficientStockException("Item have no sufficient sold for this operation: " + itemId);
     }
   }
 }

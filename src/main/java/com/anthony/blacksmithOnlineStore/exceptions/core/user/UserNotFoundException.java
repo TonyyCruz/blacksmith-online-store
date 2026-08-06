@@ -1,7 +1,8 @@
 package com.anthony.blacksmithOnlineStore.exceptions.core.user;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.NotFoundException;
 import java.util.UUID;
+
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
 
 public class UserNotFoundException extends NotFoundException {
 

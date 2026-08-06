@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.core.order;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.baseExceptions.BadRequestException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
 
 public class InvalidOrderException extends BadRequestException {
   public InvalidOrderException() {

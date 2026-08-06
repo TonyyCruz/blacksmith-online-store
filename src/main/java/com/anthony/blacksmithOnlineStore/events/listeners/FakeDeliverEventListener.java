@@ -9,7 +9,7 @@ import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.core.DeliverException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.exceptions.core.order.OrderNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 
@@ -27,10 +27,10 @@ public class FakeDeliverEventListener {
     Order order = orderRepository.findById(paidEvent.orderId())
         .orElseThrow(() -> new OrderNotFoundException(paidEvent.orderId()));
       if (!order.getStatus().equals(OrderStatus.PAYMENT_APPROVED)) {
-        throw new DeliverException("A not paid order cannot be delivered");
+        throw new BusinessViolationException("A not paid order cannot be delivered");
       }
       if (order.getDeliveredAt() != null) {
-        throw new DeliverException("This order has already been delivered");
+        throw new BusinessViolationException("This order has already been delivered");
       }
       order.setDeliveredAt(LocalDateTime.now());
       order.setStatus(OrderStatus.SEPARATING);
@@ -47,7 +47,7 @@ public class FakeDeliverEventListener {
     Order order = orderRepository.findById(returnEvent.orderId())
         .orElseThrow(() -> new OrderNotFoundException(returnEvent.orderId()));
     if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-    throw new DeliverException("A not delivered order cannot be returned");
+    throw new BusinessViolationException("A not delivered order cannot be returned");
       }
     order.setStatus(OrderStatus.RETURN_REQUESTED);
     order.setStatus(OrderStatus.RETURNED);
