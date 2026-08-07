@@ -1,7 +1,7 @@
 package com.anthony.blacksmithOnlineStore.entity;
 
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderStatusException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -67,7 +67,7 @@ public class Order {
 
   public void setStatus(OrderStatus status) {
     if (!this.status.canChangeTo(status)) {
-      throw new InvalidOrderStatusException(
+      throw new BusinessViolationException(
           "The current state \""
               .concat(this.status.getStatus())
               .concat("\" cannot be change to \"")

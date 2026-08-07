@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.security.utils;
 
-import com.anthony.blacksmithOnlineStore.exceptions.core.user.UserUnauthorizedException;
 import java.util.UUID;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +23,7 @@ public class AuthenticatedUserService {
 
   private Authentication getAuthentication() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null || !auth.isAuthenticated()) throw new UserUnauthorizedException();
+    if (auth == null || !auth.isAuthenticated()) throw new UnauthorizedOperationException();
     return auth;
   }
 }

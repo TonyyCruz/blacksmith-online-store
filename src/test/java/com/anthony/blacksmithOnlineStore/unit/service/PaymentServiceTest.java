@@ -18,8 +18,7 @@ import com.anthony.blacksmithOnlineStore.entity.Payment;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.payment.PaymentException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockPayment;
 import com.anthony.blacksmithOnlineStore.payment.BankSlipProcessor;
@@ -137,7 +136,7 @@ public class PaymentServiceTest {
       when(orderService.findEntityById(order.getId())).thenReturn(order);
       when(paymentFactory.getProcessor(dto.method())).thenReturn(mockPaymentProcessor(dto));
 
-      assertThrows(InvalidOrderStatusException.class, () -> {
+      assertThrows(BusinessViolationException.class, () -> {
         paymentService.createPayment(order.getId(), dto);
       });
       verify(eventPublisher, times(0)).publishEvent(any(OrderPaidEvent.class));
@@ -161,7 +160,8 @@ public class PaymentServiceTest {
         when(orderService.findEntityById(order.getId())).thenReturn(order);
 
         PaymentCreateDto finalDto = dto;
-        assertThrows(PaymentException.class, () -> {
+        assertThrows(
+            BusinessViolationException.class, () -> {
           paymentService.createPayment(order.getId(), finalDto);
         });
         verify(eventPublisher, times(0)).publishEvent(any(OrderPaidEvent.class));
@@ -186,7 +186,8 @@ public class PaymentServiceTest {
         when(orderService.findEntityById(order.getId())).thenReturn(order);
 
         PaymentCreateDto finalDto = dto;
-        assertThrows(PaymentException.class, () -> {
+        assertThrows(
+            BusinessViolationException.class, () -> {
           paymentService.createPayment(order.getId(), finalDto);
         });
         verify(eventPublisher, times(0)).publishEvent(any(OrderPaidEvent.class));

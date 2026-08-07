@@ -1,10 +1,10 @@
 package com.anthony.blacksmithOnlineStore.unit.service;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
-import com.anthony.blacksmithOnlineStore.exceptions.core.user.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.enums.Role;
-import com.anthony.blacksmithOnlineStore.exceptions.core.user.UserNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.core.user.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
@@ -83,7 +83,7 @@ class AdminServiceTest {
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
       when(authUser.getAuthenticatedId()).thenReturn(adminUser.getId());
       RoleUpdateDto dto = new RoleUpdateDto(Role.ADMIN);
-      assertThrows(UserNotFoundException.class, () -> adminService.updateRole(fakeId, dto));
+      assertThrows(ResourceNotFoundException.class, () -> adminService.updateRole(fakeId, dto));
       verify(userRepository, never()).save(any());
     }
 
@@ -103,7 +103,7 @@ class AdminServiceTest {
     void getById_ShouldThrowUserNotFoundException_WhenNotFound() {
       UUID fakeId = UUID.randomUUID();
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
-      assertThrows(UserNotFoundException.class, () -> adminService.findEntityById(fakeId));
+      assertThrows(ResourceNotFoundException.class, () -> adminService.findEntityById(fakeId));
     }
   }
 }

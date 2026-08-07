@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
-import com.anthony.blacksmithOnlineStore.exceptions.core.payment.InvalidPaymentException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 
 @Component
 public class PaymentProcessorFactory {
@@ -22,7 +22,7 @@ public class PaymentProcessorFactory {
     public PaymentProcessor getProcessor(PaymentMethod method) {
         PaymentProcessor processor = processors.get(method);
         if (processor == null) {
-            throw new InvalidPaymentException("Invalid payment method: ".concat(method.name()));
+            throw new BusinessViolationException("Invalid payment method: ".concat(method.name()));
         }
         return processor;
     }

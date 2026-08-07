@@ -3,7 +3,6 @@ package com.anthony.blacksmithOnlineStore.service;
 import org.springframework.stereotype.Service;
 
 import com.anthony.blacksmithOnlineStore.exceptions.InsufficientStockException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderException;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,7 @@ public class SaleService {
   public void performSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
     if (!itemRepository.isItemActive(itemId)) {
-      throw new InvalidOrderException("Item %d is unactive".formatted(itemId));
+      throw new InsufficientStockException("Item %d is unactive".formatted(itemId));
     }
     int modifiedLines = itemRepository.decrementStockAndIncrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {

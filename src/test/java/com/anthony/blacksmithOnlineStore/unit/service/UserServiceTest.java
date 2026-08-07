@@ -8,8 +8,8 @@ import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.exceptions.core.user.InvalidCredentialsException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.user.UsernameAlreadyExistsException;
+import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ConflictDataException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.enums.Role;
@@ -141,7 +141,7 @@ class UserServiceTest {
 
       when(userRepository.existsByUsername(dto.username())).thenReturn(true);
 
-      assertThrows(UsernameAlreadyExistsException.class,
+      assertThrows(ConflictDataException.class,
           () -> userService.create(dto));
       verify(userRepository, times(1)).existsByUsername(dto.username());
     }
@@ -154,7 +154,7 @@ class UserServiceTest {
       when(userRepository.existsByUsername(dto.username())).thenReturn(true);
       when(authUser.getName()).thenReturn("differentUsername");
 
-      assertThrows(UsernameAlreadyExistsException.class,
+      assertThrows(ConflictDataException.class,
           () -> userService.updateUser(dto));
       verify(userRepository, times(1)).existsByUsername(dto.username());
       }
@@ -172,7 +172,7 @@ class UserServiceTest {
 
       PasswordUpdateDto dto = new PasswordUpdateDto("wrong", "newPass");
 
-      assertThrows(InvalidCredentialsException.class,
+      assertThrows(UnauthorizedOperationException.class,
           () -> userService.updatePassword(dto));
       verify(userRepository, times(1))
           .findById(targetUser.getId());

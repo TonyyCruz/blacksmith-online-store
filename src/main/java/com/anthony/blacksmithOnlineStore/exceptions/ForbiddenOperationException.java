@@ -1,4 +1,4 @@
-package com.anthony.blacksmithOnlineStore.exceptions.core.user;
+package com.anthony.blacksmithOnlineStore.exceptions;
 
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ForbiddenException;
 

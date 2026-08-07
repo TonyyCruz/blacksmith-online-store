@@ -10,10 +10,10 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.order.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.order.OrderNotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.core.user.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.InsufficientStockException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
@@ -41,7 +41,7 @@ public class OrderService {
     for (OrderItemRequestDto orderItemDto : dto.items()) {
       Item item = itemService.findEntityById(orderItemDto.itemId());
       if (orderItemDto.quantity() > item.getStock()) {
-        throw new InvalidOrderException(
+        throw new InsufficientStockException(
             "Item %d does not have enough stock".formatted(item.getId()));
       }
       OrderItem orderItem = orderItemFactory.create(item, orderItemDto.quantity());
@@ -57,7 +57,7 @@ public class OrderService {
   public OrderResponseDto cancel(long id) {
     Order order = findEntityById(id);
     if (!order.getStatus().canBeCanceled()) {
-      throw new InvalidOrderStatusException("Only pending orders can be cancelled");
+      throw new BusinessViolationException("Only pending orders can be cancelled");
     }
     order.setStatus(OrderStatus.CANCELLED);
     return OrderResponseDto.fromEntity(order);
@@ -68,9 +68,9 @@ public class OrderService {
     Order order = findEntityById(id);
     if (!order.getStatus().canBeRefunded()) {
       if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
-        throw new InvalidOrderStatusException("This order is already pending for refund.");
+        throw new BusinessViolationException("This order is already pending for refund.");
       }
-      throw new InvalidOrderStatusException("This order cannot be refunded");
+      throw new BusinessViolationException("This order cannot be refunded");
     }
     order.setStatus(OrderStatus.REFUND_PENDING);
     eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
@@ -80,7 +80,7 @@ public class OrderService {
   public void returnRequest(long id) {
     Order order = findEntityById(id);
     if (!order.getStatus().canBeReturned()) {
-      throw new InvalidOrderStatusException("Only delivered orders can be returned");
+      throw new BusinessViolationException("Only delivered orders can be returned");
     }
     eventPublisher.publishEvent(new ReturnRequestEvent(id, order.getOrderItems()));
   }
@@ -97,7 +97,9 @@ public class OrderService {
   }
 
   public Order findEntityById(long id) {
-    if (!orderRepository.existsById(id)) throw new OrderNotFoundException(id);
+    if (!orderRepository.existsById(id)) {
+      throw new ResourceNotFoundException("Order not found with id: " + id);
+    }
     if (authUser.isAdmin()) return orderRepository.findById(id).get();
     return orderRepository.findByIdAndUserId(id, authUser.getAuthenticatedId())
         .orElseThrow(() -> new ForbiddenOperationException("You cannot access this order."));
