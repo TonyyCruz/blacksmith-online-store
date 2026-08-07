@@ -9,9 +9,9 @@ import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.DeliverException;
-import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
+import com.anthony.blacksmithOnlineStore.service.OrderService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,17 +20,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FakeDeliverEventListener {
   private final OrderRepository orderRepository;
+  private final OrderService orderService;
 
   @Transactional
   @EventListener
   public void deliverRequest(OrderPaidEvent paidEvent) {
-    Order order = orderRepository.findById(paidEvent.orderId())
-        .orElseThrow(() -> new OrderNotFoundException(paidEvent.orderId()));
+    Order order = orderService.findEntityById(paidEvent.orderId());
       if (!order.getStatus().equals(OrderStatus.PAYMENT_APPROVED)) {
-        throw new DeliverException("A not paid order cannot be delivered");
+        throw new BusinessViolationException("A not paid order cannot be delivered");
       }
       if (order.getDeliveredAt() != null) {
-        throw new DeliverException("This order has already been delivered");
+        throw new BusinessViolationException("This order has already been delivered");
       }
       order.setDeliveredAt(LocalDateTime.now());
       order.setStatus(OrderStatus.SEPARATING);
@@ -44,10 +44,9 @@ public class FakeDeliverEventListener {
   @Transactional
   @EventListener
   public void returnRequest(ReturnRequestEvent returnEvent) {
-    Order order = orderRepository.findById(returnEvent.orderId())
-        .orElseThrow(() -> new OrderNotFoundException(returnEvent.orderId()));
+    Order order = orderService.findEntityById(returnEvent.orderId());
     if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-    throw new DeliverException("A not delivered order cannot be returned");
+    throw new BusinessViolationException("A not delivered order cannot be returned");
       }
     order.setStatus(OrderStatus.RETURN_REQUESTED);
     order.setStatus(OrderStatus.RETURNED);

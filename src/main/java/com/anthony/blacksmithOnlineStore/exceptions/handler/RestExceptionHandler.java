@@ -1,9 +1,5 @@
 package com.anthony.blacksmithOnlineStore.exceptions.handler;
 
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ForbiddenException;
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import org.springframework.core.NestedRuntimeException;
@@ -16,6 +12,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BadRequestException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BusinessException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ConflictException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ForbiddenException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
+
 @RestControllerAdvice
 public class RestExceptionHandler {
 
@@ -23,44 +26,32 @@ public class RestExceptionHandler {
   public ResponseEntity<ExceptionDetails> handleNotFoundException(NotFoundException e,
       HttpServletRequest request) {
     ExceptionDetails exceptionDetails = new ExceptionDetails();
-    exceptionDetails.setTitle("Not found");
+    exceptionDetails.setTitle("Not Found");
     exceptionDetails.setTimestamp(Instant.now());
     exceptionDetails.setStatus(HttpStatus.NOT_FOUND.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
-  @ExceptionHandler({BadRequestException.class, DataAccessException.class,
-      NestedRuntimeException.class})
+  //@ExceptionHandler({BadRequestException.class, DataAccessException.class,
+  //    NestedRuntimeException.class})
+  @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<ExceptionDetails> handleBadRequestException(Exception e,
       HttpServletRequest request) {
     ExceptionDetails exceptionDetails = new ExceptionDetails();
-    exceptionDetails.setTitle("Bad request");
+    exceptionDetails.setTitle("Bad Request");
     exceptionDetails.setTimestamp(Instant.now());
     exceptionDetails.setStatus(HttpStatus.BAD_REQUEST.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
-    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
-  }
-
-  @ExceptionHandler(ForbiddenException.class)
-  public ResponseEntity<ExceptionDetails> handleForbiddenException(ForbiddenException e,
-      HttpServletRequest request) {
-    ExceptionDetails exceptionDetails = new ExceptionDetails();
-    exceptionDetails.setTitle("Forbidden");
-    exceptionDetails.setTimestamp(Instant.now());
-    exceptionDetails.setStatus(HttpStatus.FORBIDDEN.value());
-    exceptionDetails.setException(e.getClass().toString());
-    exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
   @ExceptionHandler({AuthenticationException.class, UnauthorizedException.class})
-  public ResponseEntity<ExceptionDetails> handleSpringAuthenticationException(
+  public ResponseEntity<ExceptionDetails> handleAuthenticationException(
       Exception e,
       HttpServletRequest request) {
     ExceptionDetails exceptionDetails = new ExceptionDetails();
@@ -69,33 +60,59 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.UNAUTHORIZED.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
-  @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<ExceptionDetails> handleSpringForbiddenException(AccessDeniedException e,
+  @ExceptionHandler({ForbiddenException.class, AccessDeniedException.class})
+  public ResponseEntity<ExceptionDetails> handleForbiddenException(Exception e,
       HttpServletRequest request) {
     ExceptionDetails exceptionDetails = new ExceptionDetails();
-    exceptionDetails.setTitle("Unauthorized");
+    exceptionDetails.setTitle("Forbidden");
     exceptionDetails.setTimestamp(Instant.now());
     exceptionDetails.setStatus(HttpStatus.FORBIDDEN.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<ExceptionDetails> handleConflictException(Exception e,
+      HttpServletRequest request) {
+    ExceptionDetails exceptionDetails = new ExceptionDetails();
+    exceptionDetails.setTitle("Conflict Exception");
+    exceptionDetails.setTimestamp(Instant.now());
+    exceptionDetails.setStatus(HttpStatus.CONFLICT.value());
+    exceptionDetails.setException(e.getClass().toString());
+    exceptionDetails.setPath(request.getRequestURI());
+    exceptionDetails.setMessage(e.getMessage());
+    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
+  }
+
+  @ExceptionHandler(BusinessException.class)
+  public ResponseEntity<ExceptionDetails> handleUnprocessableEntity(Exception e,
+      HttpServletRequest request) {
+    ExceptionDetails exceptionDetails = new ExceptionDetails();
+    exceptionDetails.setTitle("Unprocessable Entity");
+    exceptionDetails.setTimestamp(Instant.now());
+    exceptionDetails.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+    exceptionDetails.setException(e.getClass().toString());
+    exceptionDetails.setPath(request.getRequestURI());
+    exceptionDetails.setMessage(e.getMessage());
+    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
+  }
+
+  @ExceptionHandler({MethodArgumentNotValidException.class})
   ResponseEntity<ValidationDetails> invalidArgumentation(MethodArgumentNotValidException e,
       HttpServletRequest request) {
     ValidationDetails validationDetails = new ValidationDetails();
-    validationDetails.setTitle("Bad request");
+    validationDetails.setTitle("Bad Request");
     validationDetails.setTimestamp(Instant.now());
     validationDetails.setStatus(HttpStatus.BAD_REQUEST.value());
     validationDetails.setException(e.getClass().toString());
     validationDetails.setPath(request.getRequestURI());
-    validationDetails.addError("InvalidFieldData", e.getMessage());
+    validationDetails.setMessage(e.getMessage());
     e.getBindingResult().getFieldErrors().forEach(objectError -> {
       validationDetails.addFieldError(objectError.getField(), objectError.getDefaultMessage());
     });
@@ -111,8 +128,8 @@ public class RestExceptionHandler {
     exceptionDetails.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
-    exceptionDetails.addError("error", "Ops, algo deu errado. 😵");
-//    exceptionDetails.addError("error", e.getMessage());
+    exceptionDetails.setMessage("Ops, something went wrong. 😵");
+//    exceptionDetails.addError(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 }

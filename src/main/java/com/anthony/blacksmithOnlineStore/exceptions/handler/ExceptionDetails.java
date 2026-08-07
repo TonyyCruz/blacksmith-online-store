@@ -1,33 +1,33 @@
 package com.anthony.blacksmithOnlineStore.exceptions.handler;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import lombok.AccessLevel;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExceptionDetails implements Serializable {
+   @Schema(description = "Exception title")
   private String title;
+  @Schema(description = "Exception ocurrence date")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",
       timezone = "GMT")
   private Instant timestamp;
+  @Schema(description = "Exception status code")
   private int status;
+  @Schema(description = "Exception class name")
   private String exception;
+  @Schema(description = "Exception ocurrence path")
   private String path;
-  @Setter(AccessLevel.NONE)
-  private final Map<String, String> errors = new HashMap<>();
-
-  public void addError(String error, String details) {
-    errors.put(error, details);
-  }
+  @Schema(description = "Exception error message")
+  private String message;
 }

@@ -28,10 +28,9 @@ import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
-import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
@@ -181,57 +180,57 @@ public class ItemServiceTest {
   class ItemServiceExceptionPath {
 
     @Test
-    @DisplayName("Create should throw InvalidItemDataException when final price is greater than base price")
+    @DisplayName("Create should throw exception when final price is greater than base price")
     void createItem_shouldThrowException_whenFinalPriceIsGreaterThanBasePrice() {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100))
           .finalPrice(BigDecimal.valueOf(200))
           .build();
 
-      assertThrows(InvalidItemDataException.class, () -> itemService.create(dto),
+      assertThrows(BusinessViolationException.class, () -> itemService.create(dto),
           "Create Item should throw an exception when final price is greater than base price");
     }
 
     @Test
-    @DisplayName("Create should throw BlacksmithNotFoundException when blacksmith does not exist")
+    @DisplayName("Create should throw exception when blacksmith does not exist")
     void createItem_shouldThrowException_whenBlacksmithNotFound() {
       ItemRequestDto dto = MockItem.itemRequestDto();
 
       when(blacksmithService.findEntityById(dto.blacksmithId()))
-          .thenThrow(new BlacksmithNotFoundException(dto.blacksmithId()));
+          .thenThrow(new ResourceNotFoundException());
 
-      assertThrows(BlacksmithNotFoundException.class, () -> itemService.create(dto),
+      assertThrows(ResourceNotFoundException.class, () -> itemService.create(dto),
           "Create item must throw an exception when blacksmith was not found");
       verify(blacksmithService, times(1))
           .findEntityById(dto.blacksmithId());
     }
 
     @Test
-    @DisplayName("Update should throw BlacksmithNotFoundException when blacksmith does not exist")
+    @DisplayName("Update should throw exception when blacksmith does not exist")
     void updateItem_shouldThrowException_whenBlacksmithNotFound() {
       ItemRequestDto dto = MockItem.itemRequestDto();
 
       when(blacksmithService.findEntityById(dto.blacksmithId()))
-          .thenThrow(new BlacksmithNotFoundException(dto.blacksmithId()));
+          .thenThrow(new ResourceNotFoundException());
 
-      assertThrows(BlacksmithNotFoundException.class, () -> itemService.update(1L, dto),
+      assertThrows(ResourceNotFoundException.class, () -> itemService.update(1L, dto),
           "Update item must throw an exception when blacksmith was not found");
       verify(blacksmithService, times(1)).findEntityById(dto.blacksmithId());
     }
 
     @Test
-    @DisplayName("Patch update should throw BlacksmithNotFoundException when blacksmith was not exist")
+    @DisplayName("Patch update should throw exception when blacksmith was not exist")
     void pathUpdate_shouldThrowException_whenBlacksmithNotFound() {
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto();
 
       when(authUser.isAdmin()).thenReturn(false);
       when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
-      doThrow(new BlacksmithNotFoundException(dto.blacksmithId()))
+      doThrow(new ResourceNotFoundException())
           .when(blacksmithService)
           .findEntityById(dto.blacksmithId());
 
-      assertThrows(BlacksmithNotFoundException.class,
+      assertThrows(ResourceNotFoundException.class,
           () -> itemService.update(targetItem.getId(), dto),
           "Patch update must throw an exception when blacksmith was not found");
       verify(itemRepository, times(1))
@@ -241,48 +240,48 @@ public class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("Update should throw InvalidItemDataException when final price is greater than base price")
-    void updateItem_shouldThrowInvalidItemDataException_whenItemFinalPriceGreaterThanBasePrice() {
+    @DisplayName("Update should throw exception when final price is greater than base price")
+    void updateItem_shouldThrowException_whenItemFinalPriceGreaterThanBasePrice() {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100)).finalPrice(BigDecimal.valueOf(200)).build();
-      assertThrows(InvalidItemDataException.class,() -> itemService.update(1L, dto),
+      assertThrows(BusinessViolationException.class,() -> itemService.update(1L, dto),
           "Update item must throw an exception when final price is greater than base price");
     }
 
     @Test
-    @DisplayName("Patch update should throw InvalidItemDataException when final price is greater than base price")
-    void pathUpdate_shouldThrowInvalidItemDataException_whenItemFinalPriceGreaterThanBasePrice() {
+    @DisplayName("Patch update should throw exception when final price is greater than base price")
+    void pathUpdate_shouldThrowException_whenItemFinalPriceGreaterThanBasePrice() {
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100)).finalPrice(BigDecimal.valueOf(200))
           .blacksmithId(null).build();
 
-      assertThrows(InvalidItemDataException.class, () -> itemService.update(1L, dto),
+      assertThrows(BusinessViolationException.class, () -> itemService.update(1L, dto),
           "Patch update must throw an exception when final price is greater than base price");
     }
 
     @Test
-    @DisplayName("Update should throw ItemNotFoundException when item does not exist")
-    void updateItem_shouldThrowItemNotFoundException_whenItemNotFound() {
+    @DisplayName("Update should throw exception when item does not exist")
+    void updateItem_shouldThrowException_whenItemNotFound() {
       when(itemRepository.existsById(any())).thenReturn(false);
-      assertThrows(ItemNotFoundException.class,
+      assertThrows(ResourceNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemRequestDto()),
           "Update item must throw an exception when item to update was not found");
       verify(itemRepository, times(1)).existsById(any());
     }
 
     @Test
-    @DisplayName("Patch update should throw ItemNotFoundException when item does not exist")
-    void patchUpdate_shouldThrowItemNotFoundException_whenItemNotFound() {
+    @DisplayName("Patch update should throw exception when item does not exist")
+    void patchUpdate_shouldThrowException_whenItemNotFound() {
       when(itemRepository.findByIdAndActiveTrue(any())).thenReturn(Optional.empty());
-      assertThrows(ItemNotFoundException.class,
+      assertThrows(ResourceNotFoundException.class,
           () -> itemService.update(1L, MockItem.itemPatchUpdateDto()),
           "Patch update must throw an exception when item to patch update was not found");
       verify(itemRepository, times(1)).findByIdAndActiveTrue(any());
     }
 
     @Test
-    @DisplayName("Delete should throw ForbiddenOperationException when item has sales")
-    void deleteItem_shouldThrowForbiddenOperationException_whenDeletingSoldItem() {
+    @DisplayName("Delete should throw exception when item has sales")
+    void deleteItem_shouldThrowException_whenDeletingSoldItem() {
       targetItem.addSoldQuantity(5);
 
       when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
@@ -296,10 +295,10 @@ public class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("Delete should throw ItemNotFoundException when item does not exist")
-    void delete_shouldThrowItemNotFoundException_whenItemNotFound() {
+    @DisplayName("Delete should throw exception when item does not exist")
+    void delete_shouldThrowException_whenItemNotFound() {
       when(itemRepository.findByIdAndActiveTrue(any())).thenReturn(Optional.empty());
-      assertThrows(ItemNotFoundException.class, () -> itemService.deleteItem(1L),
+      assertThrows(ResourceNotFoundException.class, () -> itemService.deleteItem(1L),
           "Delete item must throw an exception when trying to delete an item that was not found");
       verify(itemRepository, times(1)).findByIdAndActiveTrue(any());
     }

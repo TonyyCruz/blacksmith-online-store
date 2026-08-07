@@ -8,8 +8,9 @@ import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidCredentialsException;
-import com.anthony.blacksmithOnlineStore.exceptions.UsernameAlreadyExistsException;
+import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ConflictingDataException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidDataException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.enums.Role;
@@ -135,33 +136,33 @@ class UserServiceTest {
   class UserServiceExceptionPath {
 
     @Test
-    @DisplayName("Create should throw UsernameAlreadyExistsException when username is not available")
-    void create_shouldThrowUsernameAlreadyExistsException_whenUsernameIsNotAvailable() {
+    @DisplayName("Create should throw exception when username is not available")
+    void create_shouldThrowException_whenUsernameIsNotAvailable() {
       UserCreateDto dto = MockUser.userCreateDto();
 
       when(userRepository.existsByUsername(dto.username())).thenReturn(true);
 
-      assertThrows(UsernameAlreadyExistsException.class,
+      assertThrows(ConflictingDataException.class,
           () -> userService.create(dto));
       verify(userRepository, times(1)).existsByUsername(dto.username());
     }
 
     @Test
-    @DisplayName("UpdateUser should throw UsernameAlreadyExistsException when new username is not available")
-    void updateUser_shouldThrowUsernameAlreadyExistsException_whenNewUsernameIsNotAvailable() {
+    @DisplayName("UpdateUser should throw exception when new username is not available")
+    void updateUser_shouldThrowException_whenNewUsernameIsNotAvailable() {
       UserUpdateDto dto = MockUser.userUpdateDto();
 
       when(userRepository.existsByUsername(dto.username())).thenReturn(true);
       when(authUser.getName()).thenReturn("differentUsername");
 
-      assertThrows(UsernameAlreadyExistsException.class,
+      assertThrows(ConflictingDataException.class,
           () -> userService.updateUser(dto));
       verify(userRepository, times(1)).existsByUsername(dto.username());
       }
 
     @Test
-    @DisplayName("UpdatePassword should throw InvalidCredentialsException when current password is wrong")
-    void updatePassword_shouldThrowInvalidCredentials_whenCurrentPasswordIsWrong() {
+    @DisplayName("UpdatePassword should throw exception when current password is wrong")
+    void updatePassword_shouldThrowException_whenCurrentPasswordIsWrong() {
       targetUser.setPassword("encoded");
 
       when(authUser.getAuthenticatedId()).thenReturn(targetUser.getId());
@@ -172,7 +173,7 @@ class UserServiceTest {
 
       PasswordUpdateDto dto = new PasswordUpdateDto("wrong", "newPass");
 
-      assertThrows(InvalidCredentialsException.class,
+      assertThrows(InvalidDataException.class,
           () -> userService.updatePassword(dto));
       verify(userRepository, times(1))
           .findById(targetUser.getId());

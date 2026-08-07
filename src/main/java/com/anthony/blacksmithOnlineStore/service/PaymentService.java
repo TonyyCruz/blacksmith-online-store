@@ -7,7 +7,8 @@ import com.anthony.blacksmithOnlineStore.entity.Payment;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.PaymentException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessor;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessorFactory;
 import com.anthony.blacksmithOnlineStore.payment.PaymentResult;
@@ -30,12 +31,17 @@ public class PaymentService {
     public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
       Order order = orderService.findEntityById(orderId);
       if (order.getTotal().compareTo(dto.amount()) != 0) {
-        throw new PaymentException(
+        throw new BusinessViolationException(
             "The order total price is R$ %.2f but the amount receive is R$ %.2f"
             .formatted(order.getTotal(), dto.amount()));
       }
       Payment payment = processPayment(order, dto);
       return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
+    }
+
+    public Payment findEntityById(Long id) {
+      return paymentRepository.findById(id).orElseThrow(
+              () -> new ResourceNotFoundException("Payment not found with id: %d".formatted(id)));
     }
 
     private Payment processPayment(Order order, PaymentCreateDto dto) {

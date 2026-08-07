@@ -46,7 +46,7 @@ public record ItemRequestDto(
   @Schema(description = "The item type", example = "DAGGER")
   @NotNull(message = "Type must not be null") 
   Type type,
-  @Schema(description = "The item rariry", example = "EPIC")
+  @Schema(description = "The item rarity", example = "EPIC")
   @NotNull(message = "Rarity must not be null") 
   Rarity rarity,
   @Schema(description = "The blacksmith id (integer)", example = "1")

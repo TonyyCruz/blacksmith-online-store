@@ -3,7 +3,6 @@ package com.anthony.blacksmithOnlineStore.entity;
 import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

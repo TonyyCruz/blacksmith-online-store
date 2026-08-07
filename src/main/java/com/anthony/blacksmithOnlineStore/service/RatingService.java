@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,8 +14,8 @@ import com.anthony.blacksmithOnlineStore.entity.Rating;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.events.RatingCreatedEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
 
 import jakarta.transaction.Transactional;
@@ -53,14 +52,14 @@ public class RatingService {
   }
 
   public RatingResponseDto findByOrderItemId(Long id) {
-    Rating rating = ratingRepository.findByOrderItemId(id)
-        .orElseThrow(() -> new RatingNotFoundException(id));
+    Rating rating = ratingRepository.findByOrderItemId(id).orElseThrow(
+        () -> new ResourceNotFoundException("Order not found with id: %d".formatted(id)));
     return RatingResponseDto.fromEntity(rating);
   }
 
   private void verifyUserCanRatePurchase(UUID userId, OrderItem orderItem) {
     if (!orderItem.getOrder().wasDelivered()) {
-      throw new RatingException("You cannot rate a item that Was not delivered.");
+      throw new BusinessViolationException("You cannot rate a item that Was not delivered.");
     }
     if (!orderItem.getUserId().equals(userId)) {
       throw new ForbiddenOperationException("Only hwo purchased the item can rate it.");

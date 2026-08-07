@@ -108,8 +108,8 @@ class AuthControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Register returns 400 when username already exists")
-    void register_shouldReturn400_whenUsernameAlreadyExists() throws Exception {
+    @DisplayName("Register returns 409 when username already exists")
+    void register_shouldReturn409_whenUsernameAlreadyExists() throws Exception {
       UserCreateDto dto = MockUser.userCreateDto();
       dto = new UserCreateDto(
           user.getUsername(),
@@ -120,7 +120,7 @@ class AuthControllerTest extends TestBase {
       mockMvc.perform(post(AUTH_REGISTER_URL)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isBadRequest())
+          .andExpect(status().isConflict())
           .andDo(print());
     }
 

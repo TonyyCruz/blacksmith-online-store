@@ -5,11 +5,12 @@ import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidCredentialsException;
-import com.anthony.blacksmithOnlineStore.exceptions.UserNotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.UsernameAlreadyExistsException;
-import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.enums.Role;
+import com.anthony.blacksmithOnlineStore.exceptions.ConflictingDataException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidDataException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationException;
+import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,9 @@ public class UserService {
   private final AuthenticatedUserService authUser;
 
   public UserDto create(UserCreateDto createDto) {
-    if (usernameExists(createDto.username())) throw new UsernameAlreadyExistsException();
+    if (usernameExists(createDto.username())) {
+      throw new ConflictingDataException("Username already exists in database");
+    }
     User user = UserCreateDto.toEntity(createDto);
     user.setRole(Role.CUSTOMER);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -34,7 +37,7 @@ public class UserService {
   public UserDto updateUser(UserUpdateDto updateDto) {
     boolean isUsernameChanged = !authUser.getName().equals(updateDto.username());
     if (isUsernameChanged && usernameExists(updateDto.username())) {
-      throw new UsernameAlreadyExistsException();
+      throw new ConflictingDataException("Username already exists in database");
     }
     User user = getUserReference();
     user.setUsername(updateDto.username());
@@ -45,7 +48,7 @@ public class UserService {
   public void updatePassword(PasswordUpdateDto passwordUpdateDto) {
     User user = findUserEntity();
     if (!passwordEncoder.matches(passwordUpdateDto.currentPassword(), user.getPassword())) {
-      throw new InvalidCredentialsException();
+      throw new InvalidDataException("Current password is incorrect");
     }
     user.setPassword(passwordEncoder.encode(passwordUpdateDto.newPassword()));
     userRepository.save(user);
@@ -53,7 +56,8 @@ public class UserService {
 
   public User findUserEntity() {
     UUID id = authUser.getAuthenticatedId();
-    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    return userRepository.findById(id).orElseThrow(
+        () -> new ResourceNotFoundException("User not found with id: %s".formatted(id)));
   }
   
   public UserDto getUser() {

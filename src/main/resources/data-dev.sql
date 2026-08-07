@@ -3,8 +3,20 @@
 
 INSERT INTO USERS (id, username, password, role, birth_date)
 VALUES
-  ('c0c4a69a-9dda-4b50-ab59-d896ce0a5c6e', 'admin', '$2a$10$vC1hgddH4UJBxQYv0AUqLOqd5HGPfeD5Pbp3nhTwy9tnOavEudiBK', 'ADMIN', '1988-01-10'),
-  ('7b87f809-d142-4dfa-8802-87644d774dd5', 'user',  '$2a$10$GaeCNDGHa.u6vNAPS6xUee/3PoWsN.nVxaDHmNK5LMheS7ZDqa6TG', 'CUSTOMER', '1995-05-15');
+  (
+   'c0c4a69a-9dda-4b50-ab59-d896ce0a5c6e',
+   'admin',
+   '$2a$10$vC1hgddH4UJBxQYv0AUqLOqd5HGPfeD5Pbp3nhTwy9tnOavEudiBK',
+   'ADMIN',
+   '1988-01-10'
+  ),
+  (
+   '7b87f809-d142-4dfa-8802-87644d774dd5',
+   'user',
+   '$2a$10$GaeCNDGHa.u6vNAPS6xUee/3PoWsN.nVxaDHmNK5LMheS7ZDqa6TG',
+   'CUSTOMER',
+   '1995-05-15'
+  );
 
 INSERT INTO BLACKSMITHS (name, description, total_ratings_sum, rating_count, rating_average, version)
 VALUES
@@ -32,16 +44,16 @@ VALUES
     (
      'Steel', 50, 20, 'Sword of Valor', 100.00,
      90.00, true, 'A legendary sword forged by the finest blacksmiths.',
-     5.0, 10, 'SHORT_SWORD', 'Rare', 2, 10, 2, 5,
-     '2025-11-15', '2026-02-25', 1, true,
+     5.0, 10, 'SHORT_SWORD', 'Rare', 2, 10, 2,
+     5,      '2025-11-15', '2026-02-25', 1, true,
      'Gimli o Marteleiro', 1, 0
     ), (
      'Iron', 30, 10, 'Dagger of Night', 80.00,
      80.00, false,
      'A consistent weapon great fot night hunts.', 7.0,
-     15, 'DAGGER', 'Uncommon', 154, 549, 122, 4.5,
-        '2025-11-15', '2026-02-25', 2, false,
-     'Tyrion o Perdido', 2, 0
+     15, 'DAGGER', 'Uncommon', 154, 549, 122,
+        4.5,         '2025-11-15', '2026-02-25', 2,
+        false,      'Tyrion o Perdido', 2, 0
     ), (
      'Mithril', 70, 30, 'Axe of Light', 150.00,
      135.00, true,
@@ -64,15 +76,15 @@ VALUES
         '2025-11-15', '2026-02-25', 1, true,
      'Gimli o Marteleiro', 1, 0
     ), (
-     'Adamantium', 60, 25, 'Hammer of the Titans', 200.00,
-     180.00, true,
+     'Adamantium', 60, 25, 'Hammer of the Titans',
+        200.00,      180.00, true,
      'A hammer that embodies the strength of the titans.', 12.0,
      3, 'WAR_HAMMER', 'Legendary', 0, 50, 10,
         5, '2025-11-15', '2026-02-25', 2, true,
      'Tyrion o Perdido', 2, 0
     ), (
-     'Adamantium', 80, 40, 'Spear of the Gods', 250.00,
-     225.00, true,
+     'Adamantium', 80, 40, 'Spear of the Gods',
+        250.00,      225.00, true,
      'A spear that pierces through the heavens.', 6.0,
      2, 'SPEAR', 'Mythic', 0, 100, 20, 5,
         '2025-11-15', '2026-02-25', 1, true,
@@ -85,8 +97,8 @@ VALUES
         '2025-11-15', '2026-02-25', 2, true,
      'Tyrion o Perdido', 2, 0
     ), (
-     'Obsidian', 90, 50, 'Greatsword of the Dragon', 300.00,
-     270.00, true,
+     'Obsidian', 90, 50, 'Greatsword of the Dragon',
+        300.00,      270.00, true,
      'A greatsword forged from the bones of a mighty dragon.', 15.0,
      1, 'BROADSWORD', 'Legendary', 0, 200, 50,
         5, '2025-11-15', '2026-02-25', 1, true,

@@ -4,7 +4,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.UserNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import java.util.UUID;
@@ -18,7 +18,8 @@ public class AdminService {
   private final AuthenticatedUserService authUser;
 
   public User findEntityById(UUID id) {
-    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    return userRepository.findById(id).orElseThrow(
+        () -> new ResourceNotFoundException("User not found with id: %s".formatted(id)));
   }
 
   public void updateRole(UUID id, RoleUpdateDto roleUpdateDto) {
@@ -31,8 +32,8 @@ public class AdminService {
   }
 
   public UserDto findByUsername(String username) {
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UserNotFoundException(username));
+    User user = userRepository.findByUsername(username).orElseThrow(() ->
+        new ResourceNotFoundException("User not found with username: %s".formatted(username)));
     return UserDto.fromEntity(user);
   }
 }

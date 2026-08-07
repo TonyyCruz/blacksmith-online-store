@@ -4,7 +4,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.enums.Role;
-import com.anthony.blacksmithOnlineStore.exceptions.UserNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
@@ -77,19 +77,19 @@ class AdminServiceTest {
   class AdminServiceExceptionPath {
 
     @Test
-    @DisplayName("UpdateRole should throw UserNotFoundException when userWithId not found")
-    void updateRole_ShouldThrowUserNotFoundException_WhenUserNotFound() {
+    @DisplayName("UpdateRole should throw exception when userWithId not found")
+    void updateRole_ShouldThrowException_WhenUserNotFound() {
       UUID fakeId = UUID.randomUUID();
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
       when(authUser.getAuthenticatedId()).thenReturn(adminUser.getId());
       RoleUpdateDto dto = new RoleUpdateDto(Role.ADMIN);
-      assertThrows(UserNotFoundException.class, () -> adminService.updateRole(fakeId, dto));
+      assertThrows(ResourceNotFoundException.class, () -> adminService.updateRole(fakeId, dto));
       verify(userRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("UpdateRole should throw UnauthorizedOperationException when admin tries to change own role")
-    void updateRole_ShouldThrowUnauthorizedOperationException_WhenAdminTriesToChangeOwnRole() {
+    @DisplayName("UpdateRole should throw exception when admin tries to change own role")
+    void updateRole_ShouldThrowException_WhenAdminTriesToChangeOwnRole() {
       UUID adminId = adminUser.getId();
       RoleUpdateDto dto = new RoleUpdateDto(Role.CUSTOMER);
       when(authUser.getAuthenticatedId()).thenReturn(adminId);
@@ -99,11 +99,11 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("GetById should throw UserNotFoundException when userWithId not found")
-    void getById_ShouldThrowUserNotFoundException_WhenNotFound() {
+    @DisplayName("GetById should throw exception when userWithId not found")
+    void getById_ShouldThrowException_WhenNotFound() {
       UUID fakeId = UUID.randomUUID();
       when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
-      assertThrows(UserNotFoundException.class, () -> adminService.findEntityById(fakeId));
+      assertThrows(ResourceNotFoundException.class, () -> adminService.findEntityById(fakeId));
     }
   }
 }

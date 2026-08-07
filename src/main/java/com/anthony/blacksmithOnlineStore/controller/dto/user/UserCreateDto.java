@@ -16,7 +16,7 @@ public record UserCreateDto(
   @NotBlank(message = "Username is required.")
   @Length(min = 2, max = 100, message = "Username must be between 2 and 100 characters.")
   String username,
-  @Schema(description = "The password", example = "Av4l0nGoat3")
+  @Schema(description = "The password", example = "Av4l0nGoat3*")
   @Password
   String password,
   @Schema(description = "The birthdate", example = "2000-04-06")

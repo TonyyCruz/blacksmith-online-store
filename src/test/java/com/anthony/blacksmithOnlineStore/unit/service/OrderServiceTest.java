@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderPaymentDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -18,10 +17,9 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidOrderStatusException;
-import com.anthony.blacksmithOnlineStore.exceptions.OrderNotFoundException;
-import com.anthony.blacksmithOnlineStore.exceptions.RatingNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
@@ -63,7 +61,6 @@ public class OrderServiceTest {
   private ApplicationEventPublisher eventPublisher;
   @InjectMocks
   OrderService orderService;
-  private final Item targetItem = MockItem.item();
   private final User user = MockUser.userWithId();
 
   @Nested
@@ -98,7 +95,7 @@ public class OrderServiceTest {
       when(orderRepository.save(any()))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
-      OrderPaymentDto response = orderService.create(dto);
+      OrderResponseDto response = orderService.create(dto);
 
       assertEquals(BigDecimal.valueOf(90), response.total(),
           "The total must have the correct price");
@@ -293,9 +290,9 @@ public class OrderServiceTest {
       ));
 
       when(userService.getUserReference()).thenReturn(user);
-      when(itemService.findEntityById(999L)).thenThrow(RatingNotFoundException.class);
+      when(itemService.findEntityById(999L)).thenThrow(ResourceNotFoundException.class);
 
-      assertThrows(RatingNotFoundException.class, () -> orderService.create(dto));
+      assertThrows(ResourceNotFoundException.class, () -> orderService.create(dto));
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(999L);
     }
@@ -305,7 +302,7 @@ public class OrderServiceTest {
     void cancel_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(anyLong())).thenReturn(false);
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.cancel(999L));
+      assertThrows(ResourceNotFoundException.class, () -> orderService.cancel(999L));
       verify(orderRepository, times(1)).existsById(anyLong());
     }
 
@@ -333,7 +330,7 @@ public class OrderServiceTest {
     void refoundRequest_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(anyLong())).thenReturn(false);
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.refundRequest(999L),
+      assertThrows(ResourceNotFoundException.class, () -> orderService.refundRequest(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(anyLong());
     }
@@ -350,7 +347,7 @@ public class OrderServiceTest {
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
 
-      assertThrows(InvalidOrderStatusException.class,
+      assertThrows(BusinessViolationException.class,
           () -> orderService.refundRequest(order.getId()));
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
@@ -363,7 +360,7 @@ public class OrderServiceTest {
     void returnRequest_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(anyLong())).thenReturn(false);
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.returnRequest(999L),
+      assertThrows(ResourceNotFoundException.class, () -> orderService.returnRequest(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(anyLong());
     }
@@ -381,7 +378,7 @@ public class OrderServiceTest {
           .thenReturn(Optional.of(order));
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
-      assertThrows(InvalidOrderStatusException.class,
+      assertThrows(BusinessViolationException.class,
           () -> orderService.returnRequest(order.getId()));
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
@@ -394,7 +391,7 @@ public class OrderServiceTest {
     void getById_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(999L)).thenReturn(false);
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.findById(999L),
+      assertThrows(ResourceNotFoundException.class, () -> orderService.findById(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(999L);
     }
@@ -404,7 +401,7 @@ public class OrderServiceTest {
     void getEntityById_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(anyLong())).thenReturn(false);
 
-      assertThrows(OrderNotFoundException.class, () -> orderService.findEntityById(999L),
+      assertThrows(ResourceNotFoundException.class, () -> orderService.findEntityById(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(anyLong());
     }

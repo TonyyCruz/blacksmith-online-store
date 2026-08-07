@@ -3,7 +3,7 @@ package com.anthony.blacksmithOnlineStore.service;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
-import com.anthony.blacksmithOnlineStore.exceptions.BlacksmithNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class BlacksmithService {
   }
 
   public Blacksmith findEntityById(Long id) {
-    return blacksmithRepository.findById(id)
-        .orElseThrow(() -> new BlacksmithNotFoundException(id));
+    return blacksmithRepository.findById(id).orElseThrow(() ->
+            new ResourceNotFoundException("Blacksmith not found with id: %d".formatted(id)));
   }
 
   public Page<BlacksmithResponseDto> findByName(String name, Pageable pageable) {
@@ -55,7 +55,7 @@ public class BlacksmithService {
 
   public void existsVerify(Long id) {
     if (!blacksmithRepository.existsById(id)) {
-      throw new BlacksmithNotFoundException(id);
+      throw new ResourceNotFoundException("Blacksmith not found with id: %d".formatted(id));
     }
   }
 }

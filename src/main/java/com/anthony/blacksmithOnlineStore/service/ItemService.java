@@ -6,9 +6,9 @@ import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
-import com.anthony.blacksmithOnlineStore.exceptions.InvalidItemDataException;
-import com.anthony.blacksmithOnlineStore.exceptions.ItemNotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.mapstruct.ItemUpdate;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.specification.ItemSpecifications;
@@ -75,7 +75,7 @@ public class ItemService {
     }
     itemUpdate.updateItemFromDto(dto, item);
     if (item.getFinalPrice().compareTo(item.getBasePrice()) > 0) {
-      throw new InvalidItemDataException("Final price cannot be greater than base price");
+      throw new BusinessViolationException("Final price cannot be greater than base price");
     }
     return ItemResponseDto.fromEntity(item);
   }
@@ -86,10 +86,11 @@ public class ItemService {
 
   public Item findEntityById(Long id) {
     if (authUser.isAdmin()) {
-      return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
+      return itemRepository.findById(id).orElseThrow(() ->
+          new ResourceNotFoundException("Item not found with id: %d".formatted(id)));
     }
-    return itemRepository.findByIdAndActiveTrue(id)
-        .orElseThrow(() -> new ItemNotFoundException(id));
+    return itemRepository.findByIdAndActiveTrue(id).orElseThrow(() ->
+            new ResourceNotFoundException("Item not found with id: %d".formatted(id)));
   }
 
   public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
@@ -114,7 +115,8 @@ public class ItemService {
   }
 
   public void itemExistesVerifier(Long id) {
-    if (!itemRepository.existsById(id)) throw new ItemNotFoundException(id);
+    if (!itemRepository.existsById(id))
+      throw new ResourceNotFoundException("Item not found with id: %d".formatted(id));
   }
 
   private void itemPriceValidate(BigDecimal basePrice, BigDecimal finalPrice) {
@@ -122,7 +124,7 @@ public class ItemService {
         && finalPrice != null
         && finalPrice.compareTo(basePrice) > 0;
     if (isInvalidPrice) {
-      throw new InvalidItemDataException(
+      throw new BusinessViolationException(
           "Final price \"%s\" cannot be greater than base price \"%s\""
               .formatted(finalPrice, basePrice));
     }
