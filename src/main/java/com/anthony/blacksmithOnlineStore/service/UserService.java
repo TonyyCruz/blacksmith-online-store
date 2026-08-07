@@ -7,6 +7,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.Role;
 import com.anthony.blacksmithOnlineStore.exceptions.ConflictingDataException;
+import com.anthony.blacksmithOnlineStore.exceptions.InvalidDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationException;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
@@ -47,7 +48,7 @@ public class UserService {
   public void updatePassword(PasswordUpdateDto passwordUpdateDto) {
     User user = findUserEntity();
     if (!passwordEncoder.matches(passwordUpdateDto.currentPassword(), user.getPassword())) {
-      throw new UnauthorizedOperationException();
+      throw new InvalidDataException("Current password is incorrect");
     }
     user.setPassword(passwordEncoder.encode(passwordUpdateDto.newPassword()));
     userRepository.save(user);

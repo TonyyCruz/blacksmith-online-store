@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
@@ -346,8 +347,8 @@ public class ItemControllerTest extends TestBase {
   class ItemControllerExceptionPath {
 
     @Test
-    @DisplayName("Create should return 400 when finalPrice greater than basePrice")
-    void createItem_shouldReturn400_whenFinalPriceIsGreater() throws Exception {
+    @DisplayName("Create should return 422 when finalPrice is greater than basePrice")
+    void createItem_shouldReturn422_whenFinalPriceIsGreater() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100))
           .finalPrice(BigDecimal.valueOf(200))
@@ -356,7 +357,7 @@ public class ItemControllerTest extends TestBase {
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(dto)))
-          .andExpect(status().isBadRequest());
+          .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
     }
 
     @Test
@@ -535,8 +536,8 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Update should return 400 when updating with final price greater than base price")
-    void update_shouldReturn400_whenFinalPriceGreaterThanBasePrice() throws Exception {
+    @DisplayName("Update should return 422 when updating with final price greater than base price")
+    void update_shouldReturn422_whenFinalPriceGreaterThanBasePrice() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto().toBuilder()
           .basePrice(BigDecimal.valueOf(100))
           .finalPrice(BigDecimal.valueOf(200))
@@ -545,7 +546,7 @@ public class ItemControllerTest extends TestBase {
               .header("Authorization", adminToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(dto)))
-          .andExpect(status().isBadRequest());
+          .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
     }
 
     @Test

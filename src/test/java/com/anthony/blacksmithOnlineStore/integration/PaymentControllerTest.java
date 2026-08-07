@@ -2,17 +2,9 @@ package com.anthony.blacksmithOnlineStore.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.anthony.blacksmithOnlineStore.entity.Item;
-import com.anthony.blacksmithOnlineStore.entity.Order;
-import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockPayment;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
-import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
-import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
-import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,13 +13,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import com.anthony.blacksmithOnlineStore.entity.Order;
+import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockPayment;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
+import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
+import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
+
 @Tag("integration")
 @DisplayName("Integration test for Payment controller")
 public class PaymentControllerTest extends TestBase {
   @Autowired
   private OrderRepository orderRepository;
-  @Autowired
-  private ItemRepository itemRepository;
   private Order order;
   private String userToken;
 
@@ -50,7 +48,7 @@ public class PaymentControllerTest extends TestBase {
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isOk());
+          .andExpect(status().isOk()).andDo(print());
        Order updatedOrder = getOrderById(order.getId());
        assertEquals(OrderStatus.DELIVERED, updatedOrder.getStatus(),
            "The order status must be approved");

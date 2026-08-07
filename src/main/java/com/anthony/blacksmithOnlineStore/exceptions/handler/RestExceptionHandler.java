@@ -103,7 +103,7 @@ public class RestExceptionHandler {
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 
-  @ExceptionHandler({BadRequestException.class, MethodArgumentNotValidException.class})
+  @ExceptionHandler({MethodArgumentNotValidException.class})
   ResponseEntity<ValidationDetails> invalidArgumentation(MethodArgumentNotValidException e,
       HttpServletRequest request) {
     ValidationDetails validationDetails = new ValidationDetails();

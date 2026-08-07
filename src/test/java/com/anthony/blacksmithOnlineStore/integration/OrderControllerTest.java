@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -206,8 +207,8 @@ public class OrderControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Create order returns 404 when buying quantity is greater than stock quantity")
-    void create_returns404_whenBuyingQuantityIsGreaterThanStockQuantity() throws Exception {
+    @DisplayName("Create order returns 422 when buying quantity is greater than stock quantity")
+    void create_returns422_whenBuyingQuantityIsGreaterThanStockQuantity() throws Exception {
       OrderRequestDto dto = new OrderRequestDto(
           List.of(new OrderItemRequestDto(1L, 9999999)));
       String valueAsString = objectMapper.writeValueAsString(dto);
@@ -215,7 +216,7 @@ public class OrderControllerTest extends TestBase {
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isBadRequest());
+          .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
     }
 
     @Test

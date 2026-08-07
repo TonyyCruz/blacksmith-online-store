@@ -179,8 +179,8 @@ public class UserControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Update Current User returns 400 when username is already taken")
-    void updateCurrentUser_returns400_whenUsernameIsAlreadyTaken() throws Exception {
+    @DisplayName("Update Current User returns 409 when username is already taken")
+    void updateCurrentUser_returns409_whenUsernameIsAlreadyTaken() throws Exception {
       User anotherUser = performSaveUser(MockUser.userWithId());
       UserUpdateDto dto = new UserUpdateDto(anotherUser.getUsername(),
           LocalDate.parse("1900-01-01"));
@@ -189,7 +189,7 @@ public class UserControllerTest extends TestBase {
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isBadRequest())
+          .andExpect(status().isConflict())
           .andDo(print());
     }
 

@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.events.listeners;
 
-import com.anthony.blacksmithOnlineStore.service.OrderService;
 import java.time.LocalDateTime;
 
 import org.springframework.context.event.EventListener;
@@ -11,8 +10,8 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
-import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
+import com.anthony.blacksmithOnlineStore.service.OrderService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

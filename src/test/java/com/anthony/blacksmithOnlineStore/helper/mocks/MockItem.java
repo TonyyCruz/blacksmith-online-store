@@ -2,6 +2,7 @@ package com.anthony.blacksmithOnlineStore.helper.mocks;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.enums.Material;
 import com.anthony.blacksmithOnlineStore.enums.Rarity;
@@ -38,7 +39,7 @@ public class MockItem {
     return item(999L);
   }
 
-  public static Item newItem() {
+  public static Item newItem(Blacksmith blacksmith) {
     BigDecimal basePrice = BigDecimal.valueOf(Math.floor(Math.random() * 1000 + 11));
     BigDecimal dif = ((Math.random() > 0.5) ? BigDecimal.valueOf(10) : BigDecimal.ZERO);
     BigDecimal finalPrice = basePrice.subtract(dif);
@@ -56,11 +57,15 @@ public class MockItem {
         .type(Type.LONG_SWORD)
         .rarity(Rarity.LEGENDARY)
         .craftedBy(MockBlacksmith.blacksmith())
-        .blacksmithIdSnapshot(MockBlacksmith.blacksmith().getId())
-        .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
+        .blacksmithIdSnapshot(blacksmith.getId())
+        .blacksmithNameSnapshot(blacksmith.getName())
         .ratingCount(0)
         .hasDiscount(dif.compareTo(BigDecimal.ZERO) > 0)
         .build();
+  }
+
+  public static Item newItem() {
+    return newItem(MockBlacksmith.blacksmith());
   }
 
   public static List<Item> newItems() {

@@ -7,9 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,23 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
 import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
-import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
-import com.anthony.blacksmithOnlineStore.entity.Item;
-import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
-import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockRating;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
-import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
-import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import com.anthony.blacksmithOnlineStore.repository.OrderItemRepository;
-import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
-
-import jakarta.persistence.EntityManager;
 
 @Tag("integration")
 @DisplayName("Integration test for Rating controller")
@@ -47,21 +35,15 @@ public class RatingControllerTest extends TestBase {
   @Autowired
   private OrderItemRepository orderItemRepository;
   @Autowired
-  private ItemRepository itemRepository;
-  @Autowired
-  private OrderRepository orderRepository;
-  @Autowired
   private RatingRepository ratingRepository;
   @Autowired
-  private BlacksmithRepository blacksmithRepository;
-  @Autowired
-  private EntityManager entityManager;
+  private DatabaseTestHelper databaseHelper;
   private OrderItem orderItem;
   private String userToken;
 
   @BeforeEach void setup() {
     userToken = performLogin(userLogin);
-    orderItem = getTestOrderItem(1L);
+    orderItem = getTestOrderItem();
   }
 
   @Nested
@@ -148,47 +130,8 @@ public class RatingControllerTest extends TestBase {
     }
   }
 
-  private OrderItem getTestOrderItem(Long id) {
-    Item itm = getItem(1L);
-    OrderItem oi = MockOrderItem.fromItem(itm, 1);
-    oi.setUserId(USER_ID);
-    oi.setOrder(getNormalizedOrder(id));
-    return orderItemRepository.save(oi);
+  private OrderItem getTestOrderItem() {
+    return databaseHelper.getNewOrder().getOrderItems().get(0);
   }
-
-  private Order getNormalizedOrder(Long id) {
-    Order order = getOrder(id);
-    Order updatedOrder = order.toBuilder()
-        .status(OrderStatus.DELIVERED)
-        .deliveredAt(LocalDateTime.now())
-        .user(getUserById(USER_ID))
-        .build();
-    return orderRepository.save(updatedOrder);
-  }
-
-  private Item getItem(Long id) {
-    return itemRepository.findById(id).orElseThrow(()-> new IllegalArgumentException(
-        "Item not found in test DB"));
-  }
-
-  private Order getOrder(Long id) {
-    return orderRepository.findById(id).orElseThrow(()-> new IllegalArgumentException(
-        "Order not found in test DB"));
-  }
-
-  private Blacksmith getBlacksmith(Long id) {
-    return blacksmithRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Blacksmith not found in test DB"));
-  }
-
-//  private OrderItem getOrderItem(Long id) {
-//    return orderItemRepository.findById(id).orElseThrow(()-> new IllegalArgumentException(
-//        "Order Item not found in test DB"));
-//  }
-//
-//  private Rating rate(Long orderItemId, Rating rating) {
-//    rating.setOrderItem(orderItem);
-//    orderItem.setRating(rating);
-//    return ratingRepository.save(rating);
-//  }
+  
 }
