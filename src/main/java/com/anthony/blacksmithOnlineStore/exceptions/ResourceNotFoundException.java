@@ -4,6 +4,10 @@ import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundExcep
 
 public class ResourceNotFoundException extends NotFoundException {
 
+  public ResourceNotFoundException() {
+    super("Resource not found");
+  }
+
   public ResourceNotFoundException(String msg) {
     super(msg);
   }
