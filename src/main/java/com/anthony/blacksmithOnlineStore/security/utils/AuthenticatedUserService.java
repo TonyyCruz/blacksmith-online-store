@@ -5,6 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationException;
+
 @Component
 public class AuthenticatedUserService {
 
