@@ -104,7 +104,7 @@ public class RatingControllerTest extends TestBase {
     @Test
     @DisplayName("Cannot rate a bought item that is not yours")
     void user_cannotRateABoughtThatIsNotYours() throws Exception {
-      performSaveUser(MockUser.user());
+      testHelper.saveUser(MockUser.user());
       String token = performLogin(new LoginRequest(MockUser.user().getUsername(), MockUser.user().getPassword()));
       RatingRequestDto rating = new RatingRequestDto(orderItem.getId(), 4, "my review");
       String valueAsString = objectMapper.writeValueAsString(rating);

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
@@ -24,6 +25,8 @@ import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 
 @Component
 public class DatabaseTestHelper {
+  @Autowired
+  PasswordEncoder passwordEncoder;
   @Autowired
   private OrderItemRepository orderItemRepository;
   @Autowired
@@ -52,6 +55,8 @@ public class DatabaseTestHelper {
   }
 
   public User saveUser(User user) {
+    user.setId(null);
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
     return userRepository.save(user);
   }
 

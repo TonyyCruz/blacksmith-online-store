@@ -144,7 +144,7 @@ public class OrderControllerTest extends TestBase {
     @Test
     @DisplayName("User can get all his existing order successfully")
     void getAll_userCanGetAllHisOrdersSuccessfully() throws Exception {
-      User user = getUserById(USER_ID);
+      User user = testHelper.findUserById(USER_ID);
       List<Order> orders = orderRepository.findByUserId(user.getId());
       mockMvc.perform(get(ORDER_BASE_URL)
               .header("Authorization", userToken))

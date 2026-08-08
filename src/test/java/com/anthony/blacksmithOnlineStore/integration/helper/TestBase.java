@@ -37,8 +37,8 @@ public class TestBase {
   protected final String AUTH_LOGIN_URL = "/auth/login";
   protected final UUID USER_ID = UUID.fromString("7b87f809-d142-4dfa-8802-87644d774dd5");
   protected final UUID ADMIN_ID = UUID.fromString("c0c4a69a-9dda-4b50-ab59-d896ce0a5c6e");
-  protected LoginRequest userLogin = new LoginRequest("user", "123456");
-  protected LoginRequest adminLogin = new LoginRequest("admin", "loginAdmin");
+  protected LoginRequest userLogin = new LoginRequest("user", "P4ssw0rd#");
+  protected LoginRequest adminLogin = new LoginRequest("admin", "P4ssw0rd#");
 
   public String performLogin(LoginRequest loginRequest) {
     try {
@@ -54,16 +54,5 @@ public class TestBase {
     } catch (Exception e) {
       throw new RuntimeException("Fail in perform login on test " + loginRequest.username(), e);
     }
-  }
-
-  public User performSaveUser(User entity) {
-    entity.setId(null);
-    entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-    return userRepository.save(entity);
-  }
-
-  public User getUserById(UUID id) {
-    return userRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("User not found in test DB"));
   }
 }
