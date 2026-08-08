@@ -18,8 +18,8 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
-import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrderItem;
@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ public class OrderServiceTest {
   private ApplicationEventPublisher eventPublisher;
   @InjectMocks
   OrderService orderService;
-  private final User user = MockUser.userWithId();
+  private final User user = MockUser.user(UUID.randomUUID());
 
   @Nested
   @DisplayName("Happy Path")
@@ -196,7 +197,7 @@ public class OrderServiceTest {
     @MethodSource("com.anthony.blacksmithOnlineStore.unit.service.helper.OrderStatusHelper#refundable")
     @DisplayName("Should request a refound of a paid order and set status refound pending")
     void refundRequest_shouldSetRefoundRequestAndSetStatusRefoundPending(OrderStatus status) {
-      User user = MockUser.userWithId();
+      User user = MockUser.user(UUID.randomUUID());
       Order order = MockOrder.orderWithItems()
           .toBuilder()
           .user(user)
@@ -220,7 +221,7 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Should request a return of a delivered order")
     void returnRequest_shouldRequestAReturn_ofAReturnedRequestOrder() {
-      User user = MockUser.userWithId();
+      User user = MockUser.user(UUID.randomUUID());
       Order order = MockOrder.orderWithItems()
           .toBuilder()
           .user(user)

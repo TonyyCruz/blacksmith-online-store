@@ -1,12 +1,22 @@
 package com.anthony.blacksmithOnlineStore.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
+import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
+import com.anthony.blacksmithOnlineStore.entity.Order;
+import com.anthony.blacksmithOnlineStore.entity.OrderItem;
+import com.anthony.blacksmithOnlineStore.entity.Rating;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockRating;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
+import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
+import com.anthony.blacksmithOnlineStore.repository.OrderItemRepository;
+import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,33 +27,22 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
-import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
-import com.anthony.blacksmithOnlineStore.entity.OrderItem;
-import com.anthony.blacksmithOnlineStore.entity.Rating;
-import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockRating;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
-import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
-import com.anthony.blacksmithOnlineStore.repository.OrderItemRepository;
-import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
-
 @Tag("integration")
 @DisplayName("Integration test for Rating controller")
 public class RatingControllerTest extends TestBase {
   private final String RATING_BASE_URL = "/ratings";
   @Autowired
+  private DatabaseTestHelper testHelper;
+  @Autowired
   private OrderItemRepository orderItemRepository;
   @Autowired
   private RatingRepository ratingRepository;
-  @Autowired
-  private DatabaseTestHelper databaseHelper;
   private OrderItem orderItem;
   private String userToken;
 
   @BeforeEach void setup() {
     userToken = performLogin(userLogin);
-    orderItem = getTestOrderItem();
+    orderItem = getDeliveredOrderItem();
   }
 
   @Nested
@@ -63,9 +62,9 @@ public class RatingControllerTest extends TestBase {
           .andExpect(status().isCreated());
       OrderItem updatedOrderItem = orderItemRepository.findById(orderItem.getId()).get();
       assertEquals(rating.rating(), updatedOrderItem.getRating().getRatingValue(), 
-    "The rate sended must be the same finded in the rating rate");
-      assertTrue(rating.review().equals(updatedOrderItem.getRating().getReview()), 
-      "The review sended must be the same finded in the rating review");
+    "The rate sent must be the same found in the rating rate");
+      assertEquals(rating.review(), updatedOrderItem.getRating().getReview(),
+          "The review sent must be the same found in the rating review");
     }
 
     @Test
@@ -130,8 +129,10 @@ public class RatingControllerTest extends TestBase {
     }
   }
 
-  private OrderItem getTestOrderItem() {
-    return databaseHelper.getNewOrder().getOrderItems().get(0);
+  private OrderItem getDeliveredOrderItem() {
+    Order order = testHelper.getNewOrder();
+    testHelper.deliveryOrder(order.getId());
+    return order.getOrderItems().get(0);
   }
   
 }

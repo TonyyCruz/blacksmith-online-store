@@ -14,6 +14,7 @@ import com.anthony.blacksmithOnlineStore.entity.Item;
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockOrder;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
@@ -36,6 +37,8 @@ import org.springframework.test.web.servlet.MvcResult;
 public class OrderControllerTest extends TestBase {
   private final String ORDER_BASE_URL = "/orders";
   @Autowired
+  private DatabaseTestHelper testHelper;
+  @Autowired
   private OrderRepository orderRepository;
   @Autowired
   private ItemRepository itemRepository;
@@ -45,7 +48,7 @@ public class OrderControllerTest extends TestBase {
   @BeforeEach
   void setup() {
     userToken = performLogin(userLogin);
-    order = getTestOrder(1L);
+    order = testHelper.getNewOrder();
   }
 
   @Nested
@@ -331,16 +334,5 @@ public class OrderControllerTest extends TestBase {
           .andExpect(status().isForbidden());
     }
 
-  }
-
-  private Order getTestOrder(long id) {
-    Order newOrder = getOrderById(id).toBuilder().status(OrderStatus.PENDING).build();
-    newOrder.setUser(getUserById(USER_ID));
-    return orderRepository.save(newOrder);
-  }
-
-  private Order getOrderById(long id) {
-    return orderRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("Order not found in test DB"));
   }
 }

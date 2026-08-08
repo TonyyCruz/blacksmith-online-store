@@ -7,36 +7,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDate;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-
 import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.Role;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jayway.jsonpath.JsonPath;
+import java.time.LocalDate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 @Tag("integration")
 @DisplayName("Integration test for auth controller")
 class AuthControllerTest extends TestBase {
   private final static String AUTH_REGISTER_URL = "/auth/register";
+  @Autowired
+  private DatabaseTestHelper testHelper;
   private User user;
 
   @BeforeEach
   void setUp() {
-    user = userRepository.findByUsername(userLogin.username())
-        .orElseThrow(() -> new IllegalStateException("User not found in test DB"));
+    user = testHelper.findUserByUsername(userLogin.username());
   }
 
   @Nested

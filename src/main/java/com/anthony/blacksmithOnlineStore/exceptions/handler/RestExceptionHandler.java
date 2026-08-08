@@ -129,7 +129,7 @@ public class RestExceptionHandler {
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
     exceptionDetails.setMessage("Ops, something went wrong. 😵");
-//    exceptionDetails.addError(e.getMessage());
+//    exceptionDetails.setMessage(e.getMessage());
     return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
   }
 }

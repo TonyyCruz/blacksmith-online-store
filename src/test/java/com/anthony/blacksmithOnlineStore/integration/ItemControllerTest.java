@@ -12,8 +12,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
+import com.anthony.blacksmithOnlineStore.entity.Item;
+import com.anthony.blacksmithOnlineStore.enums.Material;
+import com.anthony.blacksmithOnlineStore.enums.Rarity;
+import com.anthony.blacksmithOnlineStore.enums.Type;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
+import com.anthony.blacksmithOnlineStore.integration.helper.QueryHelper;
+import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
+import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
 import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,54 +35,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
-import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
-import com.anthony.blacksmithOnlineStore.entity.Item;
-import com.anthony.blacksmithOnlineStore.enums.Material;
-import com.anthony.blacksmithOnlineStore.enums.Rarity;
-import com.anthony.blacksmithOnlineStore.enums.Type;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockItem;
-import com.anthony.blacksmithOnlineStore.integration.helper.QueryHelper;
-import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
-import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
-import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
-
 @Tag("integration")
 @DisplayName("Integration test for Item controller")
 public class ItemControllerTest extends TestBase {
+  private final String item_BASE_URL = "/items";
+  @Autowired
+  private DatabaseTestHelper testHelper;
   @Autowired
   private ItemRepository itemRepository;
-  @Autowired
-  private BlacksmithRepository blacksmithRepository;
-  private final String item_BASE_URL = "/items";
   private Item item;
   private String adminToken;
   private String userToken;
 
   @BeforeEach
   void setUp() {
-    item = saveItem(Item.builder()
-        .material(Material.IRON)
-        .baseDamage(250)
-        .baseDefense(10)
-        .name("Test Dagger")
-        .basePrice(BigDecimal.valueOf(355.99))
-        .finalPrice(BigDecimal.valueOf(350.00))
-        .hasDiscount(true)
-        .description("Dagger for tests")
-        .weight(8.2d)
-        .stock(102)
-        .type(Type.DAGGER)
-        .rarity(Rarity.TRANSCENDENT)
-        .craftedBy(MockBlacksmith.blacksmith())
-        .blacksmithIdSnapshot(MockBlacksmith.blacksmith().getId())
-        .blacksmithNameSnapshot(MockBlacksmith.blacksmith().getName())
-        .ratingCount(0)
-        .active(true)
-        .build());
+    item = testHelper.getNewItem();
     adminToken = performLogin(adminLogin);
     userToken = performLogin(userLogin);
   }
@@ -83,7 +62,7 @@ public class ItemControllerTest extends TestBase {
     @DisplayName("Can create a new Item successfully")
     void createItem_canCreateItemSuccessfully() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto();
-      Blacksmith blacksmith = findBlacksmithById(dto.blacksmithId());
+      Blacksmith blacksmith = testHelper.findBlacksmithById(dto.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(dto);
       mockMvc.perform(post(item_BASE_URL)
               .header("Authorization", adminToken)
@@ -112,7 +91,7 @@ public class ItemControllerTest extends TestBase {
     @DisplayName("Can update an existing Item successfully")
     void updateItem_canUpdateItemSuccessfully() throws Exception {
       ItemRequestDto dto = MockItem.itemRequestDto();
-      Blacksmith blacksmith = findBlacksmithById(dto.blacksmithId());
+      Blacksmith blacksmith = testHelper.findBlacksmithById(dto.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(dto);
       mockMvc.perform(put(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)
@@ -136,10 +115,10 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can update all fields witha PATH update successfully")
+    @DisplayName("Can update all fields witha PATCH update successfully")
     void patchUpdate_canUpdateAllFieldsSuccessfully() throws Exception {
       ItemPatchUpdateDto itemUpdate = MockItem.itemPatchUpdateDto();
-      Blacksmith blacksmith = findBlacksmithById(itemUpdate.blacksmithId());
+      Blacksmith blacksmith = testHelper.findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
       mockMvc.perform(patch(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)
@@ -175,7 +154,7 @@ public class ItemControllerTest extends TestBase {
           .active(!item.isActive())
           .blacksmithId(2L)
           .build();
-      Blacksmith blacksmith = findBlacksmithById(itemUpdate.blacksmithId());
+      Blacksmith blacksmith = testHelper.findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
       mockMvc.perform(patch(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)
@@ -323,7 +302,7 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Can delete an itens with admin acount")
     void deleteItem_canDeleteAnItem_WithAdminAccount() throws Exception {
-      Item savedItem = saveItem(MockItem.newItem());
+      Item savedItem = testHelper.saveItem(MockItem.newItem());
       mockMvc.perform(delete(item_BASE_URL + "/" + savedItem.getId())
               .header("Authorization", adminToken))
           .andExpect(status().isNoContent());
@@ -676,7 +655,7 @@ public class ItemControllerTest extends TestBase {
     @Test
     @DisplayName("Delete should return 403 when deleting sold itemWithId")
     void delete_shouldReturn403_whenItemWasSold() throws Exception {
-      Item soldItem = saveItem(MockItem.newItem());
+      Item soldItem = testHelper.saveItem(MockItem.newItem());
       soldItem.addSoldQuantity(10);
       itemRepository.save(soldItem);
       mockMvc.perform(delete(item_BASE_URL + "/" + soldItem.getId())
@@ -694,16 +673,4 @@ public class ItemControllerTest extends TestBase {
 
   }
 
-  private Item saveItem(Item newItem) {
-    Blacksmith blacksmith = findBlacksmithById(newItem.getBlacksmithIdSnapshot());
-    newItem.setCraftedBy(blacksmith);
-    newItem.setBlacksmithIdSnapshot(blacksmith.getId());
-    newItem.setBlacksmithNameSnapshot(blacksmith.getName());
-    return itemRepository.save(newItem);
-  }
-
-  private Blacksmith findBlacksmithById(Long id) {
-    return blacksmithRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("Blacksmith not found in test DB"));
-  }
 }
