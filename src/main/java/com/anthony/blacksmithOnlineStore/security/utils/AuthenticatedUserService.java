@@ -11,8 +11,12 @@ import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationExcepti
 public class AuthenticatedUserService {
 
   public  boolean isAdmin() {
-    return getAuthentication().getAuthorities().stream()
-        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+    try {
+      return getAuthentication().getAuthorities().stream()
+          .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+    } catch(NullPointerException e) {
+      return false;
+    }
   }
 
   public UUID getAuthenticatedId() {
