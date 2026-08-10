@@ -9,9 +9,9 @@ import jakarta.validation.constraints.NotBlank;
 
 public record LoginRequest(
   @NotBlank 
-  @Schema(description = "The username", example = "user")
+  @Schema(description = "The username", example = "Avalon")
   String username, 
-  @Schema(description = "The password", example = "P4ssw0rd#")
+  @Schema(description = "The password", example = "Av4l0nGoat3*")
   @Password String password) {
 
   public UsernamePasswordAuthenticationToken toAuthentication() {
