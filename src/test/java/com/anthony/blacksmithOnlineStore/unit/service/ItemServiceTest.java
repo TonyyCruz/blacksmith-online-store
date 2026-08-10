@@ -150,8 +150,8 @@ public class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("FindById should return item response when item exists")
-    void findById_shouldFindItemByIdSuccessfully_whenItemExists() {
+    @DisplayName("User can find an active item by id when it exists")
+    void findById_userCanFindAnActiveItemByIdSuccessfully_whenItemExists() {
       when(authUser.isAdmin()).thenReturn(false);
       when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
@@ -162,6 +162,21 @@ public class ItemServiceTest {
           "Found item must have the correct ID");
       verify(itemRepository, times(1))
           .findByIdAndActiveTrue(targetItem.getId());
+    }
+
+    @Test
+    @DisplayName("Admin can find an inactive item by id when it")
+    void findById_adminCanFindAnInactiveItemByIdSuccessfully_whenItemExists() {
+      when(authUser.isAdmin()).thenReturn(true);
+      when(itemRepository.findById(targetItem.getId()))
+          .thenReturn(Optional.of(targetItem));
+
+      ItemResponseDto response = itemService.findById(targetItem.getId());
+
+      assertEquals(targetItem.getId(), response.id(),
+          "Found item must have the correct ID");
+      verify(itemRepository, times(1))
+          .findById(targetItem.getId());
     }
 
     @Test
