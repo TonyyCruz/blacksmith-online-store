@@ -1,17 +1,5 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
-import com.anthony.blacksmithOnlineStore.controller.dto.login.TokenDto;
-import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.security.TokenService;
-import com.anthony.blacksmithOnlineStore.service.UserService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,23 +9,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.anthony.blacksmithOnlineStore.controller.docs.AuthControllerDocs;
+import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
+import com.anthony.blacksmithOnlineStore.controller.dto.login.TokenDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
+import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.security.TokenService;
+import com.anthony.blacksmithOnlineStore.service.UserService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Sign up and log in")
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
   private final AuthenticationManager authManager;
   private final TokenService tokenService;
   private final UserService userService;
 
+  @Override
   @PostMapping("/register")
-  @Operation(summary = "Register a new user")
   public ResponseEntity<UserDto> register(@RequestBody @Valid UserCreateDto userCreateDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userCreateDto));
   }
 
+  @Override
   @PostMapping("/login")
-  @Operation(summary = "Authentication")
   public ResponseEntity<TokenDto> login(@RequestBody LoginRequest loginRequest) {
     Authentication authentication = authManager.authenticate(loginRequest.toAuthentication());
     User user = (User) authentication.getPrincipal();

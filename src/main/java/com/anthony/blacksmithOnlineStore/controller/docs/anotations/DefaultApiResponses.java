@@ -11,5 +11,6 @@ import java.lang.annotation.Target;
 @ApiForbiddenDoc
 @ApiNotFoundDoc
 @ApiUnauthorizedDoc
+@ApiBadValidationRequestDoc
 public @interface DefaultApiResponses {
 }
