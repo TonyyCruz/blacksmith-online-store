@@ -10,6 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @SecurityRequirement(name = "bearerAuth")
-@DefaultApiResponses
+@ApiBusinessViolationDoc
 public @interface SecuredApiResponses {
 }
