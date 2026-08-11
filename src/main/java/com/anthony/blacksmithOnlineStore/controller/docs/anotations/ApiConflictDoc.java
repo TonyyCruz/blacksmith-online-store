@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 "title": "Conflict",
                 "timestamp": "2026-08-05T15:10:12Z",
                 "status": 409,
-                "exception": "ConflictStateDataException",
+                "exception": "ConflictingDataException",
                 "path": "/resource",
                 "message": "Conflict with current resource state"
               """

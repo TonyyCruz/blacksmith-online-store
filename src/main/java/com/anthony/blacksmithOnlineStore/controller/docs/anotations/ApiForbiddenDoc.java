@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 "title": "Forbidden",
                 "timestamp": "2026-08-05T15:10:12Z",
                 "status": 403,
-                "exception": "ForbiddenException",
+                "exception": "ForbiddenOperationException",
                 "path": "/resource",
                 "message": "You must be authenticated to access this resource."
               """

@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 "title": "Unprocessable Entity",
                 "timestamp": "2026-08-05T15:10:12Z",
                 "status": 422,
-                "exception": "BusinessException",
+                "exception": "BusinessViolationException",
                 "path": "/resource",
                 "message": "This operation violates a business rule."
               """

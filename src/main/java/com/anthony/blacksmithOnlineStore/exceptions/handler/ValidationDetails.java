@@ -14,17 +14,13 @@ import lombok.EqualsAndHashCode;
               "title": "Bad request",
               "timestamp": "2026-08-05T15:10:12Z",
               "status": 400,
-              "exception": "MethodArgumentNotValidException",
+              "exception": "DataValidationException",
               "path": "/resource",
               "message": "Invalid field data",
               "fieldError": [
                 {
                   "field": "fieldName",
-                  "error": "Field must not be blank"
-                },
-                {
-                  "field": "fieldName",
-                  "error": "Field must be at least 2 characteres"
+                  "error": "Invalid field data"
                 }
               ]
             }
