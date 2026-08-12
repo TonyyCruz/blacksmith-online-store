@@ -20,9 +20,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Authentication", description = "Sign up and log in")
 public interface AuthControllerDocs {
 
-  @ApiResponse(responseCode = "201",
-  description = "User created successfully",
-  content = @Content(
+  @ApiResponse(
+    responseCode = "201",
+    description = "User created successfully",
+    content = @Content(
     schema = @Schema(implementation = UserDto.class)
   ))
   @ApiConflictDoc
