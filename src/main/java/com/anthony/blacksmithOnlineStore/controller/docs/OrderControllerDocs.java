@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
+import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiBadValidationRequestDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiBusinessViolationDoc;
-import com.anthony.blacksmithOnlineStore.controller.docs.anotations.SecuredApiResponses;
+import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiForbiddenDoc;
+import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiNotFoundDoc;
+import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiUnauthorizedDoc;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 
@@ -22,10 +25,11 @@ public interface OrderControllerDocs {
     responseCode = "201",
     description = "Order created successfully",
     content = @Content(
-    schema = @Schema(implementation = OrderResponseDto.class)
-  ))
+    schema = @Schema(implementation = OrderResponseDto.class)))
+  @ApiNotFoundDoc
+  @ApiUnauthorizedDoc
   @ApiBusinessViolationDoc
-  @SecuredApiResponses
+  @ApiBadValidationRequestDoc
   @Operation(summary = "Create a new order")
   public ResponseEntity<OrderResponseDto> create(OrderRequestDto dto);
 
@@ -33,44 +37,43 @@ public interface OrderControllerDocs {
     responseCode = "200",
     description = "Order found successfully",
     content = @Content(
-    schema = @Schema(implementation = OrderResponseDto.class)
-  ))
-  @SecuredApiResponses
+    schema = @Schema(implementation = OrderResponseDto.class)))
+  @ApiNotFoundDoc
+  @ApiForbiddenDoc
   @Operation(summary = "Find your own order by id")
   public ResponseEntity<OrderResponseDto> getOrderById(Long id);
 
   @ApiResponse(
     responseCode = "200",
-    description = "Page of orders"
-  )
-  @SecuredApiResponses
+    description = "Page of orders")
+  @ApiForbiddenDoc
   @Operation(summary = "Find all your own orders")
   public ResponseEntity<List<OrderResponseDto>> getOrders();
 
   @ApiResponse(
     responseCode = "204",
-    description = "Return requested"
-  )
+    description = "Return requested")
+  @ApiNotFoundDoc
+  @ApiForbiddenDoc
   @ApiBusinessViolationDoc
-  @SecuredApiResponses
   @Operation(summary = "Request a return of your own order by id")
   public ResponseEntity<Void> returnRequest(Long id);
 
   @ApiResponse(
     responseCode = "204",
-    description = "Refound requested"
-  )
+    description = "Refound requested")
+  @ApiNotFoundDoc
+  @ApiForbiddenDoc
   @ApiBusinessViolationDoc
-  @SecuredApiResponses
   @Operation(summary = "Request a refound of your own payd order by id")
   public ResponseEntity<Void> refundRequest(Long id);
 
   @ApiResponse(
     responseCode = "204",
-    description = "Order canceled"
-  )
+    description = "Order canceled")
+  @ApiNotFoundDoc
+  @ApiForbiddenDoc
   @ApiBusinessViolationDoc
-  @SecuredApiResponses
   @Operation(summary = "Cancel your own order by id")
   public ResponseEntity<Void> cancel(Long id);
 }

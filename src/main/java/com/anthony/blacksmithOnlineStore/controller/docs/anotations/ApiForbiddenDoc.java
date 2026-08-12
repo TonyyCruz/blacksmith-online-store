@@ -31,5 +31,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 "message": "You must be authenticated to access this resource."
               """
 )))
+@ApiUnauthorizedDoc
 public @interface ApiForbiddenDoc {
 }

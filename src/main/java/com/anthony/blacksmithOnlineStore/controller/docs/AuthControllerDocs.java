@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiBadRequestDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiBadValidationRequestDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiConflictDoc;
-import com.anthony.blacksmithOnlineStore.controller.docs.anotations.SecuredApiResponses;
+import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiNotFoundDoc;
 import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
 import com.anthony.blacksmithOnlineStore.controller.dto.login.TokenDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
@@ -24,8 +24,7 @@ public interface AuthControllerDocs {
     responseCode = "201",
     description = "User created successfully",
     content = @Content(
-    schema = @Schema(implementation = UserDto.class)
-  ))
+    schema = @Schema(implementation = UserDto.class)))
   @ApiConflictDoc
   @ApiBadValidationRequestDoc
   @Operation(summary = "Register a new user")
@@ -35,8 +34,8 @@ public interface AuthControllerDocs {
     responseCode = "200", 
     description = "Authentication successfully",
     content = @Content(
-    schema = @Schema(implementation = TokenDto.class)
-  ))
+    schema = @Schema(implementation = TokenDto.class)))
+  @ApiNotFoundDoc
   @ApiBadRequestDoc
   @ApiBadValidationRequestDoc
   @Operation(summary = "User authentication")
