@@ -57,7 +57,7 @@ public interface BlacksmithControllerDocs {
 
   @ApiResponse(
     responseCode = "200",
-    description = "Blacksmith search result"
+    description = "Page of blacksmiths found"
   )
   @SecuredApiResponses
   @Operation(summary = "Find blacksmith by name")

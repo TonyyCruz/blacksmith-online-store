@@ -1,15 +1,5 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import com.anthony.blacksmithOnlineStore.controller.docs.BlacksmithControllerDocs;
-import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
-import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.anthony.blacksmithOnlineStore.controller.docs.BlacksmithControllerDocs;
+import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
+import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor

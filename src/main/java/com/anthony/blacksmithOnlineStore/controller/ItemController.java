@@ -1,17 +1,7 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
-import com.anthony.blacksmithOnlineStore.service.ItemService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -29,47 +19,55 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.anthony.blacksmithOnlineStore.controller.docs.ItemControllerDocs;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemResponseDto;
+import com.anthony.blacksmithOnlineStore.service.ItemService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/items")
-@SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Items", description = "Item management")
-public class ItemController {
+public class ItemController implements ItemControllerDocs {
   private final ItemService itemService;
 
+  @Autowired
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Create item, ADMIN only")
   public ResponseEntity<ItemResponseDto> createItem(@RequestBody @Valid ItemRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(dto));
   }
 
+  @Autowired
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Update all item data by id, ADMIN only")
   public ResponseEntity<ItemResponseDto> updateItem(
       @PathVariable Long id,
       @RequestBody @Valid ItemRequestDto dto) {
     return ResponseEntity.ok(itemService.update(id, dto));
   }
 
+  @Autowired
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Update item partially by id, ADMIN only")
   public ResponseEntity<ItemResponseDto> patchItemUpdate(
       @PathVariable Long id,
       @RequestBody @Valid ItemPatchUpdateDto dto) {
     return ResponseEntity.ok(itemService.update(id, dto));
   }
 
+  @Autowired
   @GetMapping("/{id}")
-  @Operation(summary = "Find an active item by id")
   public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long id) {
     return ResponseEntity.ok(itemService.findById(id));
   }
 
+  @Autowired
   @GetMapping
-  @Operation(summary = "Find all items by filter, only admin can get inactive items")
   public ResponseEntity<Page<ItemResponseDto>> getAllFilteredItems(
       @ParameterObject ItemFilterDto filter,
       @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC)
@@ -77,9 +75,9 @@ public class ItemController {
     return ResponseEntity.ok(itemService.findFilteredItems(filter, pageable));
   }
 
+  @Autowired
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Delete item by id, ADMIN only")
   public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
     itemService.deleteItem(id);
     return ResponseEntity.noContent().build();
