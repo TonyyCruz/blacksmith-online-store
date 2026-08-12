@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +31,10 @@ public class PaymentService {
     @Transactional
     public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
       Order order = orderService.findEntityById(orderId);
+      if (order.getPayment() != null) {
+        throw new DataIntegrityViolationException(
+          "You cannot pay for an order that has already been paid for");
+      }
       if (order.getTotal().compareTo(dto.amount()) != 0) {
         throw new BusinessViolationException(
             "The order total price is R$ %.2f but the amount receive is R$ %.2f"
