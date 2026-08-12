@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
+import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiBusinessViolationDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.SecuredApiResponses;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemFilterDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.item.ItemPatchUpdateDto;
@@ -25,6 +26,7 @@ public interface ItemControllerDocs {
     content = @Content(
     schema = @Schema(implementation = ItemResponseDto.class)
   ))
+  @ApiBusinessViolationDoc
   @SecuredApiResponses
   @Operation(summary = "Create item, ADMIN only")
   public ResponseEntity<ItemResponseDto> createItem(ItemRequestDto dto);
@@ -35,6 +37,7 @@ public interface ItemControllerDocs {
     content = @Content(
     schema = @Schema(implementation = ItemResponseDto.class)
   ))
+  @ApiBusinessViolationDoc
   @SecuredApiResponses
   @Operation(summary = "Update all item data by id, ADMIN only")
   public ResponseEntity<ItemResponseDto> updateItem(Long id, ItemRequestDto dto);
@@ -45,6 +48,7 @@ public interface ItemControllerDocs {
     content = @Content(
     schema = @Schema(implementation = ItemResponseDto.class)
   ))
+  @ApiBusinessViolationDoc
   @SecuredApiResponses
   @Operation(summary = "Update item partially by id, ADMIN only")
   public ResponseEntity<ItemResponseDto> patchItemUpdate(Long id, ItemPatchUpdateDto dto);
