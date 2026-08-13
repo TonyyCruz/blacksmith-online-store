@@ -2,6 +2,11 @@ package com.anthony.blacksmithOnlineStore.apiDoc;
 
 import java.util.List;
 
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
+import org.springdoc.core.properties.SwaggerUiOAuthProperties;
+import org.springdoc.core.providers.ObjectMapperProvider;
+import org.springdoc.webmvc.ui.SwaggerIndexTransformer;
+import org.springdoc.webmvc.ui.SwaggerWelcomeCommon;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -59,7 +64,7 @@ public class OpenApiConfig {
           .url("https://github.com/TonyyCruz/blacksmith-online-store")
       ).tags(
         List.of(
-          new Tag().name("Authentication").description("Authentication and authorization"),
+          new Tag().name("Authentications").description("Authentication and authorization"),
           new Tag().name("Users").description("User management"),
           new Tag().name("Orders").description("Order management"),
           new Tag().name("Payments").description("Payment management"),
@@ -68,5 +73,15 @@ public class OpenApiConfig {
           new Tag().name("Blacksmiths").description("Blacksmith management"),
           new Tag().name("Admins").description("Admin management")
       ));
+  }
+
+  @Bean
+  public SwaggerIndexTransformer swaggerIndexTransformer(
+    SwaggerUiConfigProperties swaggerUiConfig,
+    SwaggerUiOAuthProperties swaggerUiOAuthProperties,
+    SwaggerWelcomeCommon swaggerWelcomeCommon,
+    ObjectMapperProvider objectMapperProvider) {
+
+    return new SwaggerCustomCssInjector(swaggerUiConfig, swaggerUiOAuthProperties, swaggerWelcomeCommon, objectMapperProvider);
   }
 }
