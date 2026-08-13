@@ -50,7 +50,7 @@ public class BlacksmithController implements BlacksmithControllerDocs {
   @Override
   @GetMapping
   public ResponseEntity<Page<BlacksmithResponseDto>> findAll(
-      @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
+      @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.DESC)
       @ParameterObject
       Pageable pageable
   ) {

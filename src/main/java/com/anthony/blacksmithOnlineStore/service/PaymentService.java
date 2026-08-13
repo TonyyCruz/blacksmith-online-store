@@ -1,5 +1,10 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import java.time.LocalDateTime;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Order;
@@ -8,17 +13,15 @@ import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ConflictingDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessor;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessorFactory;
 import com.anthony.blacksmithOnlineStore.payment.PaymentResult;
 import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
+
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,7 @@ public class PaymentService {
     public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
       Order order = orderService.findEntityById(orderId);
       if (order.getPayment() != null) {
-        throw new DataIntegrityViolationException(
+        throw new ConflictingDataException(
           "You cannot pay for an order that has already been paid for");
       }
       if (order.getTotal().compareTo(dto.amount()) != 0) {

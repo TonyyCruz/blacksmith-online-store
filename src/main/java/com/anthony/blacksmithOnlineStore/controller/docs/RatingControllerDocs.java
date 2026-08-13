@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiBadValidationRequestDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiBusinessViolationDoc;
+import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiConflictDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiForbiddenDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiNotFoundDoc;
 import com.anthony.blacksmithOnlineStore.controller.docs.anotations.ApiUnauthorizedDoc;
@@ -25,6 +26,7 @@ public interface RatingControllerDocs {
     responseCode = "201",
     description = "Rating created successfully")
   @ApiNotFoundDoc
+  @ApiConflictDoc
   @ApiForbiddenDoc
   @ApiBusinessViolationDoc
   @ApiBadValidationRequestDoc
