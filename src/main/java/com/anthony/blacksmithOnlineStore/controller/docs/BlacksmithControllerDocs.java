@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Blacksmith", description = "Blacksmith management")
+@Tag(name = "Blacksmiths Controller", description = "Blacksmith management")
 public interface BlacksmithControllerDocs {
 
   @ApiResponse(

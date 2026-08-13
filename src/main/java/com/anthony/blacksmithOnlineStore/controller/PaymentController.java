@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class PaymentController implements PaymentControllerDocs {
   private final PaymentService paymentService;
 
-  @Autowired
+  @Override
   @PostMapping("/order/{id}")
   public ResponseEntity<PaymentResponseDto> create(@PathVariable @Valid Long id,
     @RequestBody PaymentCreateDto dto) {

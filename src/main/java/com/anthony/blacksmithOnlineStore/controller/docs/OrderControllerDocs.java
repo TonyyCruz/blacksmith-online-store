@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Orders", description = "Order management")
+@Tag(name = "Orders Controller", description = "Order management")
 public interface OrderControllerDocs {
 
   @ApiResponse(

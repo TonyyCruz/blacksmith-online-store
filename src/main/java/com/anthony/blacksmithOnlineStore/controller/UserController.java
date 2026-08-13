@@ -1,6 +1,5 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,19 +23,19 @@ import lombok.RequiredArgsConstructor;
 public class UserController implements UserControllerDocs {
   private final UserService userService;
 
-  @Autowired
+  @Override
   @GetMapping("/me")
   public ResponseEntity<UserDto> getCurrentUser() {
     return ResponseEntity.ok(userService.getUser());
   }
 
-  @Autowired
+  @Override
   @PutMapping("/me")
   public ResponseEntity<UserDto> updateCurrentUser(@RequestBody @Valid UserUpdateDto updateDto) {
     return ResponseEntity.ok(userService.updateUser(updateDto));
   }
 
-  @Autowired
+  @Override
   @PutMapping("/me/password")
   public ResponseEntity<Void> updateCurrentUserPassword(
       @RequestBody @Valid PasswordUpdateDto passwordUpdateDto) {
@@ -44,7 +43,7 @@ public class UserController implements UserControllerDocs {
     return ResponseEntity.noContent().build();
   }
 
-  @Autowired
+  @Override
   @DeleteMapping("/me")
   public ResponseEntity<Void> deleteCurrentUser() {
     userService.deleteUserFromAuth();

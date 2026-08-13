@@ -1,7 +1,6 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -32,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class BlacksmithController implements BlacksmithControllerDocs {
   private final BlacksmithService blacksmithService;
 
-  @Autowired
+  @Override
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BlacksmithResponseDto> createBlacksmith(
@@ -40,7 +39,7 @@ public class BlacksmithController implements BlacksmithControllerDocs {
     return ResponseEntity.status(HttpStatus.CREATED).body(blacksmithService.create(dto));
   }
 
-  @Autowired
+  @Override
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BlacksmithResponseDto> updateBlacksmith(
@@ -48,7 +47,7 @@ public class BlacksmithController implements BlacksmithControllerDocs {
     return ResponseEntity.ok(blacksmithService.update(id, dto));
   }
 
-  @Autowired
+  @Override
   @GetMapping
   public ResponseEntity<Page<BlacksmithResponseDto>> findAll(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
@@ -58,13 +57,13 @@ public class BlacksmithController implements BlacksmithControllerDocs {
     return ResponseEntity.ok(blacksmithService.findAll(pageable));
   }
 
-  @Autowired
+  @Override
   @GetMapping("/{id}")
   public ResponseEntity<BlacksmithResponseDto> findById(@PathVariable Long id) {
     return ResponseEntity.ok(blacksmithService.findById(id));
   }
 
-  @Autowired
+  @Override
   @GetMapping("/search")
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)

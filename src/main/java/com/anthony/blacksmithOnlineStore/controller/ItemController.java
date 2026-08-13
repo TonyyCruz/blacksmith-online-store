@@ -1,7 +1,6 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -35,14 +34,14 @@ import lombok.RequiredArgsConstructor;
 public class ItemController implements ItemControllerDocs {
   private final ItemService itemService;
 
-  @Autowired
+  @Override
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ItemResponseDto> createItem(@RequestBody @Valid ItemRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(dto));
   }
 
-  @Autowired
+  @Override
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ItemResponseDto> updateItem(
@@ -51,7 +50,7 @@ public class ItemController implements ItemControllerDocs {
     return ResponseEntity.ok(itemService.update(id, dto));
   }
 
-  @Autowired
+  @Override
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ItemResponseDto> patchItemUpdate(
@@ -60,13 +59,13 @@ public class ItemController implements ItemControllerDocs {
     return ResponseEntity.ok(itemService.update(id, dto));
   }
 
-  @Autowired
+  @Override
   @GetMapping("/{id}")
   public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long id) {
     return ResponseEntity.ok(itemService.findById(id));
   }
 
-  @Autowired
+  @Override
   @GetMapping
   public ResponseEntity<Page<ItemResponseDto>> getAllFilteredItems(
       @ParameterObject ItemFilterDto filter,
@@ -75,7 +74,7 @@ public class ItemController implements ItemControllerDocs {
     return ResponseEntity.ok(itemService.findFilteredItems(filter, pageable));
   }
 
-  @Autowired
+  @Override
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
