@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Payments Controller", description = "Payment management")
+@Tag(name = "Payments")
 public interface PaymentControllerDocs {
 
   @ApiResponse(

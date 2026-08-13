@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Admins Controller", description = "Admins management")
+@Tag(name = "Admins")
 public interface AdminControllerDocs {
 
   @ApiNotFoundDoc

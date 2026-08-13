@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Authentications Controller", description = "Sign up and log in")
+@Tag(name = "Authentications")
 public interface AuthControllerDocs {
 
   @ApiResponse(

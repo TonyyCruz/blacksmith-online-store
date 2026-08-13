@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Ratings Controller", description = "Rating management")
+@Tag(name = "Ratings")
 public interface RatingControllerDocs {
 
   @ApiResponse(

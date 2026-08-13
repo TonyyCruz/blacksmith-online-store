@@ -1,4 +1,6 @@
-package com.anthony.blacksmithOnlineStore.doc;
+package com.anthony.blacksmithOnlineStore.apiDoc;
+
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.tags.Tag;
 
 @Configuration
 public class OpenApiConfig {
@@ -33,27 +36,37 @@ public class OpenApiConfig {
           .contact(new Contact()
             .name("Anthony Cruz")
             .email("anthony-cruz@outlook.com"))
-          .description("""
-                REST API for a medieval-themed e-commerce.
+          .description(
+            """
+            REST API for a medieval-themed e-commerce.
 
-                Authentication:
+            Authentication:
 
-                1. Call POST /auth/login
+            1. Call POST /auth/login
 
-                2. Copy the returned JWT
+            2. Copy the returned JWT
 
-                3. Click 'Authorize'
+            3. Click 'Authorize'
 
-                4. Paste the token
+            4. Paste the token
 
-                5. Execute secured endpoints
-            """)
-      )
+            5. Execute secured endpoints
+            """
+      ))
       .externalDocs(
         new ExternalDocumentation()
           .description("Blacksmith Online Store API")
           .url("https://github.com/TonyyCruz/blacksmith-online-store")
-      );
+      ).tags(
+        List.of(
+          new Tag().name("Authentication").description("Authentication and authorization"),
+          new Tag().name("Users").description("User management"),
+          new Tag().name("Orders").description("Order management"),
+          new Tag().name("Payments").description("Payment management"),
+          new Tag().name("Ratings").description("Rating management"),
+          new Tag().name("Items").description("Item management"),
+          new Tag().name("Blacksmiths").description("Blacksmith management"),
+          new Tag().name("Admins").description("Admin management")
+      ));
   }
-
 }
