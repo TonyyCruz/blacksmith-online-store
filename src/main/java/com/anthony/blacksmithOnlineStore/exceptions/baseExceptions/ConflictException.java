@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.baseExceptions;
 
-public class ConflictException extends RuntimeException{
+public abstract class ConflictException extends RuntimeException{
 
   public ConflictException(String msg, Throwable cause) {
     super(msg, cause);

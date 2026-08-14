@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.exceptions.baseExceptions;
 
-public class UnauthorizedException extends RuntimeException {
+public abstract class UnauthorizedException extends RuntimeException {
+  
   protected UnauthorizedException(String msg, Throwable cause) {
     super(msg, cause);
   }

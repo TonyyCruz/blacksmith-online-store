@@ -1,6 +1,6 @@
 package com.anthony.blacksmithOnlineStore.exceptions.baseExceptions;
 
-public class ForbiddenException extends RuntimeException{
+public abstract class ForbiddenException extends RuntimeException{
 
   public ForbiddenException(String msg, Throwable cause) {
     super(msg, cause);

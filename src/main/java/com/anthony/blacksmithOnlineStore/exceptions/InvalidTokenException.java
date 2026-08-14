@@ -10,4 +10,8 @@ public class InvalidTokenException extends BadRequestException {
   public InvalidTokenException(Throwable cause) {
     super("Invalid or expired token", cause);
   }
+
+  public InvalidTokenException(String msg) {
+    super(msg);
+  }
 }
