@@ -53,6 +53,12 @@ VALUES
         '2025-11-15', '2026-02-25', 2, false,
      'Tyrion o Perdido', 2, 0
     ), (
+      'Steel', 13, 6, 'Student Sword', 18.00,
+     15.00, true, 'A basic sword forged for beginners.',
+     4.8, 1233, 'SHORT_SWORD', 'Rare', 2, 10, 2, 5,
+     '2020-11-15', '2022-02-25', 1, true,
+     'Gimli o Marteleiro', 1, 0
+    ), (
      'Mithril', 70, 30, 'Axe of Light', 150.00,
      135.00, true,
      'A Axe that shines with the brilliance of the sun.', 10.0,
