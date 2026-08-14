@@ -43,19 +43,25 @@ public class OpenApiConfig {
             .email("anthony-cruz@outlook.com"))
           .description(
             """
-            REST API for a medieval-themed e-commerce.
+            API REST para um e-commerce com temática medieval.
 
-            Authentication:
+            Autenticação:
 
-            1. Call POST /auth/login
+            1. Crie um usuário em: POST /auth/register 
 
-            2. Copy the returned JWT
+            2. Faça seu login em: POST /auth/login
 
-            3. Click 'Authorize'
+            3. Copie o token JWT recebido
 
-            4. Paste the token
+            4. Clike no botão 'Authorize' e cole seu token
 
-            5. Execute secured endpoints
+            5. Agora você pode acessar as rotas protegidas
+
+            Ps: para utilizar as funcionalidades de administrador:
+
+            Usuário: admin
+            
+            Senha:   P4ssw0rd#
             """
       ))
       .externalDocs(

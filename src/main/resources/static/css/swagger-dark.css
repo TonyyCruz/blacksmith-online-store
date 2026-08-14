@@ -393,6 +393,11 @@ body {
     color: var(--secondary-text-color);
 }
 
+/* text size */
+.parameters-col_description .renderedMarkdown {
+    font-size: 13px;
+}
+
 
 :root {
     /* primary colors */
