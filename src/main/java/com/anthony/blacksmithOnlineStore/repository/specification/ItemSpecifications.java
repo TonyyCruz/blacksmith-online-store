@@ -12,7 +12,8 @@ public class ItemSpecifications {
 
       if (filters.name() != null) {
         predicates = criteriaBuilder.and(predicates,
-            criteriaBuilder.like(root.get("name"), "%" + filters.name() + "%"));
+            criteriaBuilder.like(
+              criteriaBuilder.lower(root.get("name")), "%" + filters.name().toLowerCase() + "%"));
       }
       if (filters.material() != null) {
         predicates = criteriaBuilder.and(predicates,
