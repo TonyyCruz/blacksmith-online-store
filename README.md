@@ -13,12 +13,13 @@ Esta aplicação, foi idealizada como um **projeto pessoal**, focando em **boas 
 ### 👤 Autenticação e Autorização
 - Implementação de **Spring Security** com **JWT (Auth0 Java JWT)**.
 - Controle de acesso baseado em **roles** (`ADMIN` e `CUSTOMER`).
+- Cadastro e autenticação de usuários.
 - Apenas `ADMIN` pode gerenciar produtos, ferreiros e visualizar todos os pedidos.
 - Usuários `CUSTOMER` podem criar e visualizar apenas os seus próprios pedidos.
 - Criptografia de senhas com **BCryptPasswordEncoder**.
 
 ### 🧍 Usuários (`User`)
-- Cadastro e autenticação de usuários.
+- Controle de dados pessoais.
 - Validação de idade mínima (18 anos).
 - Senha deve possuir os caracteres obrigatórios.
 - Para atualizar a senha deve enviar a senha antiga para validação.
@@ -31,7 +32,7 @@ Esta aplicação, foi idealizada como um **projeto pessoal**, focando em **boas 
 - Usa o padrão de projeto **Builder** para otimizar a construção da entidade.
 
 ### 🧾 Pedidos (`Order`)
-- Cálculo automático do valor total do pedido.
+- Pedidos só podem ser finalizados se os itens possuirem estoque.
 - Apenas o cliente pode acessar os seus próprios pedidos.
 - Admins têm acesso global para fins de auditoria.
 
@@ -64,7 +65,8 @@ A arquitetura segue o modelo de **camadas** (layered architecture), com separaç
 com.anthony.blacksmithOnlineStore <br>
 │ <br>
 ├┬─ controller → Camada de entrada da aplicação (endpoints REST) <br>
-│└─ dto → Objetos de transferência de dados (entrada e saída)<br>
+│├─ dto  → Objetos de transferência de dados (entrada e saída)<br>
+│└─ docs → Interfaces para agrupar a documemtação dos controllers<br>
 ├── service → Contém a lógica de negócio <br>
 ├── repository → Interface com o banco de dados (Spring Data JPA)<br>
 ├── security → Configuração de segurança e JWT<br>
@@ -115,14 +117,13 @@ spring.datasource.password=sua_senha
 spring.jpa.hibernate.ddl-auto=update
 
 ### 3️⃣ Compile e execute
-```mvn spring-boot:run``` <br>
+Dentro da pasta do projeto execute o comando ```mvn spring-boot:run``` <br>
 Ou diretamente na sua IDE favorita.
 
 ### Swagger
 Acesse `http://localhost:8080/swagger-ui/index.html`
-Faça o cadastro ha rota auth/register.
-Faça o log in ha rota auth/login.
-Copie o token para o botão de authorization na parte superior direita.
+Para acessar as rotas protegidas, realize o cadastro na rota ```auth/register```, depois daça o login em ```auth/login```, 
+feito isso, copie o token recebido e o cole no botão de ```authorization``` na parte superior direita.
 
 ---
 
@@ -146,37 +147,40 @@ Copie o token para o botão de authorization na parte superior direita.
 
 - Pelo fato de trabalhar com itens únicos e de pouco estoque, resolvi fazer a dedução do estoque apenas no momento do pagamento, evitando o bloqueio temporário dos itens que ocorreria em caso de dedução imediata do mesmo.
 
+- Utilizei eventos nas avaliaçôes dos itens e nos pagamentos dos pedidos. O evento de avaliação, atribui a nota ao item comprado e ao ferreito que o forjou, já o evento do pagamento, aciona o serviço de entrega.
+
 ---
 
 ## 📘 Exemplos de Endpoints
+
 ### Autenticação
 `POST /auth/register`
 
 `POST /auth/login`
 
-### Armas
-`GET /weapons`
+### Items
+`GET /items`
 
-`GET /weapons/id`
+`GET /items/id`
 
-`GET /weapons?`
+`GET /items?`
 
-`POST /weapons`        # ADMIN
+`POST /items`        # ADMIN
 
-`PUT /weapons/{id}`    # ADMIN
+`PUT /items/{id}`    # ADMIN
 
-`PATCH /weapons/{id}`  # ADMIN
+`PATCH /items/{id}`  # ADMIN
 
-`DELETE /weapons/{id}` # ADMIN
+`DELETE /items/{id}` # ADMIN
 
 ### Ferreiros
-`GET /ferreiros`
+`GET /blacksmiths`
 
-`GET /ferreiros/{id}`
+`GET /blacksmiths/{id}`
 
-`POST /ferreiros`      #ADMIN
+`POST /blacksmiths`      #ADMIN
 
-`PUT /ferreiros`       #ADMIN
+`PUT /blacksmiths`       #ADMIN
 
 ### Pedidos
 `POST /orders`          # CUSTOMER
@@ -186,6 +190,6 @@ Copie o token para o botão de authorization na parte superior direita.
 `GET /orders/{ID}`      # ADMIN / CUSTOMER (somente os seus pedidos)
 
 ### Avaliação
-- `POST /api/avaliacoes` → Avaliar arma (apenas os compradores)
+- `POST /rating` → Avaliar arma (apenas os compradores)
 
-- `GET /api/armas/{id}/avaliacoes` → Listar avaliações de uma arma
+- `GET /item/{id}` → Listar avaliações de uma arma

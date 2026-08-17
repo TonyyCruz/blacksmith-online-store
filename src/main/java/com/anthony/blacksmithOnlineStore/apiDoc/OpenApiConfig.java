@@ -87,7 +87,6 @@ public class OpenApiConfig {
     SwaggerUiOAuthProperties swaggerUiOAuthProperties,
     SwaggerWelcomeCommon swaggerWelcomeCommon,
     ObjectMapperProvider objectMapperProvider) {
-
-    return new SwaggerCustomCssInjector(swaggerUiConfig, swaggerUiOAuthProperties, swaggerWelcomeCommon, objectMapperProvider);
+      return new SwaggerCustomCssInjector(swaggerUiConfig, swaggerUiOAuthProperties, swaggerWelcomeCommon, objectMapperProvider);
   }
 }
