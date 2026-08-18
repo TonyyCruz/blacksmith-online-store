@@ -1,9 +1,11 @@
 package com.anthony.blacksmithOnlineStore.helper;
 
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
@@ -24,6 +26,8 @@ import com.anthony.blacksmithOnlineStore.repository.UserRepository;
 @Component
 public class DatabaseTestHelper {
   @Autowired
+  PasswordEncoder passwordEncoder;
+  @Autowired
   private OrderItemRepository orderItemRepository;
   @Autowired
   private ItemRepository itemRepository;
@@ -37,22 +41,47 @@ public class DatabaseTestHelper {
   private UserRepository userRepository;
   private final UUID USER_ID = UUID.fromString("7b87f809-d142-4dfa-8802-87644d774dd5");
 
-  public Order getNewOrder() {
-    Order odr = new Order();
-    odr.setUser(findUserById(USER_ID));
-    Item itm = itemRepository.save(MockItem.newItem(findBlacksmithById(1L)));
-    OrderItem oi = MockOrderItem.create(itm, 1, odr);
-    odr.addOrderItem(oi);
-    odr.recalculateTotal();
-    odr.setDeliveredAt(LocalDateTime.now());
-    odr.setStatus(OrderStatus.PAYMENT_APPROVED);
-    odr.setStatus(OrderStatus.SEPARATING);
-    odr.setStatus(OrderStatus.DISPATCHED);
-    odr.setStatus(OrderStatus.IN_TRANSIT);
-    odr.setStatus(OrderStatus.OUT_FOR_DELIVERY);
-    odr.setStatus(OrderStatus.DELIVERED);
-    return orderRepository.save(odr);
+//  ==================== SAVES ====================
+  public Order saveorder(Order order) {
+    return orderRepository.save(order);
   }
+
+  public Item saveItem(Item item) {
+    return itemRepository.save(item);
+  }
+
+  public Blacksmith saveBlacksmith(Blacksmith blacksmith) {
+    return blacksmithRepository.save(blacksmith);
+  }
+
+  public User saveUser(User user) {
+    user.setId(null);
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    return userRepository.save(user);
+  }
+
+  //  ==================== GET NEW ====================
+
+  public Order getNewOrder() {
+    Order order = new Order();
+    order.setUser(findUserById(USER_ID));
+    Item item = saveItem(MockItem.newItem(findBlacksmithById(1L)));
+    OrderItem orderItem = MockOrderItem.create(item, 1, order);
+    order.addOrderItem(orderItem);
+    order.recalculateTotal();
+    return saveorder(order);
+  }
+
+  public Item getNewItem() {
+    Item newItem = MockItem.newItem(findBlacksmithById(1L));
+    return itemRepository.save(newItem);
+  }
+
+  public User getNewUser() {
+    return saveUser(MockUser.user());
+  }
+
+  //  ==================== FINDERS ====================
 
   public Item findItemById(Long id) {
     return itemRepository.findById(id).orElseThrow(()-> new IllegalArgumentException(
@@ -74,4 +103,21 @@ public class DatabaseTestHelper {
     .orElseThrow(() -> new IllegalArgumentException("User not found in test DB"));
   }
 
+  public User findUserByUsername(String username) {
+    return userRepository.findByUsername(username)
+        .orElseThrow(() -> new IllegalStateException("User not found in test DB"));
+  }
+
+  //  ==================== OTHERS ====================
+  public Order deliveryOrder(Long id) {
+    Order order = findOrderById(id);
+    order.setDeliveredAt(LocalDateTime.now());
+    order.setStatus(OrderStatus.PAYMENT_APPROVED);
+    order.setStatus(OrderStatus.SEPARATING);
+    order.setStatus(OrderStatus.DISPATCHED);
+    order.setStatus(OrderStatus.IN_TRANSIT);
+    order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
+    order.setStatus(OrderStatus.DELIVERED);
+    return saveorder(order);
+  }
 }

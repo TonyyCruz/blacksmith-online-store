@@ -1,14 +1,5 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingResponseDto;
-import com.anthony.blacksmithOnlineStore.service.RatingService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,29 +14,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.anthony.blacksmithOnlineStore.controller.docs.RatingControllerDocs;
+import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.rating.RatingResponseDto;
+import com.anthony.blacksmithOnlineStore.service.RatingService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/ratings")
-@SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Rating", description = "Rating management")
-public class RatingController {
+public class RatingController implements RatingControllerDocs {
   private final RatingService ratingService;
 
+  @Override
   @PostMapping
-  @Operation(summary = "Rate your recived item")
   public ResponseEntity<Void> rate(@Valid @RequestBody RatingRequestDto dto) {
     ratingService.ratePurchase(dto);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
+  @Override
   @GetMapping("/orderItem/{id}")
-  @Operation(summary = "Find the rate by order item id")
-  public ResponseEntity<RatingResponseDto> getRatingsFromItemId(@PathVariable Long id) {
+  public ResponseEntity<RatingResponseDto> getRatingFromOrderItemId(@PathVariable Long id) {
     return ResponseEntity.ok(ratingService.findByOrderItemId(id));
   }
 
+  @Override
   @GetMapping("/item/{id}")
-  @Operation(summary = "Find all items rate by item id")
   public ResponseEntity<Page<RatingResponseDto>> getRatingsFromItemId(
       @PathVariable Long id,
       @PageableDefault(page = 0, size = 5, sort = "id", direction = Direction.DESC)

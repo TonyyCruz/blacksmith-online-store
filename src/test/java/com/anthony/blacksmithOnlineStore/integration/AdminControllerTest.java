@@ -7,21 +7,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
+import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.enums.Role;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
+import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-
-import com.anthony.blacksmithOnlineStore.controller.dto.admin.RoleUpdateDto;
-import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.enums.Role;
-import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 
 @Tag("integration")
 @DisplayName("Integration test for admin controller")
 public class AdminControllerTest extends TestBase {
+  @Autowired
+  private DatabaseTestHelper testHelper;
   private String adminToken;
   private User admin;
   private User user;
@@ -29,10 +32,8 @@ public class AdminControllerTest extends TestBase {
   @BeforeEach
   void setUp() {
     adminToken = performLogin(adminLogin);
-    admin = userRepository.findByUsername(adminLogin.username())
-        .orElseThrow(() -> new IllegalStateException("Admin not found in test DB"));
-    user = userRepository.findByUsername(userLogin.username())
-        .orElseThrow(() -> new IllegalStateException("User not found in test DB"));
+    admin = testHelper.findUserByUsername(adminLogin.username());
+    user = testHelper.findUserByUsername(userLogin.username());
   }
 
   @Nested

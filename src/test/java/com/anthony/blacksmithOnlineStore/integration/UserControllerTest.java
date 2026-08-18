@@ -8,12 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
 import java.time.LocalDate;
 
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.login.LoginRequest;
@@ -25,14 +28,15 @@ import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 
 public class UserControllerTest extends TestBase {
   private static final String USER_URL = "/users/me";
+  @Autowired
+  private DatabaseTestHelper testHelper;
   private User user;
   private String userToken;
 
   @BeforeEach
   void setUp() {
     userToken = performLogin(userLogin);
-    user = userRepository.findByUsername(userLogin.username())
-        .orElseThrow(() -> new IllegalStateException("User not found in test DB"));
+    user = testHelper.findUserByUsername(userLogin.username());
   }
 
   @Nested
@@ -181,8 +185,8 @@ public class UserControllerTest extends TestBase {
     @Test
     @DisplayName("Update Current User returns 409 when username is already taken")
     void updateCurrentUser_returns409_whenUsernameIsAlreadyTaken() throws Exception {
-      User anotherUser = performSaveUser(MockUser.userWithId());
-      UserUpdateDto dto = new UserUpdateDto(anotherUser.getUsername(),
+      User newUser = testHelper.getNewUser();
+      UserUpdateDto dto = new UserUpdateDto(newUser.getUsername(),
           LocalDate.parse("1900-01-01"));
       String valueAsString = objectMapper.writeValueAsString(dto);
       mockMvc.perform(put(USER_URL)
@@ -198,7 +202,7 @@ public class UserControllerTest extends TestBase {
     void updateCurrentUser_returns400_whenUsernameIsInvalid() throws Exception {
       String[] wrongUsername = {"", "   ", "a", null};
       for (String usrName : wrongUsername) {
-        UserUpdateDto dto = new UserUpdateDto(usrName, MockUser.userWithId().getBirthDate());
+        UserUpdateDto dto = new UserUpdateDto(usrName, MockUser.user(UUID.randomUUID()).getBirthDate());
         String valueAsString = objectMapper.writeValueAsString(dto);
         mockMvc.perform(put(USER_URL)
                 .header("Authorization", userToken)
@@ -219,7 +223,7 @@ public class UserControllerTest extends TestBase {
           LocalDate.now()
       };
       for (LocalDate date : invalidDates) {
-        UserUpdateDto dto = new UserUpdateDto(MockUser.userWithId().getUsername(), date);
+        UserUpdateDto dto = new UserUpdateDto(MockUser.user(UUID.randomUUID()).getUsername(), date);
         mockMvc.perform(put(USER_URL)
                 .header("Authorization", userToken)
                 .contentType(MediaType.APPLICATION_JSON)

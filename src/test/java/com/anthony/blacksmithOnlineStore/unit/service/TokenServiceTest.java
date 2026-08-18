@@ -14,6 +14,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
   private TokenService tokenService;
-  private final User user = MockUser.userWithId();
+  private final User user = MockUser.user(UUID.randomUUID());
 
   @BeforeEach
   void setup() {

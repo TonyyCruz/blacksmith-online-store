@@ -11,10 +11,10 @@ import jakarta.validation.constraints.Min;
 
 public record ItemFilterDto(
     @Schema(description = "Partial or full item name. Optional. If omitted, this filter will be ignored", 
-      example = "blade")
+      example = "sword")
     String name,
     @Schema(description = "Item material. Optional. If omitted, this filter will be ignored", 
-      example = "COOPER")
+      example = "STEEL")
     Material material,
     @Schema(description = "The minimum item damage (integer). Optional. If omitted, this filter will be ignored",
       example = "1")
@@ -52,7 +52,7 @@ public record ItemFilterDto(
       example = "SHORT_SWORD")
     Type type,
     @Schema(description = "The item rarity. Optional. If omitted, this filter will be ignored",
-      example = "UNCOMMON")
+      example = "RARE")
     Rarity rarity,
     @Schema(description = "The blacksmith id (integer). Optional. If omitted, this filter will be ignored", 
       example = "1")

@@ -5,6 +5,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.anthony.blacksmithOnlineStore.entity.Order;
+import com.anthony.blacksmithOnlineStore.entity.User;
+import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockPayment;
+import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
+import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,26 +20,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import com.anthony.blacksmithOnlineStore.entity.Order;
-import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockPayment;
-import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
-import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
-import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
-
 @Tag("integration")
 @DisplayName("Integration test for Payment controller")
 public class PaymentControllerTest extends TestBase {
+  private final String ORDER_PAYMENT_URL = "/payments/order/{id}";
   @Autowired
-  private OrderRepository orderRepository;
+  private DatabaseTestHelper testHelper;
   private Order order;
   private String userToken;
 
   @BeforeEach
   void setup() {
     userToken = performLogin(userLogin);
-    order = getTestOrder(1L);
+    order = testHelper.getNewOrder();
   }
 
   @Nested
@@ -44,12 +44,12 @@ public class PaymentControllerTest extends TestBase {
     void approve_canPayAValidOrderSuccessfully() throws Exception {
       String valueAsString = objectMapper.writeValueAsString(
           MockPayment.creditCard().toBuilder().amount(order.getTotal()).build());
-      mockMvc.perform(post("/payments/order/{id}", order.getId())
+      mockMvc.perform(post(ORDER_PAYMENT_URL, order.getId())
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isOk()).andDo(print());
-       Order updatedOrder = getOrderById(order.getId());
+          .andExpect(status().isCreated());
+       Order updatedOrder = testHelper.findOrderById(order.getId());
        assertEquals(OrderStatus.DELIVERED, updatedOrder.getStatus(),
            "The order status must be approved");
     }
@@ -62,7 +62,7 @@ public class PaymentControllerTest extends TestBase {
     @Test
     @DisplayName("Throws 404 trying pay an order with invalid id")
     void approve_throws404TryingPayAnOrderWithInvalidId() throws Exception {
-      mockMvc.perform(post("/payments/order/{id}", 9999999)
+      mockMvc.perform(post(ORDER_PAYMENT_URL, 9999999)
               .header("Authorization", userToken).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(MockPayment.creditCard())))
           .andExpect(status().isNotFound());
@@ -73,21 +73,10 @@ public class PaymentControllerTest extends TestBase {
     void approve_throws403TryingPayAnOrderThatIsNotYours() throws Exception {
         User anotherUser = userRepository.save(MockUser.user());
         order.setUser(anotherUser);
-      mockMvc.perform(post("/payments/order/{id}", order.getId())
+      mockMvc.perform(post(ORDER_PAYMENT_URL, order.getId())
               .header("Authorization", userToken).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(MockPayment.creditCard())))
           .andExpect(status().isForbidden());
     }
-  }
-
-  private Order getTestOrder(long id) {
-    Order newOrder = getOrderById(id).toBuilder().status(OrderStatus.PENDING).build();
-    newOrder.setUser(getUserById(USER_ID));
-    return orderRepository.save(newOrder);
-  }
-
-  private Order getOrderById(long id) {
-    return orderRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("Order not found in test DB"));
   }
 }

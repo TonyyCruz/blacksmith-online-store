@@ -19,7 +19,7 @@ public record PaymentCreateDto(
   @Schema(description = "The payment method", example = "CREDIT_CARD")
   @NotNull
   PaymentMethod method,
-  @Schema(description = "The payment amount", example = "380.00")
+  @Schema(description = "The payment amount", example = "180.00")
   @NotNull
   @Min(value = 0, message = "Amount must be greater than or equal to zero")
   BigDecimal amount,

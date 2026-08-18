@@ -1,15 +1,16 @@
 package com.anthony.blacksmithOnlineStore.integration;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
+import com.anthony.blacksmithOnlineStore.helper.DatabaseTestHelper;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockBlacksmith;
 import com.anthony.blacksmithOnlineStore.integration.helper.TestBase;
-import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
-import jakarta.transaction.Transactional;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,16 +23,15 @@ import org.springframework.http.MediaType;
 @Tag("integration")
 @DisplayName("Integration test for Blacksmith controller")
 public class BlacksmithControllerTest extends TestBase {
-  @Autowired
-  private BlacksmithRepository blacksmithRepository;
   private final String BLACKSMITH_BASE_URL = "/blacksmiths";
+  @Autowired
+  private DatabaseTestHelper testHelper;
   private Blacksmith blacksmith;
   private String userToken;
 
   @BeforeEach
   void setUp() {
-    blacksmith = blacksmithRepository.findById(1L)
-        .orElseThrow(() -> new IllegalStateException("Blacksmith not found in test DB"));
+    blacksmith = testHelper.findBlacksmithById(1L);
     userToken = performLogin(userLogin);
   }
 

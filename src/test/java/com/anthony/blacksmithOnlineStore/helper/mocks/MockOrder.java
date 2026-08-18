@@ -8,11 +8,12 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public class MockOrder {
 
   public static Order pendingOrder() {
-    User user = MockUser.userWithId();
+    User user = MockUser.user(UUID.randomUUID());
     return Order.builder()
         .id(1L)
         .user(user)
@@ -22,7 +23,7 @@ public class MockOrder {
   }
 
   public static Order deliveredOrder() {
-    User user = MockUser.userWithId();
+    User user = MockUser.user(UUID.randomUUID());
     return Order.builder()
         .id(2L)
         .user(user)

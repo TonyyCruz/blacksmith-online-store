@@ -16,7 +16,7 @@ public record PaymentResponseDto(
   PaymentMethod method,
   @Schema(example = "134.20")
   BigDecimal amount,
-  @Schema(example = "DEBIT_CARD")
+  @Schema(example = "APPROVED")
   String status) {
 
   public static PaymentResponseDto fromEntity(Payment payment) {

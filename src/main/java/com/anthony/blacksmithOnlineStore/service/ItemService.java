@@ -65,7 +65,6 @@ public class ItemService {
 
   @Transactional
   public ItemResponseDto update(Long id, ItemPatchUpdateDto dto) {
-    itemPriceValidate(dto.basePrice(), dto.finalPrice());
     Item item = findEntityById(id);
     if (dto.blacksmithId() != null) {
       Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
@@ -74,9 +73,7 @@ public class ItemService {
       item.setBlacksmithNameSnapshot(blacksmith.getName());
     }
     itemUpdate.updateItemFromDto(dto, item);
-    if (item.getFinalPrice().compareTo(item.getBasePrice()) > 0) {
-      throw new BusinessViolationException("Final price cannot be greater than base price");
-    }
+    itemPriceValidate(item.getBasePrice(), item.getFinalPrice());
     return ItemResponseDto.fromEntity(item);
   }
 

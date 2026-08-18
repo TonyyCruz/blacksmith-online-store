@@ -1,14 +1,5 @@
 package com.anthony.blacksmithOnlineStore.controller;
 
-import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
-import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
-import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,48 +17,54 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.anthony.blacksmithOnlineStore.controller.docs.BlacksmithControllerDocs;
+import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
+import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
+import com.anthony.blacksmithOnlineStore.service.BlacksmithService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Blacksmith", description = "Blacksmith management")
 @RequestMapping("/blacksmiths")
-public class BlacksmithController {
+public class BlacksmithController implements BlacksmithControllerDocs {
   private final BlacksmithService blacksmithService;
 
+  @Override
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Create a blacksmith, ADMIN only")
   public ResponseEntity<BlacksmithResponseDto> createBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(blacksmithService.create(dto));
   }
 
+  @Override
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Update all blacksmith data, ADMIN only")
   public ResponseEntity<BlacksmithResponseDto> updateBlacksmith(
       @Valid @RequestBody BlacksmithRequestDto dto, @PathVariable Long id) {
     return ResponseEntity.ok(blacksmithService.update(id, dto));
   }
 
+  @Override
   @GetMapping
-  @Operation(summary = "Find all blacksmiths")
   public ResponseEntity<Page<BlacksmithResponseDto>> findAll(
-      @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
+      @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.DESC)
       @ParameterObject
       Pageable pageable
   ) {
     return ResponseEntity.ok(blacksmithService.findAll(pageable));
   }
 
+  @Override
   @GetMapping("/{id}")
-  @Operation(summary = "Find blacksmith by id")
   public ResponseEntity<BlacksmithResponseDto> findById(@PathVariable Long id) {
     return ResponseEntity.ok(blacksmithService.findById(id));
   }
 
+  @Override
   @GetMapping("/search")
-  @Operation(summary = "Find blacksmith by name")
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(
       @PageableDefault(page = 0, size = 20, sort = "name", direction = Direction.ASC)
       @ParameterObject

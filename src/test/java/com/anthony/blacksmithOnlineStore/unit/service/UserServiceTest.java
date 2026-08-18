@@ -1,19 +1,22 @@
 package com.anthony.blacksmithOnlineStore.unit.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.anthony.blacksmithOnlineStore.controller.dto.user.PasswordUpdateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserCreateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.user.UserUpdateDto;
 import com.anthony.blacksmithOnlineStore.entity.User;
-import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationException;
+import com.anthony.blacksmithOnlineStore.enums.Role;
 import com.anthony.blacksmithOnlineStore.exceptions.ConflictingDataException;
 import com.anthony.blacksmithOnlineStore.exceptions.InvalidDataException;
 import com.anthony.blacksmithOnlineStore.helper.mocks.MockUser;
 import com.anthony.blacksmithOnlineStore.repository.UserRepository;
-import com.anthony.blacksmithOnlineStore.enums.Role;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import java.time.LocalDate;
@@ -42,7 +45,7 @@ class UserServiceTest {
 
   @BeforeEach
   void setup() {
-    targetUser = MockUser.userWithId();
+    targetUser = MockUser.user(UUID.randomUUID());
   }
 
   @Nested
