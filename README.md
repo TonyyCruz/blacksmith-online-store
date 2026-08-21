@@ -39,7 +39,7 @@ O projeto foi desenvolvido com foco em **boas práticas de desenvolvimento de AP
 * Git / GitHub
 * Insomnia
 * Maven
-* Docker *(planejado)*
+* Docker
 
 ---
 
