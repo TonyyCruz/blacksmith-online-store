@@ -17,12 +17,6 @@ public class AuthenticatedUserService {
     } catch (NullPointerException e) {
       return false;
     }
-    try {
-      return getAuthentication().getAuthorities().stream()
-          .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-    } catch(NullPointerException e) {
-      return false;
-    }
   }
 
   public UUID getAuthenticatedId() {
