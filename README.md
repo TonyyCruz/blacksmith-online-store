@@ -5,9 +5,12 @@
 
 > **Uma API REST de e-commerce medieval desenvolvida com Java e Spring Boot.**
 
-O **Blacksmith Online Store** é uma API REST de e-commerce inspirada em um mercado medieval, onde ferreiros podem vender seus itens, enquanto clientes podem realizar pedidos, avaliações e acompanhar o processo de entrega.
+O **Blacksmith Online Store** é uma API REST de e-commerce inspirada em um mercado medieval, onde 
+ferreiros podem vender os seus itens, enquanto clientes podem realizar pedidos, avaliações e 
+acompanhar o processo de entrega.
 
-O projeto foi desenvolvido com foco em **boas práticas de desenvolvimento de APIs REST, segurança, persistência de dados, transações, eventos e arquitetura de aplicações Spring**.
+O projeto foi desenvolvido com foco em **boas práticas de desenvolvimento de APIs REST, segurança, 
+persistência de dados, transações, eventos e arquitetura de aplicações Spring**.
 
 ---
 
@@ -95,7 +98,8 @@ O projeto foi desenvolvido com foco em **boas práticas de desenvolvimento de AP
 
 O sistema permite que clientes criem pedidos contendo múltiplos itens.
 
-Durante a criação do pedido, os dados importantes do produto são armazenados em um **snapshot através da entidade `OrderItem`**.
+Durante a criação do pedido, os dados importantes do produto são armazenados em um 
+**snapshot através da entidade `OrderItem`**.
 
 Isso evita que alterações futuras no produto afetem pedidos já realizados.
 
@@ -116,7 +120,8 @@ OrderItem (snapshot)
  └── totalPrice: 300.00
 ```
 
-Dessa maneira, mesmo que o preço do produto seja alterado posteriormente, o pedido mantém o valor original da compra.
+Dessa maneira, mesmo que o preço do produto seja alterado posteriormente, o pedido mantém o valor 
+original da compra.
 
 </details>
 
@@ -134,7 +139,7 @@ Cliente
 Criação do pedido
    │
    ▼
-Pagamento ◀――――――――――――――――――┑
+Pagamento ◀―――――――――――――――――――┑
    │                          │
    ▼                          │
 Processamento do pagamento    │
@@ -178,7 +183,8 @@ Simulação de processamento
 Entrega finalizada
 ```
 
-A entrega é simulada utilizando processamento assíncrono e um atraso artificial para representar o tempo necessário para o envio.
+A entrega é simulada utilizando processamento assíncrono e um atraso artificial para representar o 
+tempo necessário para o envio.
 
 </details>
 
@@ -187,12 +193,13 @@ A entrega é simulada utilizando processamento assíncrono e um atraso artificia
 
 Clientes podem avaliar itens após uma compra.
 
-As avaliações também influenciam o rating do:
+As avaliações também influenciam a classificação do:
 
 * Item
 * Ferreiro
 
-O processamento utiliza eventos para desacoplar a criação da avaliação da atualização dos ratings.
+O processamento utiliza eventos, que após capturados, atualizam as médias de avaliação dos itens e 
+ferreiros.
 
 </details>
 </details>
@@ -218,7 +225,7 @@ src/main/java
 │
 ├┬─ controller → Camada de entrada da aplicação (endpoints REST) <br>
 │├─ dto  → Objetos de transferência de dados (entrada e saída)<br>
-│└─ docs → Interfaces para agrupar a documemtação dos controllers<br>
+│└─ docs → Interfaces para agrupar a documentação dos controllers<br>
 ├── service → Contém a lógica de negócio <br>
 ├── repository → Interface com o banco de dados (Spring Data JPA)<br>
 ├── security → Configuração de segurança e JWT<br>
@@ -272,12 +279,13 @@ RatingService
      ▼
 Event Listener
      │
-     ├── Atualiza rating do Item
+     ├── Atualiza avaliação do Item
      │
-     └── Atualiza rating do Blacksmith
+     └── Atualiza avaliação do Blacksmith
 ```
 
-Esse modelo permite que a criação da avaliação não precise conhecer diretamente todos os componentes responsáveis por atualizar os ratings.
+Esse modelo permite que a criação da avaliação não precise conhecer diretamente todos os componentes 
+responsáveis por atualizar as avaliações.
 
 </details>
 
@@ -343,7 +351,8 @@ GET /items
 &sort=price,asc
 ```
 
-Isso permite combinar diferentes critérios sem precisar criar um método de repository para cada combinação possível.
+Isso permite combinar diferentes critérios sem precisar criar um método de repository para cada 
+combinação possível.
 
 </details>
 </details>
@@ -357,7 +366,7 @@ Isso permite combinar diferentes critérios sem precisar criar um método de rep
 
 A API possui documentação utilizando **OpenAPI / Swagger**.
 
-Depois de iniciar a aplicação, a documentação pode ser acessada através de:
+Após iniciar a aplicação, a documentação pode ser acessada em:
 
 ```text
 http://localhost:8080/swagger-ui/index.html
@@ -393,7 +402,8 @@ Entre os cenários testados estão:
 * Atualização de ratings
 * Fluxos envolvendo eventos
 
-Os testes também são utilizados para validar o comportamento da aplicação com transações e persistência JPA.
+Os testes também são utilizados para validar o comportamento da aplicação com transações e 
+persistência JPA.
 
 Para executar os testes:
 
@@ -492,15 +502,21 @@ Isso garante a preservação das informações relevantes no momento da compra.
 
 - Specifications para filtros dinâmicos em consultas (ex: busca de armas).
 
-- Adicionei `name` e `id` do ferreiro em memória na entidade `item` e mudei o fetch para lazy, deixando a consulta de itens mais performática.
+- Adicionei `name` e `id` do ferreiro em memória na entidade `item` e mudei o fetch para lazy, 
+deixando a consulta de itens mais performática.
 
-- Adicionei métodos de validação de status no OrderStatus para garantir transições de status válidas e centralizar as validações.
+- Adicionei métodos de validação de status no OrderStatus para garantir transições de status válidas 
+e centralizar as validações.
 
-- Pelo fato de trabalhar com itens únicos e de pouco estoque, resolvi fazer a dedução do estoque apenas no momento do pagamento, evitando o bloqueio temporário dos itens que ocorreria em caso de dedução imediata do mesmo.
+- Pelo fato de trabalhar com itens únicos e de pouco estoque, resolvi fazer a dedução do estoque 
+apenas no momento do pagamento, evitando o bloqueio temporário dos itens que ocorreria em caso de 
+dedução imediata do mesmo.
 
-- Utilizei eventos nas avaliações dos itens. Quando o evento é capturado, ele atribui a nota recebida ao item comprado e ao ferreito que o forjou.
+- Utilizei eventos nas avaliações dos itens. Quando o evento é capturado, ele atribui a nota 
+recebida ao item comprado e ao ferreito que o forjou.
 
-- Adicionei um evento no pagamento da compra. O evento é capturado por dois listeners, um que atualiza o estoque e o status do pedido, e outro que aciona a simulação de entrega.
+- Adicionei um evento no pagamento da compra. O evento é capturado por dois listeners, um que 
+atualiza o estoque e o status do pedido, e outro que aciona a simulação de entrega.
 
 </details>
 
@@ -529,15 +545,17 @@ Na raiz do projeto, execute:
   docker compose up -d --build
 ```
 
-- Esse serviço irá inicializar dois containers chamados `blacksmith_api` e outro chamado `blacksmith_api_db`.
+- Esse serviço irá inicializar dois containers chamados `blacksmith_api` e outro chamado 
+`blacksmith_api_db`.
 
-- A partir daqui você pode acessar o container via CLI ou abri-lo em sua IDE.
+- A partir daqui você pode acessar o container via CLI ou abri-lo na sua IDE.
 
 Para acessar via CLI use o comando
 ```jsx
 docker exec -it blacksmith_api bash
 ```
-- Ele te dará acesso ao terminal interativo do container blacksmith_api criado pelo compose, que está rodando em segundo plano.
+- Com esse comando, você terá acesso ao terminal interativo do container blacksmith_api criado pelo 
+compose, que está rodando em segundo plano.
 
 <details>
 <summary>🗑️ Para remover os containers</summary><br />
@@ -680,20 +698,20 @@ Content-Type: application/json
 
 ## 🎯 Objetivos do projeto
 
-Este projeto foi desenvolvido com o objetivo de aplicarboas práticas e 
-conceitos de desenvolvimento backend utilizando Java e Spring Boot.
+Este projeto foi desenvolvido com o objetivo de demonstrar minhas habilidades no desenvolvimento
+backend utilizando Java e Spring Boot.
 
 Entre os principais desafios abordados estão:
 
 - Desenvolvimento de uma API REST completa
-- Autenticação e autorização com JWT
+- Autenticação e autorização utilizando JWT
 - Modelagem de relacionamentos utilizando JPA/Hibernate
-- Controle transacional
-- Processamento assíncrono e eventos
-- Concorrência e controle de estoque
-- Testes automatizados
+- Gerenciamento de transações
+- Processamento assíncrono e baseado em eventos
+- Controle de concorrência e estoque
+- Desenvolvimento de testes automatizados
 - Containerização com Docker
-- Documentação utilizando OpenAPI
+- Documentação da API utilizando OpenAPI
 
 ---
 
