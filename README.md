@@ -1,136 +1,488 @@
-# 🛒 Blacksmith Online Store API
 
-## 📖 Sobre o Projeto
+![Blacksmith Online Store](https://github.com/TonyyCruz/blacksmith-online-store/assets/banner.png)
 
-A **Blacksmith's Online Store API** é uma aplicação desenvolvida em **Java com Spring Boot** cujo objetivo é gerenciar o fluxo de pedidos, produtos e usuarios em um sistema de e-commerce com tema medieval.
+# ⚒️ Blacksmith Online Store
 
-Esta aplicação, foi idealizada como um **projeto pessoal**, focando em **boas práticas de arquitetura**, **segurança com JWT**, e **organização de código**.
+> **Uma API REST de e-commerce medieval desenvolvida com Java e Spring Boot.**
 
----
+O **Blacksmith Online Store** é uma API REST de e-commerce inspirada em um mercado medieval, onde ferreiros podem vender seus itens, enquanto clientes podem realizar pedidos, avaliações e acompanhar o processo de entrega.
 
-## 🧩 Funcionalidades Principais
-
-### 👤 Autenticação e Autorização
-- Implementação de **Spring Security** com **JWT (Auth0 Java JWT)**.
-- Controle de acesso baseado em **roles** (`ADMIN` e `CUSTOMER`).
-- Apenas `ADMIN` pode gerenciar produtos, ferreiros e visualizar todos os pedidos.
-- Usuários `CUSTOMER` podem criar e visualizar apenas os seus próprios pedidos.
-- Criptografia de senhas com **BCryptPasswordEncoder**.
-
-### 🧍 Usuários (`User`)
-- Cadastro e autenticação de usuários.
-- Validação de idade mínima (18 anos).
-- Senha deve possuir os caracteres obrigatórios.
-- Para atualizar a senha deve enviar a senha antiga para validação.
-
-### 📦 Armas (`Weapon`)
-- Cadastro, atualização e exclusão de produtos (somente `ADMIN`).
-- Regras de negócio simples de controle de estoque.
-- Associação da arma ao ferreiro que o forjou.
-- Clientes podem avaliar os produtos após a compra com notas de 1 a 5.
-- Usa o padrão de projeto **Builder** para otimizar a construção da entidade.
-
-### 🧾 Pedidos (`Order`)
-- Cálculo automático do valor total do pedido.
-- Apenas o cliente pode acessar os seus próprios pedidos.
-- Admins têm acesso global para fins de auditoria.
-
-### ⚔️ Ferreiro (`Blacksmith`)
-- Não interagem diretamente com a aplicação.
-- Pode ser adicionado e editado apenas por admins.
-- Tem uma nota avaliativa de 1 a 5 baseada na média das notas das armas forjadas por ele.
+O projeto foi desenvolvido com foco em **boas práticas de desenvolvimento de APIs REST, segurança, persistência de dados, transações, eventos e arquitetura de aplicações Spring**.
 
 ---
 
-## ⚙️ Tecnologias Utilizadas
+## 🖼️ Preview
 
-| Categoria | Tecnologias |
-|------------|--------------|
-| **Linguagem** | Java 17 |
-| **Framework principal** | Spring Boot 3 |
-| **Segurança** | Spring Security + JWT (Auth0) |
-| **Persistência** | Spring Data JPA + Hibernate |
-| **Banco de Dados** | PostgreSQL |
-| **Build & Dependências** | Maven |
-| **Validações** | Jakarta Bean Validation (javax/jakarta.validation) |
-| **Documentação** | Swagger / Springdoc OpenAPI |
-| **Utilitários** | Lombok, MapStruct |
+![Blacksmith Online Store](https://github.com/TonyyCruz/blacksmith-online-store/assets/preview.png)
 
 ---
 
-## 🧱 Arquitetura do Projeto
+## 🚀 Tecnologias
 
-A arquitetura segue o modelo de **camadas** (layered architecture), com separação clara de responsabilidades:
-com.anthony.blacksmithOnlineStore <br>
-│ <br>
+### Backend
+
+* ☕ Java
+* 🌱 Spring Boot
+* 🔐 Spring Security
+* 🎟️ JWT
+* 🗄️ Spring Data JPA
+* 🐘 PostgreSQL
+* 📚 Hibernate
+* 📖 SpringDoc OpenAPI / Swagger
+* 🧪 JUnit
+* 🔄 Spring Events
+* ⚡ Spring Async
+* 🗺️ MapStruct
+
+### Ferramentas
+
+* Git / GitHub
+* Insomnia
+* Maven
+* Docker
+
+---
+
+### ⚒️ Funcionalidades
+
+<details>
+<summary>Detalhes</summary>
+
+<br>
+
+<details>
+<summary>🔐 Autenticação e autorização</summary>
+
+* Cadastro de usuários
+* Login
+* Autenticação utilizando JWT
+* Controle de acesso baseado em roles
+* Roles `CUSTOMER` e `ADMIN`
+* Proteção dos endpoints através do Spring Security
+
+</details>
+
+<details>
+<summary>⚒️ Ferreiros</summary>
+
+* Cadastro de ferreiros
+* Consulta de ferreiros
+* Atualização de dados
+* Remoção de ferreiros
+* Associação de itens aos seus respectivos ferreiros
+* Sistema de avaliação
+
+</details>
+
+<details>
+<summary>🗡️ Itens</summary>
+
+* Cadastro de itens
+* Consulta de itens
+* Atualização de itens
+* Remoção de itens
+* Controle de estoque
+* Preços
+* Sistema de avaliações
+* Filtros utilizando `Specification`
+* Paginação e ordenação
+
+</details>
+
+
+<details>
+<summary>🛒 Pedidos</summary>
+
+O sistema permite que clientes criem pedidos contendo múltiplos itens.
+
+Durante a criação do pedido, os dados importantes do produto são armazenados em um **snapshot através da entidade `OrderItem`**.
+
+Isso evita que alterações futuras no produto afetem pedidos já realizados.
+
+Por exemplo:
+
+```text
+Item atual
+ ├── name: Iron Sword
+ ├── price: 150.00
+ └── stock: 10
+
+        ↓ compra
+
+OrderItem (snapshot)
+ ├── name: Iron Sword
+ ├── quantity: 2
+ ├── unitPrice: 150.00
+ └── totalPrice: 300.00
+```
+
+Dessa maneira, mesmo que o preço do produto seja alterado posteriormente, o pedido mantém o valor original da compra.
+
+</details>
+
+<details>
+<summary>💰 Pagamentos</summary>
+
+O projeto possui um fluxo de pagamento simulado para representar o processamento de uma compra.
+
+Fluxo simplificado:
+
+```text
+Cliente
+   │
+   ▼
+Criação do pedido
+   │
+   ▼
+Pagamento ◀――――――――――――――――――┑
+   │                          │
+   ▼                          │
+Processamento do pagamento    │
+   │                          │
+   ├── Pagamento aprovado     │
+   │       │                  │
+   │       ▼                  │
+   │   Pedido confirmado      │
+   │                          │
+   └── Pagamento recusado     │
+           ├──――――――――――――――――┛
+           ▼
+       Pedido cancelado
+```
+
+</details>
+
+<details>
+<summary>📦 Entregas</summary>
+
+Após a confirmação do pagamento, o sistema utiliza eventos para iniciar o processo de entrega.
+
+Fluxo:
+
+```text
+Pagamento aprovado
+        │
+        ▼
+Evento de pedido pago
+        │
+        ▼
+Serviço de entrega
+        │
+        ▼
+Entrega criada
+        │
+        ▼
+Simulação de processamento
+        │
+        ▼
+Entrega finalizada
+```
+
+A entrega é simulada utilizando processamento assíncrono e um atraso artificial para representar o tempo necessário para o envio.
+
+</details>
+
+<details>
+<summary>⭐ Avaliações</summary>
+
+Clientes podem avaliar itens após uma compra.
+
+As avaliações também influenciam o rating do:
+
+* Item
+* Ferreiro
+
+O processamento utiliza eventos para desacoplar a criação da avaliação da atualização dos ratings.
+
+</details>
+</details>
+
+<br>
+
+---
+
+## 📚 Arquitetura, eventos e segurança
+
+<details>
+<summary>Detalhes</summary>
+
+### 🧩 Arquitetura
+
+<details>
+<summary>Detalhes</summary>
+O projeto segue uma organização baseada nas principais responsabilidades da aplicação:
+
+```text
+src/main/java
+├── com.anthony.blacksmithOnlineStore
+│
 ├┬─ controller → Camada de entrada da aplicação (endpoints REST) <br>
-│└─ dto → Objetos de transferência de dados (entrada e saída)<br>
+│├─ dto  → Objetos de transferência de dados (entrada e saída)<br>
+│└─ docs → Interfaces para agrupar a documemtação dos controllers<br>
 ├── service → Contém a lógica de negócio <br>
 ├── repository → Interface com o banco de dados (Spring Data JPA)<br>
 ├── security → Configuração de segurança e JWT<br>
 ├── entity → Mapeamento JPA das entidades<br>
 ├── enums → Enumerações (ex: Role)<br>
+├── events → Eventos e seus listeners<br>
 ├── exception → Exceções personalizadas e handlers globais<br>
 └── mapstruct → Para atualização parcial de entidades
 
 
+```
+
+A aplicação utiliza uma separação entre:
+
+```text
+Controller
+    │
+    ▼
+Service
+    │
+    ▼
+Repository
+    │
+    ▼
+Database
+```
+
+Os controllers são responsáveis pela camada HTTP, enquanto a regra de negócio permanece nos services.
 Essa estrutura garante:
 - Coesão interna em cada camada
 - Baixo acoplamento entre componentes
 - Facilidade para testes e manutenção
 
+</details>
+
 ---
 
-## 🔐 Segurança
+### 🔄 Eventos
 
-A autenticação é baseada em **JWT (JSON Web Token)**.  
-Após o login bem-sucedido, o usuário recebe um token que deve ser enviado no cabeçalho `Authorization` de cada requisição:
-`Authorization: Bearer <seu_token_aqui>`
+<details>
+<summary>Detalhes</summary>
 
+O projeto utiliza o sistema de eventos do Spring para desacoplar algumas operações.
 
-A autorização é controlada por anotações como:
+Exemplo:
 
-```java
-@PreAuthorize("hasRole('ADMIN')")
-@PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
+```text
+RatingService
+     │
+     │ RatingCreatedEvent
+     ▼
+Event Listener
+     │
+     ├── Atualiza rating do Item
+     │
+     └── Atualiza rating do Blacksmith
 ```
+
+Esse modelo permite que a criação da avaliação não precise conhecer diretamente todos os componentes responsáveis por atualizar os ratings.
+
+</details>
+
 ---
 
-## 🚀 Como Executar o Projeto
-Pré-requisitos
+### 🔒 Segurança
 
-- Java 17+
-- Maven 3.8+
-- PostgreSQL em execução
+<details>
+<summary>Detalhes</summary>
 
-### 1️⃣ Clone o repositório
-git clone git@github.com:TonyyCruz/blacksmith-online-store.git
-cd blacksmith-online-store
+A autenticação da API utiliza **JWT (JSON Web Token)**.
 
-### 2️⃣ Configure o banco de dados (Opcional)
-#### Edite o arquivo src/main/resources/application.properties:
-spring.datasource.url=jdbc:postgresql://localhost:5432/order_management
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
-spring.jpa.hibernate.ddl-auto=update
+Fluxo:
 
-### 3️⃣ Compile e execute
-```mvn spring-boot:run``` <br>
-Ou diretamente na sua IDE favorita.
+```text
+POST /auth/login
+       │
+       ▼
+Credenciais validadas
+       │
+       ▼
+JWT gerado
+       │
+       ▼
+Cliente envia token
+       │
+       ▼
+Authorization: Bearer <token>
+       │
+       ▼
+JwtFilter
+       │
+       ▼
+Spring Security
+       │
+       ▼
+Endpoint protegido
+```
 
-### Swagger
-Acesse `http://localhost:8080/swagger-ui/index.html`
-Faça o cadastro ha rota auth/register.
-Faça o log in ha rota auth/login.
-Copie o token para o botão de authorization na parte superior direita.
+Os endpoints são protegidos de acordo com as permissões do usuário.
+
+</details>
+
+---
+
+### 🔎 Filtros
+
+<details>
+<summary>Detalhes</summary>
+
+A consulta de itens utiliza `Specification` do Spring Data JPA para permitir filtros dinâmicos.
+
+Exemplo:
+
+```text
+GET /items
+
+?name=sword
+&minPrice=100
+&maxPrice=500
+&page=0
+&size=10
+&sort=price,asc
+```
+
+Isso permite combinar diferentes critérios sem precisar criar um método de repository para cada combinação possível.
+
+</details>
+</details>
+
+---
+
+## 📒 Documentação da API
+
+<details>
+<summary>Detalhes</summary>
+
+A API possui documentação utilizando **OpenAPI / Swagger**.
+
+Depois de iniciar a aplicação, a documentação pode ser acessada através de:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+A documentação contém:
+
+* Endpoints
+* Parâmetros
+* DTOs
+* Respostas HTTP
+* Autenticação Bearer Token
+* Códigos de erro
+* Exemplos de requisições
+
+</details>
+
+---
+
+## 🧪 Testes
+
+<details>
+<summary>Detalhes</summary>
+
+O projeto possui testes para validar os principais fluxos da aplicação.
+
+Entre os cenários testados estão:
+
+* Autenticação
+* Criação de pedidos
+* Processamento de pagamentos
+* Avaliações
+* Atualização de ratings
+* Fluxos envolvendo eventos
+
+Os testes também são utilizados para validar o comportamento da aplicação com transações e persistência JPA.
+
+Para executar os testes:
+
+```bash
+./mvnw test
+```
+
+No Windows:
+
+```bash
+mvnw.cmd test
+```
+
+</details>
+
+---
+
+## 🗄️ Banco de dados
+
+<details>
+<summary>Detalhes</summary>
+
+O projeto utiliza **PostgreSQL** como banco de dados relacional.
+
+O mapeamento das entidades é realizado através do:
+
+* Spring Data JPA
+* Hibernate
+* JPA
+
+Principais entidades:
+
+```text
+User
+ │
+ ├── Orders
+ │
+ └── Ratings
+
+Blacksmith
+ │
+ └── Items
+
+Order
+ │
+ └── OrderItems
+
+Item
+ │
+ └── Ratings
+```
+
+<details>
+<summary>📷 Snapshot de pedidos</summary>
+
+Uma das decisões importantes do projeto é o uso de `OrderItem` como snapshot.
+
+```text
+Item
+ ├── id
+ ├── name
+ ├── price
+ └── ...
+
+          ↓
+
+OrderItem
+ ├── itemId
+ ├── name
+ ├── unitPrice
+ ├── quantity
+ └── totalPrice
+```
+
+Isso garante a preservação das informações relevantes no momento da compra.
+
+</details>
+</details>
 
 ---
 
 ## 🧠 Decisões Técnicas
 
+<details>
+<summary>Detalhes</summary>
+
 - Utilização de DTOs para isolamento entre a API e a camada de persistência.
 
-- Métodos fromEntity() e toEntity() para conversões claras e centralizadas.
+- Métodos `fromEntity()` e `toEntity()` para conversões claras e centralizadas.
 
 - Enum Role implementando GrantedAuthority, garantindo integração limpa com o Spring Security.
 
@@ -140,52 +492,224 @@ Copie o token para o botão de authorization na parte superior direita.
 
 - Specifications para filtros dinâmicos em consultas (ex: busca de armas).
 
-- Adicionei nome e ‘id’ do ferreiro em memória na entidade ‘item’ e mudei o fetch para lazy, deixando a consulta de itens mais performática.
+- Adicionei `name` e `id` do ferreiro em memória na entidade `item` e mudei o fetch para lazy, deixando a consulta de itens mais performática.
 
 - Adicionei métodos de validação de status no OrderStatus para garantir transições de status válidas e centralizar as validações.
 
 - Pelo fato de trabalhar com itens únicos e de pouco estoque, resolvi fazer a dedução do estoque apenas no momento do pagamento, evitando o bloqueio temporário dos itens que ocorreria em caso de dedução imediata do mesmo.
 
+- Utilizei eventos nas avaliações dos itens. Quando o evento é capturado, ele atribui a nota recebida ao item comprado e ao ferreito que o forjou.
+
+- Adicionei um evento no pagamento da compra. O evento é capturado por dois listeners, um que atualiza o estoque e o status do pedido, e outro que aciona a simulação de entrega.
+
+</details>
+
 ---
 
-## 📘 Exemplos de Endpoints
-### Autenticação
-`POST /auth/register`
+## ⚙️ Como executar
 
-`POST /auth/login`
+### Clone o projeto
 
-### Armas
-`GET /weapons`
+```bash
+git clone https://github.com/TonyyCruz/blacksmith-online-store.git
+```
 
-`GET /weapons/id`
+Entre no diretório(raiz do projeto):
 
-`GET /weapons?`
+```bash
+cd blacksmith-online-store
+```
 
-`POST /weapons`        # ADMIN
+<details>
+<summary>🐋 Rodando no Docker</summary>
 
-`PUT /weapons/{id}`    # ADMIN
+Na raiz do projeto, execute:
 
-`PATCH /weapons/{id}`  # ADMIN
+```jsx
+  docker compose up -d --build
+```
 
-`DELETE /weapons/{id}` # ADMIN
+- Esse serviço irá inicializar dois containers chamados `blacksmith_api` e outro chamado `blacksmith_api_db`.
 
-### Ferreiros
-`GET /ferreiros`
+- A partir daqui você pode acessar o container via CLI ou abri-lo em sua IDE.
 
-`GET /ferreiros/{id}`
+Para acessar via CLI use o comando
+```jsx
+docker exec -it blacksmith_api bash
+```
+- Ele te dará acesso ao terminal interativo do container blacksmith_api criado pelo compose, que está rodando em segundo plano.
 
-`POST /ferreiros`      #ADMIN
+<details>
+<summary>🗑️ Para remover os containers</summary><br />
 
-`PUT /ferreiros`       #ADMIN
+- Somente containers
+```jsx
+docker compose down
+```
 
-### Pedidos
-`POST /orders`          # CUSTOMER
+- Containers + imagens
+```jsx
+docker compose down -v
+```
 
-`GET /orders`           # CUSTOMER (somente os seus pedidos)
+⚠️ `docker compose down -v` remove os volumes, portanto os dados persistidos no banco serão perdidos.
 
-`GET /orders/{ID}`      # ADMIN / CUSTOMER (somente os seus pedidos)
+</details>
+</details>
 
-### Avaliação
-- `POST /api/avaliacoes` → Avaliar arma (apenas os compradores)
+<details>
+<summary>💻 Rodando Localmente</summary>
 
-- `GET /api/armas/{id}/avaliacoes` → Listar avaliações de uma arma
+### Pré-requisitos
+Antes de iniciar a aplicação, certifique-se de possuir:
+* Java instalado
+* Maven
+* PostgreSQL
+
+### Configure o banco
+
+Crie um banco PostgreSQL para a aplicação.
+
+Exemplo:
+
+```sql
+CREATE DATABASE blacksmith_online_store;
+```
+
+Configure as propriedades de conexão no arquivo de configuração da aplicação:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/blacksmith_online_store
+spring.datasource.username=SEU_USUARIO
+spring.datasource.password=SUA_SENHA
+```
+
+### Execute a aplicação
+
+Linux/macOS:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Windows:
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+A API estará disponível em:
+
+```text
+http://localhost:8080
+```
+
+</details>
+
+<br>
+
+---
+
+## 📡 Exemplos de requisições
+
+<details>
+<summary>Detalhes</summary>
+
+### Login
+
+```http
+POST /auth/login
+Content-Type: application/json
+```
+
+```json
+{
+  "email": "customer@email.com",
+  "password": "Password01#"
+}
+```
+
+---
+
+### Criar pedido
+
+```http
+POST /orders
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+```json
+{
+  "items": [
+    {
+      "itemId": "item-id",
+      "quantity": 2
+    }
+  ]
+}
+```
+
+</details>
+
+---
+
+## 🗺️ Roadmap
+
+* [x] Autenticação JWT
+* [x] Spring Security
+* [x] CRUD de itens
+* [x] CRUD de ferreiros
+* [x] Sistema de pedidos
+* [x] Snapshot de `OrderItem`
+* [x] Sistema de avaliações
+* [x] Eventos do Spring
+* [x] Simulação de pagamento
+* [x] Simulação de entrega
+* [x] Swagger / OpenAPI
+* [x] Paginação
+* [x] Filtros dinâmicos
+* [x] Docker / Docker Compose
+* [ ] Separar pagamento e entrega em microserviços
+* [ ] Pipeline CI/CD
+* [ ] Melhorias nos testes de integração
+* [ ] Sistema de cupons e descontos
+* [ ] Integração com gateway de pagamento real
+
+---
+
+## 🎯 Objetivos do projeto
+
+Este projeto foi desenvolvido com o objetivo de aplicarboas práticas e 
+conceitos de desenvolvimento backend utilizando Java e Spring Boot.
+
+Entre os principais desafios abordados estão:
+
+- Desenvolvimento de uma API REST completa
+- Autenticação e autorização com JWT
+- Modelagem de relacionamentos utilizando JPA/Hibernate
+- Controle transacional
+- Processamento assíncrono e eventos
+- Concorrência e controle de estoque
+- Testes automatizados
+- Containerização com Docker
+- Documentação utilizando OpenAPI
+
+---
+
+## 👨‍💻 Autor
+
+**Anthony Cruz**
+
+Desenvolvedor focado em Backend com Java e Spring Boot.
+
+### 🔗 Links
+
+* GitHub: https://github.com/TonyyCruz
+* Projeto: https://github.com/TonyyCruz/blacksmith-online-store
+
+---
+
+## 📄 Licença
+
+Este projeto está disponível para fins de estudo e portfólio.

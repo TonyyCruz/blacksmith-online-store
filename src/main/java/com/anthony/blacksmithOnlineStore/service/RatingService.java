@@ -13,8 +13,9 @@ import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Rating;
 import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.events.RatingCreatedEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
+import com.anthony.blacksmithOnlineStore.exceptions.ConflictingDataException;
+import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
 import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.RatingRepository;
 
@@ -65,7 +66,7 @@ public class RatingService {
       throw new ForbiddenOperationException("Only hwo purchased the item can rate it.");
     }
     if (ratingRepository.existsByOrderItemId(orderItem.getId())) {
-      throw new ForbiddenOperationException("This item has already been rated.");
+      throw new ConflictingDataException("This item has already been rated.");
     }
   }
 }

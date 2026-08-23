@@ -40,9 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
     }
     filterChain.doFilter(request, response);
     } catch (InvalidTokenException e) {
-      writeErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+      writeErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
     }
-
   }
 
   /**

@@ -48,7 +48,7 @@ public class PaymentControllerTest extends TestBase {
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isOk()).andDo(print());
+          .andExpect(status().isCreated());
        Order updatedOrder = testHelper.findOrderById(order.getId());
        assertEquals(OrderStatus.DELIVERED, updatedOrder.getStatus(),
            "The order status must be approved");
