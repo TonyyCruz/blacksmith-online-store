@@ -89,8 +89,8 @@ public class ItemService {
       return itemRepository.findById(id).orElseThrow(() ->
           new ResourceNotFoundException("Item not found with id: %d".formatted(id)));
     }
-    return itemRepository.findByIdAndActiveTrue(id).orElseThrow(() ->
-            new ResourceNotFoundException("Item not found with id: %d".formatted(id)));
+    return itemRepository.findByIdAndActiveTrue(id).orElseThrow(() ->new ResourceNotFoundException(
+                "This item does not exist or is inactive: %d".formatted(id)));
   }
 
   public Page<ItemResponseDto> findFilteredItems(ItemFilterDto filter, Pageable pageable) {
