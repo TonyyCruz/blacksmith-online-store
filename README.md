@@ -536,13 +536,20 @@ Entre no diretório(raiz do projeto):
 cd blacksmith-online-store
 ```
 
+É recomendado a utilização do Docker para rodar a aplicação, pois ele já vem com o banco de dados 
+PostgreSQL pré-configurado e pronto para uso.
+
+- [Instalando o Docker no Linux](https://docs.docker.com/engine/install/)
+- [Instalando o Docker no Windows](https://docs.docker.com/desktop/setup/install/windows-install/)
+- [Instalando o Docker no Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
+
 <details>
 <summary>🐋 Rodando no Docker</summary>
 
 Na raiz do projeto, execute:
 
 ```jsx
-  docker compose up -d --build
+  sudo docker compose up -d --build
 ```
 
 - Esse serviço irá inicializar dois containers chamados `blacksmith_api` e outro chamado 
@@ -552,22 +559,22 @@ Na raiz do projeto, execute:
 
 Para acessar via CLI use o comando
 ```jsx
-docker exec -it blacksmith_api bash
+  sudo docker exec -it blacksmith_api bash
 ```
 - Com esse comando, você terá acesso ao terminal interativo do container blacksmith_api criado pelo 
-compose, que está rodando em segundo plano.
+compose que está rodando em segundo plano.
 
 <details>
 <summary>🗑️ Para remover os containers</summary><br />
 
 - Somente containers
 ```jsx
-docker compose down
+  sudo docker compose down
 ```
 
 - Containers + imagens
 ```jsx
-docker compose down -v
+  sudo docker compose down -v
 ```
 
 ⚠️ `docker compose down -v` remove os volumes, portanto os dados persistidos no banco serão perdidos.
