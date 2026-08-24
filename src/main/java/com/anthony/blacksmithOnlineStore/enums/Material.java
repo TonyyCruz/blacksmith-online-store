@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum Material {
-  COOPER("Copper"),
+  COPPER("Copper"),
   IRON("Iron"),
   STEEL("Steel"),
   MITHRIL("Mithril"),

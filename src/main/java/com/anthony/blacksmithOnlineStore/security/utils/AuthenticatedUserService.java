@@ -14,7 +14,7 @@ public class AuthenticatedUserService {
     try {
       return getAuthentication().getAuthorities().stream()
           .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-    } catch(NullPointerException e) {
+    } catch (NullPointerException e) {
       return false;
     }
   }
