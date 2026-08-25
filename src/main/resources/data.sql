@@ -36,6 +36,13 @@ VALUES
         0
     ) ON CONFLICT DO NOTHING;
 
+SELECT setval
+    (
+       pg_get_serial_sequence('blacksmiths', 'id'),
+       COALESCE((SELECT MAX(id) FROM blacksmiths), 0) + 1,
+       false
+    );
+
 INSERT INTO ITEMS (material, base_damage, base_defense, name, base_price, final_price,
                    has_discount, description, weight, stock, type, rarity, sold, total_ratings_sum,
                    rating_count, rating_average,created_at, updated_at, blacksmith_id, active,
