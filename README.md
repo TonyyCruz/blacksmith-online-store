@@ -1,5 +1,6 @@
-
-![Blacksmith Online Store](https://github.com/TonyyCruz/blacksmith-online-store/assets/banner.png)
+<p align="center">
+  <img src="./assets/banner.png" alt="Blacksmith Online Store">
+</p>
 
 # ⚒️ Blacksmith Online Store
 
@@ -13,13 +14,13 @@ O projeto foi desenvolvido com foco em **boas práticas de desenvolvimento de AP
 persistência de dados, transações, eventos e arquitetura de aplicações Spring**.
 
 ---
-
+<!--
 ## 🖼️ Preview
 
 ![Blacksmith Online Store](https://github.com/TonyyCruz/blacksmith-online-store/assets/preview.png)
 
 ---
-
+-->
 ## 🚀 Tecnologias
 
 ### Backend

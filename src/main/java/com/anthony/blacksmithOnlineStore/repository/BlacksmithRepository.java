@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BlacksmithRepository extends JpaRepository<Blacksmith, Long> {
 
-  Page<Blacksmith> findByNameContaining(String name, Pageable pageable);
+  Page<Blacksmith> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

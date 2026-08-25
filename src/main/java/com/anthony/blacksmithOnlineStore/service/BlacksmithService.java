@@ -26,7 +26,7 @@ public class BlacksmithService {
   }
 
   public Page<BlacksmithResponseDto> findByName(String name, Pageable pageable) {
-    Page<Blacksmith> blacksmiths = blacksmithRepository.findByNameContaining(name, pageable);
+    Page<Blacksmith> blacksmiths = blacksmithRepository.findByNameContainingIgnoreCase(name, pageable);
     return blacksmiths.map(BlacksmithResponseDto::fromEntity);
   }
 
