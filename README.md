@@ -47,7 +47,7 @@ persistência de dados, transações, eventos e arquitetura de aplicações Spri
 
 ---
 
-### ⚒️ Funcionalidades
+## ⚒️ Funcionalidades
 
 <details>
 <summary>Detalhes</summary>
