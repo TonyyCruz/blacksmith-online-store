@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentCreateDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.PaymentResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Order;
+import com.anthony.blacksmithOnlineStore.entity.OrderItem;
 import com.anthony.blacksmithOnlineStore.entity.Payment;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
   private final OrderService orderService;
+  private final SaleService saleService;
   private final PaymentRepository paymentRepository;
   private final PaymentProcessorFactory paymentFactory;
   private final ApplicationEventPublisher eventPublisher;
@@ -43,6 +45,7 @@ public class PaymentService {
             "The order total price is R$ %.2f but the amount receive is R$ %.2f"
             .formatted(order.getTotal(), dto.amount()));
       }
+      decrementStock(order);
       Payment payment = processPayment(order, dto);
       return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
     }
@@ -68,5 +71,11 @@ public class PaymentService {
       }
       return payment;
     }
+
+    private void decrementStock(Order order) {
+    for (OrderItem orderItem : order.getOrderItems()) {
+      saleService.performSale(orderItem.getItemId(), orderItem.getQuantity());
+    }
+  }
 
 }

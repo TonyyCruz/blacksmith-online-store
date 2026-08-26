@@ -46,8 +46,8 @@ public class FakeDeliverEventListener {
   public void returnRequest(ReturnRequestEvent returnEvent) {
     Order order = orderService.findEntityById(returnEvent.orderId());
     if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-    throw new BusinessViolationException("A not delivered order cannot be returned");
-      }
+      throw new BusinessViolationException("A not delivered order cannot be returned");
+    }
     order.setStatus(OrderStatus.RETURN_REQUESTED);
     order.setStatus(OrderStatus.RETURNED);
     orderRepository.save(order);

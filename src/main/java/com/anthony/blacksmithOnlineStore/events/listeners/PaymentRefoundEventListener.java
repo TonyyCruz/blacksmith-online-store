@@ -9,6 +9,8 @@ import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 import com.anthony.blacksmithOnlineStore.service.PaymentService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ public class PaymentRefoundEventListener {
   private final PaymentService paymentService;
 
   @EventListener
+  @Transactional
   public void refundPayment(RefundRequestEvent refoundEvent) {
     // REFUND PROCESS
     Order order = orderService.findEntityById(refoundEvent.orderId());
