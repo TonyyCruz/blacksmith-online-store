@@ -70,15 +70,17 @@ public class OrderService {
   @Transactional
   public void refundRequest(long id) {
     Order order = findEntityById(id);
-    if (!order.getStatus().canBeRefunded()) {
-      if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
-        throw new BusinessViolationException("This order is already pending for refund.");
-      }
+    if (order.getStatus().equals(OrderStatus.RETURNED)) {
+      restoreStock(order);
+      order.setStatus(OrderStatus.REFUND_PENDING);
+      eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
+    }
+    else if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
+      eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
+    }
+    else {
       throw new BusinessViolationException("This order cannot be refunded");
     }
-    restoreStock(order);
-    order.setStatus(OrderStatus.REFUND_PENDING);
-    eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
   }
 
   @Transactional
