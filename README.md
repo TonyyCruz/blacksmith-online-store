@@ -503,21 +503,15 @@ Isso garante a preservação das informações relevantes no momento da compra.
 
 - Specifications para filtros dinâmicos em consultas (ex: busca de armas).
 
-- Adicionei `name` e `id` do ferreiro em memória na entidade `item` e mudei o fetch para lazy, 
-deixando a consulta de itens mais performática.
+- Adicionei `name` e `id` do ferreiro em memória na entidade `item` e mudei o fetch para lazy, deixando a consulta de itens mais performática.
 
-- Adicionei métodos de validação de status no OrderStatus para garantir transições de status válidas 
-e centralizar as validações.
+- Adicionei métodos de validação de status no OrderStatus para garantir transições de status válidas e centralizar as validações.
 
-- Pelo fato de trabalhar com itens únicos e de pouco estoque, resolvi fazer a dedução do estoque 
-apenas no momento do pagamento, evitando o bloqueio temporário dos itens que ocorreria em caso de 
-dedução imediata do mesmo.
+- Pelo fato de trabalhar com itens únicos e de pouco estoque, resolvi fazer a dedução do estoque apenas no momento do pagamento, evitando o bloqueio temporário dos itens que ocorreria em caso de dedução imediata do mesmo.
 
-- Utilizei eventos nas avaliações dos itens. Quando o evento é capturado, ele atribui a nota 
-recebida ao item comprado e ao ferreito que o forjou.
+- Utilizei eventos nas avaliações dos itens. Quando o evento é capturado, ele atribui a nota recebida ao item comprado e ao ferreito que o forjou.
 
-- Adicionei um evento no pagamento da compra. O evento é capturado por dois listeners, um que 
-atualiza o estoque e o status do pedido, e outro que aciona a simulação de entrega.
+- Adicionei um evento no pagamento da compra. O evento é capturado um listeners que aciona a simulação de entrega.
 
 </details>
 
