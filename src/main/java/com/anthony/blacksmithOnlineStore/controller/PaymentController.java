@@ -24,8 +24,8 @@ public class PaymentController implements PaymentControllerDocs {
 
   @Override
   @PostMapping("/order/{id}")
-  public ResponseEntity<PaymentResponseDto> create(@PathVariable @Valid Long id,
-    @RequestBody PaymentCreateDto dto) {
+  public ResponseEntity<PaymentResponseDto> create(@PathVariable Long id,
+    @RequestBody @Valid PaymentCreateDto dto) {
       return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.createPayment(id, dto));
   }
 }
