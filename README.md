@@ -727,6 +727,7 @@ Desenvolvedor focado em Backend com Java e Spring Boot.
 
 * GitHub: https://github.com/TonyyCruz
 * Projeto: https://github.com/TonyyCruz/blacksmith-online-store
+* Trello : [Trello](https://trello.com/b/WRqcFVRl/%E2%9A%92%EF%B8%8F-blacksmith-online-store-development)
 
 ---
 
