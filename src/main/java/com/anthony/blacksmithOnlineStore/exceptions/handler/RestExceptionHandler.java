@@ -15,6 +15,7 @@ import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.BusinessExcep
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ConflictException;
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.ForbiddenException;
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.NotFoundException;
+import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.PaymentRequiredException;
 import com.anthony.blacksmithOnlineStore.exceptions.baseExceptions.UnauthorizedException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -97,6 +98,19 @@ public class RestExceptionHandler {
     exceptionDetails.setTitle("Unprocessable Entity");
     exceptionDetails.setTimestamp(Instant.now());
     exceptionDetails.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+    exceptionDetails.setException(e.getClass().toString());
+    exceptionDetails.setPath(request.getRequestURI());
+    exceptionDetails.setMessage(e.getMessage());
+    return ResponseEntity.status(exceptionDetails.getStatus()).body(exceptionDetails);
+  }
+
+  @ExceptionHandler(PaymentRequiredException.class)
+  public ResponseEntity<ExceptionDetails> handlePaymentRefused(Exception e,
+      HttpServletRequest request) {
+    ExceptionDetails exceptionDetails = new ExceptionDetails();
+    exceptionDetails.setTitle("Payment Refused");
+    exceptionDetails.setTimestamp(Instant.now());
+    exceptionDetails.setStatus(HttpStatus.PAYMENT_REQUIRED.value());
     exceptionDetails.setException(e.getClass().toString());
     exceptionDetails.setPath(request.getRequestURI());
     exceptionDetails.setMessage(e.getMessage());
