@@ -15,6 +15,7 @@ import com.anthony.blacksmithOnlineStore.enums.PaymentStatus;
 import com.anthony.blacksmithOnlineStore.events.OrderPaidEvent;
 import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.exceptions.ConflictingDataException;
+import com.anthony.blacksmithOnlineStore.exceptions.PaymentRefusedException;
 import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessor;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessorFactory;
@@ -46,8 +47,14 @@ public class PaymentService {
             .formatted(order.getTotal(), dto.amount()));
       }
       decrementStock(order);
-      Payment payment = processPayment(order, dto);
-      return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
+      try {
+        Payment payment = processPayment(order, dto);
+        return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
+      } catch(PaymentRefusedException e) {
+        order.setStatus(OrderStatus.PAYMENT_REJECTED);
+        orderService.save(order);
+        throw e;
+      }
     }
 
     public Payment findEntityById(Long id) {
@@ -58,17 +65,15 @@ public class PaymentService {
     private Payment processPayment(Order order, PaymentCreateDto dto) {
       PaymentProcessor processor = paymentFactory.getProcessor(dto.method());
       PaymentResult paymentResult = processor.process(dto);
+      if (!paymentResult.isApproved()) {
+        throw new PaymentRefusedException("The payment was declined");
+      }
       Payment payment = PaymentCreateDto.toEntity(dto);
       payment.setTransactionId(paymentResult.transactionId());
       payment.setOrder(order);
-      if (paymentResult.isApproved()) {
-        payment.setPaymentStatus(PaymentStatus.APPROVED);
-        order.setStatus(OrderStatus.PAYMENT_APPROVED);
-        eventPublisher.publishEvent(new OrderPaidEvent(order.getId(), LocalDateTime.now()));
-      } else {
-        payment.setPaymentStatus(PaymentStatus.REJECTED);
-        order.setStatus(OrderStatus.PAYMENT_REJECTED);
-      }
+      payment.setPaymentStatus(PaymentStatus.APPROVED);
+      order.setStatus(OrderStatus.PAYMENT_APPROVED);
+      eventPublisher.publishEvent(new OrderPaidEvent(order.getId(), LocalDateTime.now()));
       return payment;
     }
 
