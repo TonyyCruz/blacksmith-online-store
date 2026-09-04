@@ -32,13 +32,14 @@ public class PaymentService {
   private final OrderService orderService;
   private final SaleService saleService;
   private final PaymentRepository paymentRepository;
-  private final PaymentProcessorFactory paymentFactory;
   private final ApplicationEventPublisher eventPublisher;
+  private final FakePaymentProcessorService paymentService;
 
   @Transactional
   public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
     try {
       Payment payment = payOrder(orderId, dto);
+      eventPublisher.publishEvent(new OrderPaidEvent(orderId, LocalDateTime.now()));
       return PaymentResponseDto.fromEntity(paymentRepository.save(payment));
     } catch(PaymentRefusedException e) {
       eventPublisher.publishEvent(new PaymentRefusedEvent(orderId, dto.method(), dto.amount()));
@@ -58,22 +59,7 @@ public class PaymentService {
           .formatted(order.getTotal(), dto.amount()));
     }
     decrementStock(order);
-    return processPayment(order, dto);
-  }
-
-  private Payment processPayment(Order order, PaymentCreateDto dto) {
-    PaymentProcessor processor = paymentFactory.getProcessor(dto.method());
-    PaymentResult paymentResult = processor.process(dto);
-    if (!paymentResult.isApproved()) {
-      throw new PaymentRefusedException("The payment was declined");
-    }
-    Payment payment = PaymentCreateDto.toEntity(dto);
-    payment.setTransactionId(paymentResult.transactionId());
-    payment.setOrder(order);
-    payment.setPaymentStatus(PaymentStatus.APPROVED);
-    order.setStatus(OrderStatus.PAYMENT_APPROVED);
-    eventPublisher.publishEvent(new OrderPaidEvent(order.getId(), LocalDateTime.now()));
-    return payment;
+    return paymentService.processPayment(order, dto);
   }
 
   public Payment findEntityById(Long id) {
