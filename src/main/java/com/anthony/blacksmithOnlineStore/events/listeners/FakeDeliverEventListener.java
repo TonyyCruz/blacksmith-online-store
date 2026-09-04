@@ -2,8 +2,9 @@ package com.anthony.blacksmithOnlineStore.events.listeners;
 
 import java.time.LocalDateTime;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.anthony.blacksmithOnlineStore.entity.Order;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
@@ -13,7 +14,6 @@ import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -22,8 +22,7 @@ public class FakeDeliverEventListener {
   private final OrderRepository orderRepository;
   private final OrderService orderService;
 
-  @Transactional
-  @EventListener
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void deliverRequest(OrderPaidEvent paidEvent) {
     Order order = orderService.findEntityById(paidEvent.orderId());
       if (!order.getStatus().equals(OrderStatus.PAYMENT_APPROVED)) {
@@ -41,8 +40,7 @@ public class FakeDeliverEventListener {
       orderRepository.save(order);
   }
 
-  @Transactional
-  @EventListener
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void returnRequest(ReturnRequestEvent returnEvent) {
     Order order = orderService.findEntityById(returnEvent.orderId());
     if (!OrderStatus.DELIVERED.equals(order.getStatus())) {

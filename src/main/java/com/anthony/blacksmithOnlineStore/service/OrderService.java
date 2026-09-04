@@ -117,8 +117,4 @@ public class OrderService {
       saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
     }
   }
-
-  public Order save(Order order) {
-    return orderRepository.save(order);
-  }
 }
