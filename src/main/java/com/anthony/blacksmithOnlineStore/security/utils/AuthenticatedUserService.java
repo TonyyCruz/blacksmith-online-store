@@ -9,14 +9,18 @@ import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationExcepti
 
 @Component
 public class AuthenticatedUserService {
+  private final Authentication auth;
+
+  public AuthenticatedUserService() {
+    this.auth = SecurityContextHolder.getContext().getAuthentication();
+  }
 
   public  boolean isAdmin() {
-    try {
-      return getAuthentication().getAuthorities().stream()
-          .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-    } catch (NullPointerException e) {
-      return false;
-    }
+    return isAuthenticated()
+      && getAuthentication()
+        .getAuthorities()
+        .stream()
+        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
   }
 
   public UUID getAuthenticatedId() {
@@ -28,8 +32,11 @@ public class AuthenticatedUserService {
   }
 
   private Authentication getAuthentication() {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null || !auth.isAuthenticated()) throw new UnauthorizedOperationException();
+    if (!isAuthenticated()) throw new UnauthorizedOperationException();
     return auth;
+  }
+
+  public boolean isAuthenticated() {
+    return auth != null || auth.isAuthenticated();
   }
 }
