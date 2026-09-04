@@ -37,6 +37,6 @@ public class AuthenticatedUserService {
   }
 
   public boolean isAuthenticated() {
-    return auth != null || auth.isAuthenticated();
+    return auth != null && auth.isAuthenticated();
   }
 }
