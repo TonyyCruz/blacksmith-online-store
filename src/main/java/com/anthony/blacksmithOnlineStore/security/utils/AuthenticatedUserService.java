@@ -1,6 +1,7 @@
 package com.anthony.blacksmithOnlineStore.security.utils;
 
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -9,11 +10,6 @@ import com.anthony.blacksmithOnlineStore.exceptions.UnauthorizedOperationExcepti
 
 @Component
 public class AuthenticatedUserService {
-  private final Authentication auth;
-
-  public AuthenticatedUserService() {
-    this.auth = SecurityContextHolder.getContext().getAuthentication();
-  }
 
   public  boolean isAdmin() {
     return isAuthenticated()
@@ -32,11 +28,10 @@ public class AuthenticatedUserService {
   }
 
   private Authentication getAuthentication() {
-    if (!isAuthenticated()) throw new UnauthorizedOperationException();
-    return auth;
+      return SecurityContextHolder.getContext().getAuthentication();
   }
 
   public boolean isAuthenticated() {
-    return auth != null && auth.isAuthenticated();
+    return getAuthentication() != null && getAuthentication().isAuthenticated();
   }
 }
