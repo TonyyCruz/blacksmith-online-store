@@ -104,13 +104,13 @@ public class OrderServiceTest {
           "The status must be pending");
       assertEquals(response.userId(), user.getId(),
           "The userWithId id must be the same");
-      assertEquals(3, response.items().size(),
+      assertEquals(3, response.orderItems().size(),
           "The order must have 3 items");
-      assertEquals(item1.getId(), response.items().get(0).productId(),
+      assertEquals(item1.getId(), response.orderItems().get(0).productId(),
           "The first itemWithId id must be the same");
-      assertEquals(item2.getId(), response.items().get(1).productId(),
+      assertEquals(item2.getId(), response.orderItems().get(1).productId(),
           "The second itemWithId id must be the same");
-      assertEquals(item3.getId(), response.items().get(2).productId(),
+      assertEquals(item3.getId(), response.orderItems().get(2).productId(),
           "The third itemWithId id must be the same");
       verify(userService, times(1)).getUserReference();
       verify(itemService, times(1)).findEntityById(item1.getId());
@@ -133,7 +133,7 @@ public class OrderServiceTest {
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
 
-      Order response = orderService.findEntityById(order.getId());
+      Order response = orderService.findSelfEntityById(order.getId());
 
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
@@ -402,7 +402,7 @@ public class OrderServiceTest {
     void getEntityById_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(anyLong())).thenReturn(false);
 
-      assertThrows(ResourceNotFoundException.class, () -> orderService.findEntityById(999L),
+      assertThrows(ResourceNotFoundException.class, () -> orderService.findSelfEntityById(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(anyLong());
     }

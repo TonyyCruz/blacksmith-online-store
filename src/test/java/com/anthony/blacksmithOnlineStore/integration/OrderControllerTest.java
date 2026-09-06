@@ -89,14 +89,14 @@ public class OrderControllerTest extends TestBase {
 
       String stringResult = result.getResponse().getContentAsString();
       OrderResponseDto orderResult = objectMapper.readValue(stringResult, OrderResponseDto.class);
-      orderResult.items().forEach(item -> {
+      orderResult.orderItems().forEach(item -> {
         assertThat(item.productId()).isNotNull();
         assertThat(item.quantity()).isGreaterThan(0);
         assertThat(item.UserId()).isEqualTo(USER_ID);
         assertThat(item.orderId()).isEqualTo(orderResult.id());
       });
 
-      OrderItemResponseDto orderItemResponseDtoOne = orderResult.items().get(0);
+      OrderItemResponseDto orderItemResponseDtoOne = orderResult.orderItems().get(0);
       assertThat(orderItemResponseDtoOne.productName()).isEqualTo(item1.getName());
       assertThat(orderItemResponseDtoOne.basePrice())
           .isEqualByComparingTo(item1.getBasePrice().toString());
@@ -106,7 +106,7 @@ public class OrderControllerTest extends TestBase {
       assertThat(orderItemResponseDtoOne.totalPrice())
           .isEqualByComparingTo(item1.getFinalPrice().toString());
 
-      OrderItemResponseDto orderItemResponseDtoTwo = orderResult.items().get(1);
+      OrderItemResponseDto orderItemResponseDtoTwo = orderResult.orderItems().get(1);
       System.out.println(orderItemResponseDtoOne.basePrice());
       System.out.println(orderItemResponseDtoOne.basePrice().scale());
       assertThat(orderItemResponseDtoTwo.productName()).isEqualTo(item2.getName());

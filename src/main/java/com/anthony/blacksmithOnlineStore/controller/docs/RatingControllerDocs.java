@@ -30,7 +30,7 @@ public interface RatingControllerDocs {
   @ApiForbiddenDoc
   @ApiBusinessViolationDoc
   @ApiBadValidationRequestDoc
-  @Operation(summary = "Rate your recived item")
+  @Operation(summary = "Rate your received order item")
   public ResponseEntity<Void> rate(RatingRequestDto dto);
 
   @ApiResponse(

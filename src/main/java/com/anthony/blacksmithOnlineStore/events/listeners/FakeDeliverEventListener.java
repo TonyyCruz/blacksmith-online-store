@@ -3,6 +3,8 @@ package com.anthony.blacksmithOnlineStore.events.listeners;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -23,26 +25,28 @@ public class FakeDeliverEventListener {
   private final OrderService orderService;
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void deliverRequest(OrderPaidEvent paidEvent) {
     Order order = orderService.findEntityById(paidEvent.orderId());
-      if (!order.getStatus().equals(OrderStatus.PAYMENT_APPROVED)) {
-        throw new BusinessViolationException("A not paid order cannot be delivered");
-      }
-      if (order.getDeliveredAt() != null) {
-        throw new BusinessViolationException("This order has already been delivered");
-      }
-      order.setDeliveredAt(LocalDateTime.now());
-      order.setStatus(OrderStatus.SEPARATING);
-      order.setStatus(OrderStatus.DISPATCHED);
-      order.setStatus(OrderStatus.IN_TRANSIT);
-      order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
-      order.setStatus(OrderStatus.DELIVERED);
-      orderRepository.save(order);
+    if (!order.getStatus().equals(OrderStatus.PAYMENT_APPROVED)) {
+      throw new BusinessViolationException("A not paid order cannot be delivered");
+    }
+    if (order.getDeliveredAt() != null) {
+      throw new BusinessViolationException("This order has already been delivered");
+    }
+    order.setDeliveredAt(LocalDateTime.now());
+    order.setStatus(OrderStatus.SEPARATING);
+    order.setStatus(OrderStatus.DISPATCHED);
+    order.setStatus(OrderStatus.IN_TRANSIT);
+    order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
+    order.setStatus(OrderStatus.DELIVERED);
+    orderRepository.save(order);
   }
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void returnRequest(ReturnRequestEvent returnEvent) {
-    Order order = orderService.findEntityById(returnEvent.orderId());
+    Order order = orderService.findSelfEntityById(returnEvent.orderId());
     if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
       throw new BusinessViolationException("A not delivered order cannot be returned");
     }

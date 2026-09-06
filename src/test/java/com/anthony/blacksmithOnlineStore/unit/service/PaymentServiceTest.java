@@ -76,7 +76,7 @@ public class PaymentServiceTest {
         Order order = MockOrder.orderWithItems().toBuilder().status(status).build();
         dto = dto.toBuilder().amount(order.getTotal()).build();
 
-        when(orderService.findEntityById(order.getId())).thenReturn(order);
+        when(orderService.findSelfEntityById(order.getId())).thenReturn(order);
         when(paymentFactory.getProcessor(dto.method())).thenReturn(mockPaymentProcessor(dto));
         when(paymentRepository.save(any(Payment.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -105,7 +105,7 @@ public class PaymentServiceTest {
         Order order = MockOrder.orderWithItems().toBuilder().status(OrderStatus.PENDING).build();
         dto = dto.toBuilder().amount(order.getTotal()).build();
 
-        when(orderService.findEntityById(order.getId())).thenReturn(order);
+        when(orderService.findSelfEntityById(order.getId())).thenReturn(order);
         when(paymentFactory.getProcessor(dto.method())).thenReturn(mockPaymentProcessor(dto));
         when(paymentRepository.save(any(Payment.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -133,7 +133,7 @@ public class PaymentServiceTest {
       Order order = MockOrder.orderWithItems().toBuilder().status(status).build();
       PaymentCreateDto dto = MockPayment.creditCard().toBuilder().amount(order.getTotal()).build();
 
-      when(orderService.findEntityById(order.getId())).thenReturn(order);
+      when(orderService.findSelfEntityById(order.getId())).thenReturn(order);
       when(paymentFactory.getProcessor(dto.method())).thenReturn(mockPaymentProcessor(dto));
 
       assertThrows(BusinessViolationException.class, () -> {
@@ -157,7 +157,7 @@ public class PaymentServiceTest {
         Order order = MockOrder.orderWithItems().toBuilder().status(status).build();
         dto = dto.toBuilder().amount(order.getTotal().min(BigDecimal.ONE)).build();
 
-        when(orderService.findEntityById(order.getId())).thenReturn(order);
+        when(orderService.findSelfEntityById(order.getId())).thenReturn(order);
 
         PaymentCreateDto finalDto = dto;
         assertThrows(
@@ -183,7 +183,7 @@ public class PaymentServiceTest {
         Order order = MockOrder.orderWithItems().toBuilder().status(status).build();
         dto = dto.toBuilder().amount(order.getTotal().add(BigDecimal.ONE)).build();
 
-        when(orderService.findEntityById(order.getId())).thenReturn(order);
+        when(orderService.findSelfEntityById(order.getId())).thenReturn(order);
 
         PaymentCreateDto finalDto = dto;
         assertThrows(

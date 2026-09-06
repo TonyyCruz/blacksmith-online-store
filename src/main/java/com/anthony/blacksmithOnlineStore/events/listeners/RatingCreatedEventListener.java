@@ -15,7 +15,7 @@ public class RatingCreatedEventListener {
   private final BlacksmithService blacksmithService;
 
   @EventListener
-  public void eventHandle(RatingCreatedEvent createdEvent) {
+  public void ratingHandle(RatingCreatedEvent createdEvent) {
     Item item = itemService.findEntityById(createdEvent.itemId());
     item.addRating(createdEvent.rate());
     blacksmithService.findEntityById(item.getBlacksmithIdSnapshot()).addRating(createdEvent.rate());
