@@ -60,7 +60,7 @@ public class OrderService {
 
   @Transactional
   public OrderResponseDto cancel(long id) {
-    Order order = findSelfEntityById(id);
+    Order order = findSelfOrderEntityById(id);
     if (!order.getStatus().canBeCanceled()) {
       throw new BusinessViolationException("Only pending orders can be cancelled");
     }
@@ -70,23 +70,18 @@ public class OrderService {
 
   @Transactional
   public void refundRequest(long id) {
-    Order order = findSelfEntityById(id);
-    if (order.getStatus().equals(OrderStatus.RETURNED)) {
+    Order order = findSelfOrderEntityById(id);
+    if (!order.getStatus().canBeRefunded()) {
+      throw new BusinessViolationException("This order cannot be refunded");
+    }
       restoreStock(order);
       order.setStatus(OrderStatus.REFUND_PENDING);
       eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
-    }
-    else if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
-      eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
-    }
-    else {
-      throw new BusinessViolationException("This order cannot be refunded");
-    }
   }
 
   @Transactional
   public void returnRequest(long id) {
-    Order order = findSelfEntityById(id);
+    Order order = findSelfOrderEntityById(id);
     if (!order.getStatus().canBeReturned()) {
       throw new BusinessViolationException("Only delivered orders can be returned");
     }
@@ -95,17 +90,17 @@ public class OrderService {
 
   public OrderResponseDto findById(long id) {
     if (authUser.isAdmin()) return OrderResponseDto.fromEntity(findEntityById(id));
-    return OrderResponseDto.fromEntity(findSelfEntityById(id));
+    return OrderResponseDto.fromEntity(findSelfOrderEntityById(id));
   }
 
-  public List<OrderResponseDto> getUserOrders() {
+  public List<OrderResponseDto> getAllSelfOrders() {
     return orderRepository.findByUserId(authUser.getAuthenticatedId())
         .stream()
         .map(OrderResponseDto::fromEntity)
         .toList();
   }
 
-  public Order findSelfEntityById(long id) {
+  public Order findSelfOrderEntityById(long id) {
     if (!orderRepository.existsById(id)) {
       throw new ResourceNotFoundException("Order not found with id: " + id);
     }

@@ -41,7 +41,7 @@ public class OrderController implements OrderControllerDocs {
   @Override
   @GetMapping
   public ResponseEntity<List<OrderResponseDto>> getOrders() {
-    return ResponseEntity.ok(orderService.getUserOrders());
+    return ResponseEntity.ok(orderService.getAllSelfOrders());
   }
 
   @Override

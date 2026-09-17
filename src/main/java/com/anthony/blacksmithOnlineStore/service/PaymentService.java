@@ -40,7 +40,7 @@ public class PaymentService {
   }
 
   private Payment payOrder(long orderId, PaymentCreateDto dto) {
-    Order order = orderService.findSelfEntityById(orderId);
+    Order order = orderService.findSelfOrderEntityById(orderId);
     if (order.getPayment() != null) {
       throw new ConflictingDataException(
         "You cannot pay for an order that has already been paid for");

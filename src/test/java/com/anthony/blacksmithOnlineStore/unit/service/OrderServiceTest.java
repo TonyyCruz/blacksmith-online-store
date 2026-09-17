@@ -2,8 +2,11 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +31,7 @@ import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.ItemService;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
+import com.anthony.blacksmithOnlineStore.service.SaleService;
 import com.anthony.blacksmithOnlineStore.service.UserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
 import java.math.BigDecimal;
@@ -60,6 +64,8 @@ public class OrderServiceTest {
   private AuthenticatedUserService authUser;
   @Mock
   private ApplicationEventPublisher eventPublisher;
+  @Mock
+  private SaleService saleService;
   @InjectMocks
   OrderService orderService;
   private final User user = MockUser.user(UUID.randomUUID());
@@ -123,8 +129,23 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Should find a order by id and return a Entity")
-    void findEntityById_shouldFindAnOrderByIdSuccessfully_andReturnAEntity() {
+    @DisplayName("Admin call method that find all order by id")
+    void findById_canFindAnyOrderById_whenUserIsAdmin() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(authUser.isAdmin()).thenReturn(true);
+      when(orderRepository.findById(order.getId()))
+          .thenReturn(Optional.of(order));
+    
+      orderService.findById(order.getId());
+
+      verify(orderRepository, times(1))
+          .findById(order.getId());
+    }
+
+    @Test
+    @DisplayName("User call method that find only his order by id")
+    void findById_canFindOnlySelfOrder_whenUserIsNotAdmin() {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
@@ -133,7 +154,41 @@ public class OrderServiceTest {
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
 
-      Order response = orderService.findSelfEntityById(order.getId());
+      orderService.findById(order.getId());
+
+      verify(orderRepository, times(1))
+          .findByIdAndUserId(order.getId(), user.getId());
+    }
+
+    @Test
+    @DisplayName("Should find a order by id and return a Entity")
+    void findEntityById_shouldFindAnOrderByIdSuccessfully_andReturnAEntity() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+      Order response = orderService.findEntityById(order.getId());
+
+      verify(orderRepository, times(1))
+          .findById(order.getId());
+      assertEquals(order.getId(), response.getId(), "The id must be the same");
+      assertEquals(order.getUser().getId(), response.getUser().getId(),
+          "The userWithId id must be the same");
+      assertEquals(order.getStatus(), response.getStatus(), "The status must be the same");
+      assertEquals(order.getTotal(), response.getTotal(), "The total must be the same");
+    }
+
+    @Test
+    @DisplayName("Should find a order by id and user id")
+    void findEntityById_shouldFindAnOrderByIdAndUserId_andReturnAEntity() {
+      Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
+
+      when(orderRepository.existsById(anyLong())).thenReturn(true);
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
+        .thenReturn(Optional.of(order));
+
+      Order response = orderService.findSelfOrderEntityById(order.getId());
 
       verify(orderRepository, times(1))
           .findByIdAndUserId(order.getId(), user.getId());
@@ -180,7 +235,6 @@ public class OrderServiceTest {
           .build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
@@ -205,10 +259,10 @@ public class OrderServiceTest {
           .build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
+      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
-      when(authUser.getAuthenticatedId()).thenReturn(user.getId());
+      doNothing().when(saleService).cancelSale(anyLong(), anyInt());
 
       orderService.refundRequest(order.getId());
 
@@ -216,6 +270,7 @@ public class OrderServiceTest {
       verify(orderRepository, times(1)).findByIdAndUserId(order.getId(), user.getId());
       verify(orderRepository, times(1)).existsById(anyLong());
       verify(authUser, times(1)).getAuthenticatedId();
+      verify(saleService, times(order.getOrderItems().size())).cancelSale(anyLong(), anyInt());
     }
 
     @Test
@@ -229,7 +284,6 @@ public class OrderServiceTest {
           .build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
@@ -255,7 +309,7 @@ public class OrderServiceTest {
       when(orderRepository.findByUserId(user.getId())).thenReturn(orders);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
-      List<OrderResponseDto> responseList = orderService.getUserOrders();
+      List<OrderResponseDto> responseList = orderService.getAllSelfOrders();
 
       assertEquals(3, responseList.size(), "Should return the same number of orders");
       verify(orderRepository, times(1)).findByUserId(user.getId());
@@ -270,7 +324,7 @@ public class OrderServiceTest {
       when(orderRepository.findByUserId(user.getId())).thenReturn(orders);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
 
-      List<OrderResponseDto> responseList = orderService.getUserOrders();
+      List<OrderResponseDto> responseList = orderService.getAllSelfOrders();
 
       assertEquals(0, responseList.size(), "Should return an empty list");
       verify(orderRepository, times(1)).findByUserId(user.getId());
@@ -314,7 +368,6 @@ public class OrderServiceTest {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
@@ -343,7 +396,6 @@ public class OrderServiceTest {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
@@ -373,7 +425,6 @@ public class OrderServiceTest {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).status(status).build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.of(order));
@@ -402,7 +453,7 @@ public class OrderServiceTest {
     void getEntityById_shouldThrownAnException_whenOrderWasNoFound() {
       when(orderRepository.existsById(anyLong())).thenReturn(false);
 
-      assertThrows(ResourceNotFoundException.class, () -> orderService.findSelfEntityById(999L),
+      assertThrows(ResourceNotFoundException.class, () -> orderService.findSelfOrderEntityById(999L),
           "Must thrown an exception with a non existing order");
       verify(orderRepository, times(1)).existsById(anyLong());
     }
@@ -413,7 +464,6 @@ public class OrderServiceTest {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
@@ -433,7 +483,6 @@ public class OrderServiceTest {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());
@@ -453,7 +502,6 @@ public class OrderServiceTest {
       Order order = MockOrder.orderWithItems().toBuilder().user(user).build();
 
       when(orderRepository.existsById(anyLong())).thenReturn(true);
-      when(authUser.isAdmin()).thenReturn(false);
       when(authUser.getAuthenticatedId()).thenReturn(user.getId());
       when(orderRepository.findByIdAndUserId(order.getId(), user.getId()))
           .thenReturn(Optional.empty());

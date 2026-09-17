@@ -28,7 +28,7 @@ public class PaymentEventListener {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void refundPayment(RefundRequestEvent refoundEvent) {
     // REFUND PROCESS
-    Order order = orderService.findSelfEntityById(refoundEvent.orderId());
+    Order order = orderService.findSelfOrderEntityById(refoundEvent.orderId());
     order.setStatus(OrderStatus.REFUNDED);
     if (order.getPayment() == null) throw new BusinessViolationException("This order have no payment");
     Payment payment = paymentService.findEntityById(order.getPayment().getId());
@@ -39,7 +39,7 @@ public class PaymentEventListener {
   @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void paymentRefused(PaymentRefusedEvent refusedEvent) {
-    Order order = orderService.findSelfEntityById(refusedEvent.OrderId());
+    Order order = orderService.findSelfOrderEntityById(refusedEvent.OrderId());
     if (!OrderStatus.PAYMENT_REJECTED.equals(order.getStatus())) {
       order.setStatus(OrderStatus.PAYMENT_REJECTED);
     }
