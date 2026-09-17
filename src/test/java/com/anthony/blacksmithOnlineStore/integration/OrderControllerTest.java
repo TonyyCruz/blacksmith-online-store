@@ -82,8 +82,8 @@ public class OrderControllerTest extends TestBase {
           .andExpect(status().isCreated())
           .andExpect(jsonPath("$.id").isNotEmpty())
           .andExpect(jsonPath("$.status").value(OrderStatus.PENDING.name()))
-          .andExpect(jsonPath("$.items").isArray())
-          .andExpect(jsonPath("$.items.size()").value(2))
+          .andExpect(jsonPath("$.orderItems").isArray())
+          .andExpect(jsonPath("$.orderItems.size()").value(2))
           .andExpect(jsonPath("$.total").value(expectTotalOrderPrice))
           .andReturn();
 
@@ -127,8 +127,8 @@ public class OrderControllerTest extends TestBase {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.id").value(order.getId()))
           .andExpect(jsonPath("$.status").value(order.getStatus().name()))
-          .andExpect(jsonPath("$.items").isArray())
-          .andExpect(jsonPath("$.items.size()").value(order.getOrderItems().size()))
+          .andExpect(jsonPath("$.orderItems").isArray())
+          .andExpect(jsonPath("$.orderItems.size()").value(order.getOrderItems().size()))
           .andExpect(jsonPath("$.total").value(order.getTotal().doubleValue()));
     }
 
@@ -151,11 +151,11 @@ public class OrderControllerTest extends TestBase {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$", Matchers.hasSize(orders.size())))
           .andExpect(jsonPath("$[0].userId").value(user.getId().toString()))
-          .andExpect(jsonPath("$[0].items.size()")
+          .andExpect(jsonPath("$[0].orderItems.size()")
               .value(orders.get(0).getOrderItems().size()))
           .andExpect(jsonPath("$[0].total").value(orders.get(0).getTotal().doubleValue()))
           .andExpect(jsonPath("$[1].userId").value(user.getId().toString()))
-          .andExpect(jsonPath("$[1].items.size()").value(orders.get(1)
+          .andExpect(jsonPath("$[1].orderItems.size()").value(orders.get(1)
               .getOrderItems().size()))
           .andExpect(jsonPath("$[1].total")
               .value(orders.get(1).getTotal().doubleValue()));
@@ -182,7 +182,7 @@ public class OrderControllerTest extends TestBase {
       mockMvc.perform(post(ORDER_BASE_URL)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -193,7 +193,7 @@ public class OrderControllerTest extends TestBase {
               .header("Authorization", "sdd88we5")
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -293,7 +293,7 @@ public class OrderControllerTest extends TestBase {
     @DisplayName("Get order by Id returns 403 when no auth token is provided")
     void getById_returns403_whenNoAuthTokenIsProvided() throws Exception {
       mockMvc.perform(get(ORDER_BASE_URL + "{id}", 1))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -301,14 +301,14 @@ public class OrderControllerTest extends TestBase {
     void getById_returns403_whenAuthTokenIsInvalid() throws Exception {
       mockMvc.perform(get(ORDER_BASE_URL + "{id}", 1)
               .header("Authorization", "sdd88we5"))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("Get order by id returns 403 when userWithId is not owner of the order")
     void getById_returns403_whenUserIsNotOwnerOfTheOrder() throws Exception {
       mockMvc.perform(get(ORDER_BASE_URL + "{id}", 2))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -323,7 +323,7 @@ public class OrderControllerTest extends TestBase {
     @DisplayName("Get all orders returns 403 when no auth token is provided")
     void getAll_returns403_whenNoAuthTokenIsProvided() throws Exception {
       mockMvc.perform(get(ORDER_BASE_URL))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -331,7 +331,7 @@ public class OrderControllerTest extends TestBase {
     void getAll_returns403_whenAuthTokenIsInvalid() throws Exception {
       mockMvc.perform(get(ORDER_BASE_URL)
               .header("Authorization", "sdd88we5"))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isUnauthorized());
     }
 
   }

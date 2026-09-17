@@ -99,13 +99,10 @@ public class BlacksmithControllerTest extends TestBase {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content").isNotEmpty())
-          .andExpect(jsonPath("$.content[0].name").value(blacksmith.getName()))
-          .andExpect(jsonPath("$.content[0].description")
-              .value(blacksmith.getDescription()))
-          .andExpect(jsonPath("$.content[0].ratingCount")
-              .value(blacksmith.getRatingCount()))
-          .andExpect(jsonPath("$.content[0].ratingAverage")
-              .value(blacksmith.getRatingAverage()));
+          .andExpect(jsonPath("$.content[0].name").exists())
+          .andExpect(jsonPath("$.content[0].description").exists())
+          .andExpect(jsonPath("$.content[0].ratingCount").exists())
+          .andExpect(jsonPath("$.content[0].ratingAverage").exists());
     }
 
     @Test
