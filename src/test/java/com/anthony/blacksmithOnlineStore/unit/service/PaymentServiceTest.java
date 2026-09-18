@@ -2,7 +2,11 @@ package com.anthony.blacksmithOnlineStore.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,8 +32,11 @@ import com.anthony.blacksmithOnlineStore.payment.PaymentProcessor;
 import com.anthony.blacksmithOnlineStore.payment.PaymentProcessorFactory;
 import com.anthony.blacksmithOnlineStore.payment.PixProcessor;
 import com.anthony.blacksmithOnlineStore.repository.PaymentRepository;
+import com.anthony.blacksmithOnlineStore.service.FakePaymentProcessorService;
 import com.anthony.blacksmithOnlineStore.service.OrderService;
 import com.anthony.blacksmithOnlineStore.service.PaymentService;
+import com.anthony.blacksmithOnlineStore.service.SaleService;
+
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +60,10 @@ public class PaymentServiceTest {
   private ApplicationEventPublisher eventPublisher;
   @Mock
   private OrderService orderService;
+  @Mock
+  private SaleService saleService;
+  @Mock
+  private FakePaymentProcessorService fakePaymentService;
   @InjectMocks
   PaymentService paymentService;
 
@@ -80,6 +91,9 @@ public class PaymentServiceTest {
         when(paymentFactory.getProcessor(dto.method())).thenReturn(mockPaymentProcessor(dto));
         when(paymentRepository.save(any(Payment.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
+        doNothing().when(saleService).performSale(anyLong(), anyInt());
+        when(fakePaymentService.processPayment(order, dto))
+            .thenReturn(MockPayment.createPayment(order, dto));
 
         PaymentResponseDto payment = paymentService.createPayment(order.getId(), dto);
 

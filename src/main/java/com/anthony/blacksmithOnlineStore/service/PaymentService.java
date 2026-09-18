@@ -25,7 +25,7 @@ public class PaymentService {
   private final SaleService saleService;
   private final PaymentRepository paymentRepository;
   private final ApplicationEventPublisher eventPublisher;
-  private final FakePaymentProcessorService paymentService;
+  private final FakePaymentProcessorService fakePaymentService;
 
   @Transactional
   public PaymentResponseDto createPayment(long orderId, PaymentCreateDto dto) {
@@ -51,7 +51,7 @@ public class PaymentService {
           .formatted(order.getTotal(), dto.amount()));
     }
     decrementStock(order);
-    return paymentService.processPayment(order, dto);
+    return fakePaymentService.processPayment(order, dto);
   }
 
   public Payment findEntityById(Long id) {
