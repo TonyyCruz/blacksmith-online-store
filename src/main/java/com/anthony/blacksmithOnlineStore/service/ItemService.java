@@ -57,9 +57,6 @@ public class ItemService {
     item.setType(dto.type());
     item.setRarity(dto.rarity());
     item.setActive(dto.active());
-    item.setCraftedBy(blacksmith);
-    item.setBlacksmithIdSnapshot(dto.blacksmithId());
-    item.setBlacksmithNameSnapshot(blacksmith.getName());
     return ItemResponseDto.fromEntity(item);
   }
 
