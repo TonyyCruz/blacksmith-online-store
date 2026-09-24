@@ -366,6 +366,10 @@ body {
     color: var(--primary-text-color);
 }
 
+.swagger-ui .opblock-tag .renderedMarkdown{
+    color: var(--secondary-text-color);
+}
+
 .swagger-ui .opblock .opblock-summary-operation-id,
 .swagger-ui .opblock .opblock-summary-path,
 .swagger-ui .opblock .opblock-summary-path__deprecated {

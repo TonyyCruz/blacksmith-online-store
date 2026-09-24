@@ -16,7 +16,9 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
             i.stock = i.stock - :qty,
             i.sold = i.sold + :qty
         WHERE
-            i.id = :itemId AND i.stock >= :qty
+            i.id = :itemId
+            AND i.active = true
+            AND i.stock >= :qty
     """)
   int decrementStockAndIncrementSoldQuantity(long itemId, int qty);
 
@@ -30,11 +32,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
             i.id = :id AND i.sold >= :qty
     """)
   int incrementStockAndDecrementSoldQuantity(long id, int qty);
-
-  @Query("""
-        SELECT i.active FROM Item i WHERE i.id = :id
-    """)
-  boolean isItemActive(long id);
 
   Optional<Item> findByIdAndActiveTrue(Long id);
 }

@@ -15,9 +15,6 @@ public class SaleService {
 
   public void performSale(long itemId, int qty) {
     itemService.itemExistesVerifier(itemId);
-    if (!itemRepository.isItemActive(itemId)) {
-      throw new InsufficientStockException("Item %d is unactive".formatted(itemId));
-    }
     int modifiedLines = itemRepository.decrementStockAndIncrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
       throw new InsufficientStockException("Item have no stock for this operation: " + itemId);

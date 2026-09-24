@@ -125,7 +125,7 @@ public class RatingControllerTest extends TestBase {
               .header("Authorization", userToken)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isConflict());
     }
   }
 

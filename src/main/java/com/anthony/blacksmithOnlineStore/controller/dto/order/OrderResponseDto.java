@@ -23,7 +23,7 @@ public record OrderResponseDto(
   @Schema(example = "DELIVERED")
   OrderStatus status,
   @Schema(description = "List of order items")
-  List<OrderItemResponseDto> items,
+  List<OrderItemResponseDto> orderItems,
   @Schema(example = "334.50")
   BigDecimal total) {
 

@@ -53,7 +53,7 @@ public class OpenApiConfig {
 
             3. Copie o token JWT recebido
 
-            4. Clike no botão 'Authorize' e cole seu token
+            4. Clique no botão 'Authorize', cole seu token e clique em 'Authorize'
 
             5. Agora você pode acessar as rotas protegidas
 
@@ -74,7 +74,7 @@ public class OpenApiConfig {
           new Tag().name("Users").description("User management"),
           new Tag().name("Orders").description("Order management"),
           new Tag().name("Payments").description("Payment management"),
-          new Tag().name("Ratings").description("Rating management"),
+          new Tag().name("Ratings").description("Rating management, rates the OrderItems"),
           new Tag().name("Items").description("Item management"),
           new Tag().name("Blacksmiths").description("Blacksmith management"),
           new Tag().name("Admins").description("Admin management")

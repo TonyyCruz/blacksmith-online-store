@@ -1,5 +1,10 @@
 package com.anthony.blacksmithOnlineStore.service;
 
+import java.util.List;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.order.OrderResponseDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.orderItem.OrderItemRequestDto;
@@ -10,24 +15,24 @@ import com.anthony.blacksmithOnlineStore.entity.User;
 import com.anthony.blacksmithOnlineStore.enums.OrderStatus;
 import com.anthony.blacksmithOnlineStore.events.RefundRequestEvent;
 import com.anthony.blacksmithOnlineStore.events.ReturnRequestEvent;
-import com.anthony.blacksmithOnlineStore.exceptions.InsufficientStockException;
 import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
-import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.exceptions.ForbiddenOperationException;
+import com.anthony.blacksmithOnlineStore.exceptions.InsufficientStockException;
+import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.OrderRepository;
 import com.anthony.blacksmithOnlineStore.security.utils.AuthenticatedUserService;
 import com.anthony.blacksmithOnlineStore.service.util.OrderItemFactory;
-import jakarta.transaction.Transactional;
-import java.util.List;
+
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
   private final OrderRepository orderRepository;
   private final UserService userService;
+  private final SaleService saleService;
   private final OrderItemFactory orderItemFactory;
   private final ItemService itemService;
   private final AuthenticatedUserService authUser;
@@ -55,7 +60,7 @@ public class OrderService {
 
   @Transactional
   public OrderResponseDto cancel(long id) {
-    Order order = findEntityById(id);
+    Order order = findSelfOrderEntityById(id);
     if (!order.getStatus().canBeCanceled()) {
       throw new BusinessViolationException("Only pending orders can be cancelled");
     }
@@ -65,20 +70,18 @@ public class OrderService {
 
   @Transactional
   public void refundRequest(long id) {
-    Order order = findEntityById(id);
+    Order order = findSelfOrderEntityById(id);
     if (!order.getStatus().canBeRefunded()) {
-      if (order.getStatus().equals(OrderStatus.REFUND_PENDING)) {
-        throw new BusinessViolationException("This order is already pending for refund.");
-      }
       throw new BusinessViolationException("This order cannot be refunded");
     }
-    order.setStatus(OrderStatus.REFUND_PENDING);
-    eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
+      restoreStock(order);
+      order.setStatus(OrderStatus.REFUND_PENDING);
+      eventPublisher.publishEvent(new RefundRequestEvent(id, order.getOrderItems()));
   }
 
   @Transactional
   public void returnRequest(long id) {
-    Order order = findEntityById(id);
+    Order order = findSelfOrderEntityById(id);
     if (!order.getStatus().canBeReturned()) {
       throw new BusinessViolationException("Only delivered orders can be returned");
     }
@@ -86,22 +89,33 @@ public class OrderService {
   }
 
   public OrderResponseDto findById(long id) {
-    return OrderResponseDto.fromEntity(findEntityById(id));
+    if (authUser.isAdmin()) return OrderResponseDto.fromEntity(findEntityById(id));
+    return OrderResponseDto.fromEntity(findSelfOrderEntityById(id));
   }
 
-  public List<OrderResponseDto> getUserOrders() {
+  public List<OrderResponseDto> getAllSelfOrders() {
     return orderRepository.findByUserId(authUser.getAuthenticatedId())
         .stream()
         .map(OrderResponseDto::fromEntity)
         .toList();
   }
 
-  public Order findEntityById(long id) {
+  public Order findSelfOrderEntityById(long id) {
     if (!orderRepository.existsById(id)) {
       throw new ResourceNotFoundException("Order not found with id: " + id);
     }
-    if (authUser.isAdmin()) return orderRepository.findById(id).get();
     return orderRepository.findByIdAndUserId(id, authUser.getAuthenticatedId())
-        .orElseThrow(() -> new ForbiddenOperationException("You cannot access this order."));
+        .orElseThrow(() -> new ForbiddenOperationException("You cannot access this order"));
+  }
+
+  public Order findEntityById(long id) {
+    return orderRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+  }
+
+  private void restoreStock(Order order) {
+    for (OrderItem orderItem : order.getOrderItems()) {
+      saleService.cancelSale(orderItem.getItemId(), orderItem.getQuantity());
+    }
   }
 }

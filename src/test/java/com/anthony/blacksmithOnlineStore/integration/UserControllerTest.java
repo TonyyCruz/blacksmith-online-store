@@ -133,7 +133,7 @@ public class UserControllerTest extends TestBase {
     @DisplayName("Get Current User returns 403 when no auth token is provided")
     void getCurrentUser_returns403_whenNoAuthTokenIsProvided() throws Exception {
       mockMvc.perform(get(USER_URL))
-          .andExpect(status().isForbidden())
+          .andExpect(status().isUnauthorized())
           .andDo(print());
     }
 
@@ -145,7 +145,7 @@ public class UserControllerTest extends TestBase {
       mockMvc.perform(put(USER_URL)
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isForbidden())
+          .andExpect(status().isUnauthorized())
           .andDo(print());
     }
 
@@ -157,7 +157,7 @@ public class UserControllerTest extends TestBase {
       mockMvc.perform(put(USER_URL + "/password")
               .contentType(MediaType.APPLICATION_JSON)
               .content(valueAsString))
-          .andExpect(status().isForbidden())
+          .andExpect(status().isUnauthorized())
           .andDo(print());
     }
 
@@ -165,7 +165,7 @@ public class UserControllerTest extends TestBase {
     @DisplayName("Delete Current User returns 403 when no auth token is provided")
     void deleteCurrentUser_returns403_whenNoAuthTokenIsProvided() throws Exception {
       mockMvc.perform(delete(USER_URL))
-          .andExpect(status().isForbidden())
+          .andExpect(status().isUnauthorized())
           .andDo(print());
     }
 

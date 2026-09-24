@@ -33,3 +33,4 @@ build/
 .vscode/
 hs_**.log
 replay_**.log
+/bin/

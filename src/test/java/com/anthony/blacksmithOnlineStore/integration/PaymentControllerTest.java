@@ -50,7 +50,7 @@ public class PaymentControllerTest extends TestBase {
               .content(valueAsString))
           .andExpect(status().isCreated());
        Order updatedOrder = testHelper.findOrderById(order.getId());
-       assertEquals(OrderStatus.DELIVERED, updatedOrder.getStatus(),
+       assertEquals(OrderStatus.PAYMENT_APPROVED, updatedOrder.getStatus(),
            "The order status must be approved");
     }
   }

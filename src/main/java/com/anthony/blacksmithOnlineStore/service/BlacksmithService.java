@@ -5,7 +5,7 @@ import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRes
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
 import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +26,8 @@ public class BlacksmithService {
   }
 
   public Page<BlacksmithResponseDto> findByName(String name, Pageable pageable) {
-    Page<Blacksmith> blacksmiths = blacksmithRepository.findByNameContainingIgnoreCase(name, pageable);
+    Page<Blacksmith> blacksmiths = blacksmithRepository
+        .findByNameContainingIgnoreCase(name, pageable);
     return blacksmiths.map(BlacksmithResponseDto::fromEntity);
   }
 
