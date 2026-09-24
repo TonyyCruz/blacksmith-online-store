@@ -63,4 +63,8 @@ public class MockPayment {
     order.setStatus(OrderStatus.PAYMENT_APPROVED);
     return payment;
   }
+  
+  public static Payment payment() {
+  	return createPayment(MockOrder.orderWithItems(), creditCard());
+  }
 }
