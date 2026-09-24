@@ -123,4 +123,4 @@ VALUES
      12, 'CROSSBOW', 'UNCOMMON', 4, 28, 7,
         4.25, '2025-11-15', '2026-02-25', 2, false,
      'Tyrion o Perdido', 2, 0
-    ) ON CONFLICT DO NOTHING;
+    );
