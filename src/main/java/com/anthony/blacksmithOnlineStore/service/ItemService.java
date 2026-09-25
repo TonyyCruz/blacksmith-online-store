@@ -43,7 +43,6 @@ public class ItemService {
   @Transactional
   public ItemResponseDto update(Long id, ItemRequestDto dto) {
     itemPriceValidate(dto.basePrice(), dto.finalPrice());
-    Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());
     item.setMaterial(dto.material());

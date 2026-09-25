@@ -10,14 +10,15 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 import com.anthony.blacksmithOnlineStore.enums.PaymentMethod;
+import com.anthony.blacksmithOnlineStore.validations.payment.ValidPayment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
+@ValidPayment
 public record PaymentCreateDto(
   @Schema(description = "The payment method", example = "CREDIT_CARD")
-  @NotNull
   PaymentMethod method,
   @Schema(description = "The payment amount", example = "180.00")
   @NotNull

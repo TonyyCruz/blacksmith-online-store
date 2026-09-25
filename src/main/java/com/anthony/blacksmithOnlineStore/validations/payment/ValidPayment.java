@@ -1,22 +1,19 @@
-package com.anthony.blacksmithOnlineStore.validations.user;
+package com.anthony.blacksmithOnlineStore.validations.payment;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.FIELD})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = AgeValidator.class)
-public @interface Age {
-	
-  String message() default "Invalid age";
+@Constraint(validatedBy = ValidPaymentValidator.class)
+public @interface ValidPayment {
 
-  int min() default 18;
-
-  int max() default 300;
+  String message() default "Invalid payment";
 
   Class<?>[] groups() default {};
 
