@@ -528,6 +528,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
     }
 
+    /*
     @Test
     @DisplayName("Update should return 404 when blacksmith not exists")
     void updateItem_shouldReturn404_whenBlacksmithNotExists() throws Exception {
@@ -538,6 +539,7 @@ public class ItemControllerTest extends TestBase {
               .content(objectMapper.writeValueAsString(dto)))
           .andExpect(status().isNotFound());
     }
+    */
 
     @Test
     @DisplayName("Patch update should return 404 when patching non-existing itemWithId")

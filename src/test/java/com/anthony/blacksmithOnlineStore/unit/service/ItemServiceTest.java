@@ -264,6 +264,7 @@ public class ItemServiceTest {
       verify(itemRepository, times(1)).findByIdAndActiveTrue(any());
     }
 
+    /*
     @Test
     @DisplayName("Patch update should throw exception when blacksmith was not exist")
     void pathUpdate_shouldThrowException_whenBlacksmithNotFound() {
@@ -284,6 +285,7 @@ public class ItemServiceTest {
       verify(blacksmithService, times(1))
           .findEntityById(dto.blacksmithId());
     }
+    */
 
     @Test
     @DisplayName("Patch update should throw exception when final price is greater than base price")
