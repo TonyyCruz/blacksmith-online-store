@@ -85,6 +85,7 @@ public class OrderService {
     if (!order.getStatus().canBeReturned()) {
       throw new BusinessViolationException("Only delivered orders can be returned");
     }
+    order.setStatus(OrderStatus.RETURN_REQUESTED);
     eventPublisher.publishEvent(new ReturnRequestEvent(id, order.getOrderItems()));
   }
 
