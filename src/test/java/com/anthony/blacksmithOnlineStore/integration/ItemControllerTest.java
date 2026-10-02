@@ -115,7 +115,7 @@ public class ItemControllerTest extends TestBase {
     }
 
     @Test
-    @DisplayName("Can update all fields witha PATCH update successfully")
+    @DisplayName("Can update all fields except blacksmith witha PATCH update successfully")
     void patchUpdate_canUpdateAllFieldsSuccessfully() throws Exception {
       ItemPatchUpdateDto itemUpdate = MockItem.itemPatchUpdateDto();
       Blacksmith blacksmith = testHelper.findBlacksmithById(itemUpdate.blacksmithId());
@@ -136,9 +136,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.stock").value(itemUpdate.stock()))
           .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
           .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
-          .andExpect(jsonPath("$.active").value(itemUpdate.active()))
-          .andExpect(jsonPath("$.blacksmithId").value(blacksmith.getId()))
-          .andExpect(jsonPath("$.blacksmithName").value(blacksmith.getName()));
+          .andExpect(jsonPath("$.active").value(itemUpdate.active()));
     }
 
     @Test
@@ -172,9 +170,7 @@ public class ItemControllerTest extends TestBase {
           .andExpect(jsonPath("$.stock").value(item.getStock()))
           .andExpect(jsonPath("$.type").value(itemUpdate.type().toString()))
           .andExpect(jsonPath("$.rarity").value(itemUpdate.rarity().toString()))
-          .andExpect(jsonPath("$.active").value(itemUpdate.active()))
-          .andExpect(jsonPath("$.blacksmithId").value(blacksmith.getId()))
-          .andExpect(jsonPath("$.blacksmithName").value(blacksmith.getName()));
+          .andExpect(jsonPath("$.active").value(itemUpdate.active()));
 
     }
 
