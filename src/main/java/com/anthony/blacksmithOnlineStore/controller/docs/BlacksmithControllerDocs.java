@@ -64,4 +64,12 @@ public interface BlacksmithControllerDocs {
   @ApiUnauthorizedDoc
   @Operation(summary = "Find blacksmith by name")
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(Pageable pageable, String name);
+  
+  @ApiResponse(
+    responseCode = "201",
+    description = "Blacksmith deleted successfully")
+  @ApiNotFoundDoc
+  @ApiForbiddenDoc
+  @Operation(summary = "Delete a blacksmith, ADMIN only")
+  public ResponseEntity<Void> delete(Long id);
 }

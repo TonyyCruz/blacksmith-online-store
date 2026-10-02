@@ -3,8 +3,11 @@ package com.anthony.blacksmithOnlineStore.service;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithRequestDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.blacksmith.BlacksmithResponseDto;
 import com.anthony.blacksmithOnlineStore.entity.Blacksmith;
+import com.anthony.blacksmithOnlineStore.exceptions.BusinessViolationException;
 import com.anthony.blacksmithOnlineStore.exceptions.ResourceNotFoundException;
 import com.anthony.blacksmithOnlineStore.repository.BlacksmithRepository;
+import com.anthony.blacksmithOnlineStore.repository.ItemRepository;
+
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BlacksmithService {
-  private final BlacksmithRepository blacksmithRepository;
+	private final BlacksmithRepository blacksmithRepository;
+	private final ItemRepository itemRepository;
 
   public BlacksmithResponseDto findById(Long id) {
     return BlacksmithResponseDto.fromEntity(findEntityById(id));
@@ -59,4 +63,12 @@ public class BlacksmithService {
       throw new ResourceNotFoundException("Blacksmith not found with id: %d".formatted(id));
     }
   }
+
+	public void delete(Long id) {
+		existsVerify(id);
+		if (itemRepository.existsByCraftedBy(id)) {
+			throw new BusinessViolationException("You cannot delete a blacksmith associated with an item");
+		}
+		blacksmithRepository.deleteById(id);
+	}
 }

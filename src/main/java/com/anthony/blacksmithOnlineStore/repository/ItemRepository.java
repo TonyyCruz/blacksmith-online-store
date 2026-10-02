@@ -34,4 +34,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
   int incrementStockAndDecrementSoldQuantity(long id, int qty);
 
   Optional<Item> findByIdAndActiveTrue(Long id);
+
+	boolean existsByCraftedBy(Long blacksmithId);
 }

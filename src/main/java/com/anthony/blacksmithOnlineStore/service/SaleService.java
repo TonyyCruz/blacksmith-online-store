@@ -14,7 +14,7 @@ public class SaleService {
   private final ItemRepository itemRepository;
 
   public void performSale(long itemId, int qty) {
-    itemService.itemExistesVerifier(itemId);
+    itemService.itemExistsVerifier(itemId);
     int modifiedLines = itemRepository.decrementStockAndIncrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
       throw new InsufficientStockException("Item have no stock for this operation: " + itemId);
@@ -22,7 +22,7 @@ public class SaleService {
   }
 
   public void cancelSale(long itemId, int qty) {
-    itemService.itemExistesVerifier(itemId);
+    itemService.itemExistsVerifier(itemId);
     int modifiedLines = itemRepository.incrementStockAndDecrementSoldQuantity(itemId, qty);
     if (modifiedLines == 0) {
       throw new InsufficientStockException("Item have no sufficient sold for this operation: " + itemId);

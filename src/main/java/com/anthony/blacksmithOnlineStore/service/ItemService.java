@@ -105,11 +105,11 @@ public class ItemService {
   }
 
   public Item getReferenceById(Long id) {
-    itemExistesVerifier(id);
+    itemExistsVerifier(id);
     return itemRepository.getReferenceById(id);
   }
 
-  public void itemExistesVerifier(Long id) {
+  public void itemExistsVerifier(Long id) {
     if (!itemRepository.existsById(id))
       throw new ResourceNotFoundException("Item not found with id: %d".formatted(id));
   }

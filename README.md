@@ -175,9 +175,6 @@ Evento de pedido pago
 Serviço de entrega
         │
         ▼
-Entrega criada
-        │
-        ▼
 Simulação de processamento
         │
         ▼
