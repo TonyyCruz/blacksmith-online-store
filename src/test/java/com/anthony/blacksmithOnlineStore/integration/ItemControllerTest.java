@@ -118,7 +118,6 @@ public class ItemControllerTest extends TestBase {
     @DisplayName("Can update all fields except blacksmith witha PATCH update successfully")
     void patchUpdate_canUpdateAllFieldsSuccessfully() throws Exception {
       ItemPatchUpdateDto itemUpdate = MockItem.itemPatchUpdateDto();
-      Blacksmith blacksmith = testHelper.findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
       mockMvc.perform(patch(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)
@@ -150,9 +149,7 @@ public class ItemControllerTest extends TestBase {
           .type(item.getType())
           .rarity(Rarity.LEGENDARY)
           .active(!item.isActive())
-          .blacksmithId(2L)
           .build();
-      Blacksmith blacksmith = testHelper.findBlacksmithById(itemUpdate.blacksmithId());
       String valueAsString = objectMapper.writeValueAsString(itemUpdate);
       mockMvc.perform(patch(item_BASE_URL + "/{id}", item.getId())
               .header("Authorization", adminToken)

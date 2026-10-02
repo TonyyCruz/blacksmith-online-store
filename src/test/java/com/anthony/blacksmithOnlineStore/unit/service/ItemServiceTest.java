@@ -126,7 +126,6 @@ public class ItemServiceTest {
     void patchUpdate_shouldPatchItemSuccessfully_withValidData() {
       Long id = targetItem.getId();
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto();
-      Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
 
       when(authUser.isAdmin()).thenReturn(false);
       when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
@@ -284,8 +283,9 @@ public class ItemServiceTest {
     @DisplayName("Patch update should throw exception when final price is greater than base price")
     void pathUpdate_shouldThrowException_whenItemFinalPriceGreaterThanBasePrice() {
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder()
-          .basePrice(targetItem.getBasePrice()).finalPrice(targetItem.getBasePrice().add(BigDecimal.TEN))
-          .blacksmithId(null).build();
+          .basePrice(targetItem.getBasePrice())
+          .finalPrice(targetItem.getBasePrice().add(BigDecimal.TEN))
+          .build();
 
       when(authUser.isAdmin()).thenReturn(false);
       when(itemRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(targetItem));

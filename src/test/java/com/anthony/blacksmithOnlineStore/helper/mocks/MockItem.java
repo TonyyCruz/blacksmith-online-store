@@ -132,7 +132,6 @@ public class MockItem {
         .stock(5)
         .type(Type.DAGGER)
         .rarity(Rarity.RARE)
-        .blacksmithId(2L)
         .active(false)
         .build();
   }
