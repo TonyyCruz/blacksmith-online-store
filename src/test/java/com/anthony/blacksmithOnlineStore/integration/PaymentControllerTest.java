@@ -41,7 +41,7 @@ public class PaymentControllerTest extends TestBase {
 
     @Test
     @DisplayName("Can paid a valid order successfuly")
-    void approve_canPayAValidOrderSuccessfully() throws Exception {
+    void payment_canPayAValidOrderSuccessfully() throws Exception {
       String valueAsString = objectMapper.writeValueAsString(
           MockPayment.creditCard().toBuilder().amount(order.getTotal()).build());
       mockMvc.perform(post(ORDER_PAYMENT_URL, order.getId())
@@ -61,7 +61,7 @@ public class PaymentControllerTest extends TestBase {
 
     @Test
     @DisplayName("Throws 404 trying pay an order with invalid id")
-    void approve_throws404TryingPayAnOrderWithInvalidId() throws Exception {
+    void payment_throws404TryingPayAnOrderWithInvalidId() throws Exception {
       mockMvc.perform(post(ORDER_PAYMENT_URL, 9999999)
               .header("Authorization", userToken).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsString(MockPayment.creditCard())))
@@ -70,7 +70,7 @@ public class PaymentControllerTest extends TestBase {
 
     @Test
     @DisplayName("Cannot pay an order that does not belong to you and return status 403")
-    void approve_throws403TryingPayAnOrderThatIsNotYours() throws Exception {
+    void payment_throws403TryingPayAnOrderThatIsNotYours() throws Exception {
         User anotherUser = userRepository.save(MockUser.user());
         order.setUser(anotherUser);
       mockMvc.perform(post(ORDER_PAYMENT_URL, order.getId())

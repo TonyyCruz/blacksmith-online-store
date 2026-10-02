@@ -11,6 +11,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/blacksmith
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+  	  SPRING_PROFILES_ACTIVE: prod
     depends_on:
       postgres:
         condition: service_healthy
