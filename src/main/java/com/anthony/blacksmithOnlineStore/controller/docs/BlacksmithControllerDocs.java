@@ -70,6 +70,7 @@ public interface BlacksmithControllerDocs {
     description = "Blacksmith deleted successfully")
   @ApiNotFoundDoc
   @ApiForbiddenDoc
+  @ApiUnauthorizedDoc
   @Operation(summary = "Delete a blacksmith, ADMIN only")
   public ResponseEntity<Void> delete(Long id);
 }

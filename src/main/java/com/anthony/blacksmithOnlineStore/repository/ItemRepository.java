@@ -35,5 +35,5 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
 
   Optional<Item> findByIdAndActiveTrue(Long id);
 
-	boolean existsByCraftedBy(Long blacksmithId);
+	boolean existsByCraftedById(Long blacksmithId);
 }

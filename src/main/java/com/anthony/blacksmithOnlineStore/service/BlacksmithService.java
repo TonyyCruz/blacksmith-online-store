@@ -66,7 +66,7 @@ public class BlacksmithService {
 
 	public void delete(Long id) {
 		existsVerify(id);
-		if (itemRepository.existsByCraftedBy(id)) {
+		if (itemRepository.existsByCraftedById(id)) {
 			throw new BusinessViolationException("You cannot delete a blacksmith associated with an item");
 		}
 		blacksmithRepository.deleteById(id);
