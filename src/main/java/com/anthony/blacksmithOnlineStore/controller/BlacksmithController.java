@@ -75,7 +75,8 @@ public class BlacksmithController implements BlacksmithControllerDocs {
   }
 
 	@Override
-	@DeleteMapping("/id")
+	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		blacksmithService.delete(id);
 		return ResponseEntity.noContent().build();

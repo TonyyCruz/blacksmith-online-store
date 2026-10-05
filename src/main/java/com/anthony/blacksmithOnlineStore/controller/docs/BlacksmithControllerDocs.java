@@ -66,7 +66,7 @@ public interface BlacksmithControllerDocs {
   public ResponseEntity<Page<BlacksmithResponseDto>> findByName(Pageable pageable, String name);
   
   @ApiResponse(
-    responseCode = "201",
+    responseCode = "204",
     description = "Blacksmith deleted successfully")
   @ApiNotFoundDoc
   @ApiForbiddenDoc
