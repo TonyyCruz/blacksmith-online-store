@@ -120,7 +120,7 @@ public class BlacksmithControllerTest extends TestBase {
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content.length()").value(2));
     }
-    
+
     @Test
     @DisplayName("Admin can delete a existent blacksmiths by id successfully")
     void admin_canDeleteABlacksmithByIdSuccessfully() throws Exception {
@@ -206,6 +206,14 @@ public class BlacksmithControllerTest extends TestBase {
       mockMvc.perform(delete(BLACKSMITH_BASE_URL + "/{id}", blacksmith.getId())
               .header("Authorization", adminToken))
           .andExpect(status().is(422));
+    }
+    
+    @Test
+    @DisplayName("An unalthenticated cannot delete a blacksmiths and receive status code 401")
+    void unalthenticated_cannotDeleteABlacksmithAndReceiveStatus401() throws Exception {
+    	Blacksmith blacksmt = testHelper.saveBlacksmith(MockBlacksmith.blacksmith(null));
+      mockMvc.perform(delete(BLACKSMITH_BASE_URL + "/{id}", blacksmt.getId()))
+          .andExpect(status().isUnauthorized());
     }
   }
 }

@@ -41,6 +41,7 @@ public class BlacksmithService {
         blacksmithRepository.save(BlacksmithRequestDto.toEntity(dto)));
   }
 
+  @Transactional
   public BlacksmithResponseDto update(Long id, BlacksmithRequestDto dto) {
     Blacksmith blacksmith = getReferenceById(id);
     blacksmith.setName(dto.name());

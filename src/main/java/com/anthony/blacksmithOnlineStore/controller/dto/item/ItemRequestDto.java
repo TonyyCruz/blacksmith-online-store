@@ -8,6 +8,8 @@ import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -32,11 +34,13 @@ public record ItemRequestDto(
   Integer baseDefense,
   @Schema(description = "Base item price (decimal)", example = "84.50")
   @NotNull(message = "Base price must not be null") 
-  @Min(value = 0, message = "Base price must not be a negative number") 
+  @DecimalMin(value = "0.01", message = "Base price must be grater than 0")
+  @Digits(integer = 10, fraction = 2)
   BigDecimal basePrice,
   @Schema(description = "Final item price (decimal)", example = "82.00")
   @NotNull(message = "Final price must not be null") 
-  @Min(value = 0, message = "Final price must not be a negative number") 
+  @DecimalMin(value = "0.01", message = "Final price must be grater than 0") 
+  @Digits(integer = 10, fraction = 2)
   BigDecimal finalPrice,
   @Schema(description = "Item description", 
     example = "Thirsty for blood, this dagger is excellent for causing hemorrhage.")

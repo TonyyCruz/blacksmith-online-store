@@ -5,8 +5,8 @@ import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.CreditDt
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.DebitDto;
 import com.anthony.blacksmithOnlineStore.controller.dto.payment.methods.PixDTO;
 import com.anthony.blacksmithOnlineStore.entity.Payment;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -23,7 +23,8 @@ public record PaymentCreateDto(
   PaymentMethod method,
   @Schema(description = "The payment amount", example = "180.00")
   @NotNull(message = "Amount must not be null")
-  @DecimalMin(value = "0.01", message = "Amount must be a positive number")
+  @DecimalMin(value = "0.01", message = "Amount must be grater than 0")
+  @Digits(integer = 10, fraction = 2)
   BigDecimal amount,
   @Schema(description = "The debit payment method, only the payment method used must be inserted")
   DebitDto debit,
