@@ -545,7 +545,7 @@ Na raiz do projeto, execute:
 ```
 
 - Esse serviço irá inicializar dois containers chamados `blacksmith_api` e outro chamado 
-`blacksmith_api_db`.
+`blacksmith_postgres_db`.
 
 - A partir daqui você pode acessar o container via CLI ou abri-lo na sua IDE.
 
