@@ -1,5 +1,6 @@
 package com.anthony.blacksmithOnlineStore.integration;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -28,22 +29,18 @@ public class BlacksmithControllerTest extends TestBase {
   private DatabaseTestHelper testHelper;
   private Blacksmith blacksmith;
   private String userToken;
+  private String adminToken;
 
   @BeforeEach
   void setUp() {
     blacksmith = testHelper.findBlacksmithById(1L);
     userToken = performLogin(userLogin);
+    adminToken = performLogin(adminLogin);
   }
 
   @Nested
   @DisplayName("Happy Path")
   class BlacksmithControllerHappyPath {
-    private String adminToken;
-
-    @BeforeEach
-    void setUp() {
-      adminToken = performLogin(adminLogin);
-    }
 
     @Test
     @DisplayName("Can create blacksmith successfully")
@@ -81,7 +78,6 @@ public class BlacksmithControllerTest extends TestBase {
     @DisplayName("Can get blacksmith by ID successfully")
     void findById_canGetBlacksmithByIdSuccessfully() throws Exception {
       mockMvc.perform(get(BLACKSMITH_BASE_URL + "/{id}", blacksmith.getId())
-              .contentType(MediaType.APPLICATION_JSON)
               .header("Authorization", userToken))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.name").value(blacksmith.getName()))
@@ -123,6 +119,15 @@ public class BlacksmithControllerTest extends TestBase {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content.length()").value(2));
+    }
+
+    @Test
+    @DisplayName("Admin can delete a existent blacksmiths by id successfully")
+    void admin_canDeleteABlacksmithByIdSuccessfully() throws Exception {
+    	Blacksmith blacksmt = testHelper.saveBlacksmith(MockBlacksmith.blacksmith(null));
+      mockMvc.perform(delete(BLACKSMITH_BASE_URL + "/{id}", blacksmt.getId())
+              .header("Authorization", adminToken))
+          .andExpect(status().isNoContent());
     }
   }
 
@@ -184,6 +189,31 @@ public class BlacksmithControllerTest extends TestBase {
                 .content(valueAsString))
             .andExpect(status().isBadRequest());
       }
+    }
+    
+    @Test
+    @DisplayName("User cannot delete a blacksmiths and receive status code 403")
+    void user_cannotDeleteABlacksmithAndReceiveStatus403() throws Exception {
+    	Blacksmith blacksmt = testHelper.saveBlacksmith(MockBlacksmith.blacksmith(null));
+      mockMvc.perform(delete(BLACKSMITH_BASE_URL + "/{id}", blacksmt.getId())
+              .header("Authorization", userToken))
+          .andExpect(status().isForbidden());
+    }
+    
+    @Test
+    @DisplayName("Admin cannot delete a blacksmiths associated to an item and receive status code 422")
+    void admin_cannotDeleteABlacksmithAssociatedToAnItemAndReceiveStatus422() throws Exception {
+      mockMvc.perform(delete(BLACKSMITH_BASE_URL + "/{id}", blacksmith.getId())
+              .header("Authorization", adminToken))
+          .andExpect(status().is(422));
+    }
+    
+    @Test
+    @DisplayName("An unalthenticated cannot delete a blacksmiths and receive status code 401")
+    void unalthenticated_cannotDeleteABlacksmithAndReceiveStatus401() throws Exception {
+    	Blacksmith blacksmt = testHelper.saveBlacksmith(MockBlacksmith.blacksmith(null));
+      mockMvc.perform(delete(BLACKSMITH_BASE_URL + "/{id}", blacksmt.getId()))
+          .andExpect(status().isUnauthorized());
     }
   }
 }

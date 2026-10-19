@@ -43,7 +43,6 @@ public class ItemService {
   @Transactional
   public ItemResponseDto update(Long id, ItemRequestDto dto) {
     itemPriceValidate(dto.basePrice(), dto.finalPrice());
-    Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
     Item item = getReferenceById(id);
     item.setName(dto.name());
     item.setMaterial(dto.material());
@@ -57,21 +56,20 @@ public class ItemService {
     item.setType(dto.type());
     item.setRarity(dto.rarity());
     item.setActive(dto.active());
-    item.setCraftedBy(blacksmith);
-    item.setBlacksmithIdSnapshot(dto.blacksmithId());
-    item.setBlacksmithNameSnapshot(blacksmith.getName());
     return ItemResponseDto.fromEntity(item);
   }
 
   @Transactional
   public ItemResponseDto update(Long id, ItemPatchUpdateDto dto) {
     Item item = findEntityById(id);
+    /*
     if (dto.blacksmithId() != null) {
       Blacksmith blacksmith = blacksmithService.findEntityById(dto.blacksmithId());
       item.setCraftedBy(blacksmith);
       item.setBlacksmithIdSnapshot(blacksmith.getId());
       item.setBlacksmithNameSnapshot(blacksmith.getName());
     }
+    */
     itemUpdate.updateItemFromDto(dto, item);
     itemPriceValidate(item.getBasePrice(), item.getFinalPrice());
     return ItemResponseDto.fromEntity(item);
@@ -107,11 +105,11 @@ public class ItemService {
   }
 
   public Item getReferenceById(Long id) {
-    itemExistesVerifier(id);
+    itemExistsVerifier(id);
     return itemRepository.getReferenceById(id);
   }
 
-  public void itemExistesVerifier(Long id) {
+  public void itemExistsVerifier(Long id) {
     if (!itemRepository.existsById(id))
       throw new ResourceNotFoundException("Item not found with id: %d".formatted(id));
   }

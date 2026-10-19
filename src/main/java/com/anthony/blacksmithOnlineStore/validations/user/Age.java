@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = AgeValidator.class)
 public @interface Age {
-
-  String message() default "Idade inválida";
+	
+  String message() default "Invalid age";
 
   int min() default 18;
 

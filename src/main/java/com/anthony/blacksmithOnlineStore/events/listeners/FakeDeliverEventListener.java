@@ -31,12 +31,16 @@ public class FakeDeliverEventListener {
     if (order.getDeliveredAt() != null) {
       throw new BusinessViolationException("This order has already been delivered");
     }
+    simulateProcessingTime(3000L);
     order.setStatus(OrderStatus.SEPARATING);
+    simulateProcessingTime(6000L);
     order.setStatus(OrderStatus.DISPATCHED);
+    simulateProcessingTime(5000L);
     order.setStatus(OrderStatus.IN_TRANSIT);
+    simulateProcessingTime(8000L);
     order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
+    simulateProcessingTime(5000L);
     order.setStatus(OrderStatus.DELIVERED);
-    simulateProcessingTime();
     order.setDeliveredAt(LocalDateTime.now());
   }
 
@@ -45,17 +49,16 @@ public class FakeDeliverEventListener {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void returnRequest(ReturnRequestEvent returnEvent) {
     Order order = orderService.findEntityById(returnEvent.orderId());
-    if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-      throw new BusinessViolationException("A not delivered order cannot be returned");
+    if (!OrderStatus.RETURN_REQUESTED.equals(order.getStatus())) {
+      throw new BusinessViolationException("Only return request order can be returned");
     }
-    order.setStatus(OrderStatus.RETURN_REQUESTED);
+    simulateProcessingTime(8000L);
     order.setStatus(OrderStatus.RETURNED);
-    simulateProcessingTime();
   }
 
-  private void simulateProcessingTime() {
+  private void simulateProcessingTime(Long miliSec) {
     try {
-      Thread.sleep(10000); // Simulate some processing time
+      Thread.sleep(miliSec); // Simulate some processing time
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }

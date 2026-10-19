@@ -55,10 +55,6 @@ public record ItemPatchUpdateDto(
     @Schema(description = "The item rarity. Optional. If omitted, the current value is preserved",
       example = "EPIC")
     Rarity rarity,
-    @Schema(description = "The blacksmith id (integer) Optional. If omitted, the current value is preserved",
-      example = "1")
-    @Min(value = 1, message = "Blacksmith id must be a positive number greater than 0")
-    Long blacksmithId,
     @Schema(description = "If the item is active or not. Only admin can access unactive items"
       + "Optional. If omitted, the current value is preserved",
         example = "true")

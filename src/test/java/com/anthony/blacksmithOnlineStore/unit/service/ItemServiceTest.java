@@ -95,17 +95,13 @@ public class ItemServiceTest {
     void updateItem_shouldUpdateItemSuccessfully_withValidData() {
       Long id = targetItem.getId();
       ItemRequestDto dto = MockItem.itemRequestDto();
-      Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
 
       when(itemRepository.existsById(id)).thenReturn(true);
       when(itemRepository.getReferenceById(id)).thenReturn(targetItem);
-      when(blacksmithService.findEntityById(dto.blacksmithId())).thenReturn(blacksmith);
 
       ItemResponseDto response = itemService.update(id, dto);
 
       assertEquals(dto.name(), response.name(), "Name must be equal to receive in dto");
-      assertEquals(dto.blacksmithId(), response.blacksmithId(),
-          "Blacksmith Id must be equal to receive in dto");
       assertEquals(dto.baseDefense(), response.baseDefense(),
           "BaseDefense must be equal to receive in dto");
       assertEquals(dto.baseDamage(), response.baseDamage(),
@@ -123,7 +119,6 @@ public class ItemServiceTest {
       assertEquals(dto.type(), response.type(), "Type must be equal to receive in dto");
       verify(itemRepository, times(1)).existsById(id);
       verify(itemRepository, times(1)).getReferenceById(id);
-      verify(blacksmithService, times(1)).findEntityById(dto.blacksmithId());
     }
 
     @Test
@@ -131,13 +126,10 @@ public class ItemServiceTest {
     void patchUpdate_shouldPatchItemSuccessfully_withValidData() {
       Long id = targetItem.getId();
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto();
-      Blacksmith blacksmith = MockBlacksmith.blacksmith(dto.blacksmithId());
 
       when(authUser.isAdmin()).thenReturn(false);
       when(itemRepository.findByIdAndActiveTrue(targetItem.getId()))
           .thenReturn(Optional.of(targetItem));
-      when(blacksmithService.findEntityById(blacksmith.getId())).thenReturn(blacksmith);
-      doNothing().when(itemUpdate).updateItemFromDto(dto, targetItem);
 
       ItemResponseDto response = itemService.update(id, dto);
 
@@ -145,8 +137,6 @@ public class ItemServiceTest {
       verify(itemUpdate, times(1)).updateItemFromDto(dto, targetItem);
       verify(itemRepository, times(1))
           .findByIdAndActiveTrue(targetItem.getId());
-      verify(blacksmithService, times(1))
-          .findEntityById(dto.blacksmithId());
     }
 
     @Test
@@ -231,6 +221,7 @@ public class ItemServiceTest {
           "Update item must throw an exception when final price is greater than base price");
     }
 
+    /*
     @Test
     @DisplayName("Update should throw exception when blacksmith does not exist")
     void updateItem_shouldThrowException_whenBlacksmithNotFound() {
@@ -243,6 +234,7 @@ public class ItemServiceTest {
           "Update item must throw an exception when blacksmith was not found");
       verify(blacksmithService, times(1)).findEntityById(dto.blacksmithId());
     }
+    */
     
     @Test
     @DisplayName("Update should throw exception when item does not exist")
@@ -264,6 +256,7 @@ public class ItemServiceTest {
       verify(itemRepository, times(1)).findByIdAndActiveTrue(any());
     }
 
+    /*
     @Test
     @DisplayName("Patch update should throw exception when blacksmith was not exist")
     void pathUpdate_shouldThrowException_whenBlacksmithNotFound() {
@@ -284,13 +277,15 @@ public class ItemServiceTest {
       verify(blacksmithService, times(1))
           .findEntityById(dto.blacksmithId());
     }
+    */
 
     @Test
     @DisplayName("Patch update should throw exception when final price is greater than base price")
     void pathUpdate_shouldThrowException_whenItemFinalPriceGreaterThanBasePrice() {
       ItemPatchUpdateDto dto = MockItem.itemPatchUpdateDto().toBuilder()
-          .basePrice(targetItem.getBasePrice()).finalPrice(targetItem.getBasePrice().add(BigDecimal.TEN))
-          .blacksmithId(null).build();
+          .basePrice(targetItem.getBasePrice())
+          .finalPrice(targetItem.getBasePrice().add(BigDecimal.TEN))
+          .build();
 
       when(authUser.isAdmin()).thenReturn(false);
       when(itemRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(targetItem));

@@ -47,7 +47,7 @@ public class RatingService {
   }
 
   public Page<RatingResponseDto> getRatingsFromItemId(Long itemId, Pageable pageable) {
-    itemService.itemExistesVerifier(itemId);
+    itemService.itemExistsVerifier(itemId);
     Page<Rating> ratings = ratingRepository.findAllByReviewedItemId(itemId, pageable);
     return ratings.map(RatingResponseDto::fromEntity);
   }

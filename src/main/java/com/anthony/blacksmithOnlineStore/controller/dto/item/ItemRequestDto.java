@@ -8,6 +8,8 @@ import com.anthony.blacksmithOnlineStore.enums.Rarity;
 import com.anthony.blacksmithOnlineStore.enums.Type;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,31 +18,41 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 public record ItemRequestDto(
   @Schema(description = "The item name", example = "Spark")
+  @NotNull(message = "Name must not be null")
   @Size(min = 2, message = "Name must have at lest 2 characters") 
   String name,
   @Schema(description = "The Item material", example = "IRON")
   @NotNull(message = "Material must not be null") 
   Material material,
   @Schema(description = "Base item damage (integer)", example = "1")
+  @NotNull(message = "Base damage must not be null") 
   @Min(value = 0, message = "Base damage cannot be less than 0") 
   Integer baseDamage,
   @Schema(description = "Base item defense (integer)", example = "0")
+  @NotNull(message = "Base defense must not be null") 
   @Min(value = 0, message = "Base defense cannot be less than 0") 
   Integer baseDefense,
   @Schema(description = "Base item price (decimal)", example = "84.50")
-  @Min(value = 0, message = "Base price must not be a negative number") 
+  @NotNull(message = "Base price must not be null") 
+  @DecimalMin(value = "0.01", message = "Base price must be grater than 0")
+  @Digits(integer = 10, fraction = 2)
   BigDecimal basePrice,
   @Schema(description = "Final item price (decimal)", example = "82.00")
-  @Min(value = 0, message = "Final price must not be a negative number") 
+  @NotNull(message = "Final price must not be null") 
+  @DecimalMin(value = "0.01", message = "Final price must be grater than 0") 
+  @Digits(integer = 10, fraction = 2)
   BigDecimal finalPrice,
   @Schema(description = "Item description", 
     example = "Thirsty for blood, this dagger is excellent for causing hemorrhage.")
+  @NotNull(message = "Description must not be null") 
   @Size(min = 10, message = "Description must have at lest 10 characters") 
   String description,
   @Schema(description = "Item weight (decimal)", example = "3.40")
+  @NotNull(message = "Weight must not be null") 
   @Min(value = 0, message = "Weight must not be a negative number") 
   Double weight,
   @Schema(description = "Item stock (integer)", example = "5")
+  @NotNull(message = "Stock must not be null") 
   @Min(value = 0, message = "Stock must not be a negative number") 
   Integer stock,
   @Schema(description = "The item type", example = "DAGGER")

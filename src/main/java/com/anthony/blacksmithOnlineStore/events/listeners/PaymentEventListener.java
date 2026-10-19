@@ -1,5 +1,7 @@
 package com.anthony.blacksmithOnlineStore.events.listeners;
 
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +28,14 @@ public class PaymentEventListener {
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Retryable(
+      retryFor = Exception.class, // PRECISA SER AJUSTADO AO ERRO DO PROCESSO QUANDO HOUVER
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 2000)
+  )
   public void refundPayment(RefundRequestEvent refoundEvent) {
     // REFUND PROCESS
-    Order order = orderService.findSelfOrderEntityById(refoundEvent.orderId());
+    Order order = orderService.findEntityById(refoundEvent.orderId());
     order.setStatus(OrderStatus.REFUNDED);
     if (order.getPayment() == null) throw new BusinessViolationException("This order have no payment");
     Payment payment = paymentService.findEntityById(order.getPayment().getId());
@@ -39,7 +46,7 @@ public class PaymentEventListener {
   @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void paymentRefused(PaymentRefusedEvent refusedEvent) {
-    Order order = orderService.findSelfOrderEntityById(refusedEvent.OrderId());
+    Order order = orderService.findEntityById(refusedEvent.OrderId());
     if (!OrderStatus.PAYMENT_REJECTED.equals(order.getStatus())) {
       order.setStatus(OrderStatus.PAYMENT_REJECTED);
     }
